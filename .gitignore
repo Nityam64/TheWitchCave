@@ -3,3 +3,5 @@ serviceAccountKey.json
 __pycache__/
 node_modules/
 .env
+dist/
+dist
