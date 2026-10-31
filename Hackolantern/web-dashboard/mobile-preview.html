@@ -803,8 +803,14 @@
   </div>
 
   <script>
-    const host = window.location.hostname || "localhost";
-    let serverBase = localStorage.getItem("hexley_mobile_server") || `http://${host}:8000`;
+    const currentHost = window.location.hostname || "localhost";
+    let serverBase = localStorage.getItem("hexley_mobile_server");
+
+    // Auto-detect & auto-correct host for mobile devices
+    if (!serverBase || (currentHost !== "localhost" && currentHost !== "127.0.0.1" && (serverBase.includes("localhost") || serverBase.includes("127.0.0.1")))) {
+      serverBase = `http://${currentHost}:8000`;
+      localStorage.setItem("hexley_mobile_server", serverBase);
+    }
 
     function updateClock() {
       const now = new Date();
@@ -975,9 +981,6 @@
             <button class="switch-btn" style="margin-top:14px; padding:6px 12px;" onclick="openSettingsModal()">Change Host IP</button>
           </div>`;
       }
-            <button class="switch-btn" style="margin-top:14px; padding:6px 12px;" onclick="openSettingsModal()">Change Host IP</button>
-          </div>`;
-      }
     }
 
     async function reportMissing(itemId) {
@@ -1058,6 +1061,17 @@
         if (pill) pill.textContent = `View All ▾`;
       }
     };
+
+    window.fetchPantry = fetchPantry;
+    window.reportMissing = reportMissing;
+    window.openAddModal = openAddModal;
+    window.closeAddModal = closeAddModal;
+    window.handleAddSubmit = handleAddSubmit;
+    window.openSettingsModal = openSettingsModal;
+    window.closeSettingsModal = closeSettingsModal;
+    window.setPreset = setPreset;
+    window.saveSettings = saveSettings;
+    window.showToast = showToast;
 
     // Initial load
     fetchPantry();
