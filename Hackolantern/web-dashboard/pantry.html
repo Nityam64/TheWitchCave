@@ -348,18 +348,19 @@
       .items { grid-template-columns: 1fr; }
     }
 
-    /* Item labels: paper cards with a double border */
+    /* Item labels: paper cards with subtle antique ink border */
     .item {
       position: relative;
       background: var(--parchment);
       color: var(--ink);
-      border: 2px solid var(--pumpkin);
-      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin);
+      border: 1px solid rgba(43, 29, 20, 0.22);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      border-radius: 4px;
       padding: 16px;
       text-align: left;
       font: inherit;
       cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
       width: 100%;
       box-sizing: border-box;
     }
@@ -367,8 +368,9 @@
     .item .stock { display: block; color: #2f5e2a; font-weight: 600; }
     .item .price { display: block; color: #8a4a1c; }
     .item:hover:not(:disabled) {
-      transform: translateY(-4px) rotate(-0.4deg);
-      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin), 0 10px 28px rgba(138, 79, 209, 0.4);
+      transform: translateY(-2px);
+      border-color: rgba(43, 29, 20, 0.42);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
     }
     .item:disabled { opacity: 0.6; cursor: not-allowed; }
 
@@ -400,24 +402,23 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(43, 29, 20, 0.05);
-      border: 1px dashed var(--pumpkin);
+      background: rgba(43, 29, 20, 0.04);
+      border: 1px solid rgba(43, 29, 20, 0.15);
       padding: 6px 10px;
-      border-radius: 2px;
+      border-radius: 3px;
     }
     .stock-input-wrap {
       display: flex;
       align-items: center;
       gap: 0;
-      background: #fbf5e6;
-      border: 2px solid var(--pumpkin);
-      box-shadow: inset 0 0 0 1px var(--parchment);
-      border-radius: 2px;
+      background: transparent;
+      border: 1px solid rgba(43, 29, 20, 0.24);
+      border-radius: 3px;
       overflow: hidden;
     }
     .stock-btn-stepper {
-      background: #181122;
-      color: var(--gold);
+      background: rgba(43, 29, 20, 0.08);
+      color: var(--ink);
       border: none;
       width: 28px;
       height: 32px;
@@ -430,23 +431,24 @@
       transition: background 0.15s, color 0.15s;
     }
     .stock-btn-stepper:hover {
-      background: var(--pumpkin);
+      background: rgba(43, 29, 20, 0.18);
       color: var(--ink);
     }
     .stock-btn-stepper:active {
-      transform: scale(0.92);
+      transform: scale(0.94);
     }
     .stock-num-input {
-      width: 60px;
+      width: 56px;
       height: 32px;
       border: none;
-      border-left: 1px solid var(--pumpkin);
-      border-right: 1px solid var(--pumpkin);
-      background: transparent;
+      border-left: 1px solid rgba(43, 29, 20, 0.16);
+      border-right: 1px solid rgba(43, 29, 20, 0.16);
+      background: transparent !important;
       color: var(--ink);
-      font-family: "IM Fell English", serif;
-      font-size: 18px;
-      font-weight: 600;
+      font-family: "IM Fell English", Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
       text-align: center;
       padding: 0 4px;
       box-sizing: border-box;
@@ -459,18 +461,21 @@
     }
     .stock-num-input:focus {
       outline: none;
-      background: #ffffff;
-      box-shadow: inset 0 0 6px rgba(255, 117, 24, 0.35);
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .stock-num-input::placeholder {
+      color: transparent;
     }
     .stock-apply-btn {
-      background: #181122;
+      background: #2b1d14;
       color: var(--parchment);
-      border: 2px solid var(--pumpkin);
-      border-radius: 2px;
+      border: 1px solid #2b1d14;
+      border-radius: 3px;
       padding: 6px 14px;
-      font-family: "Crimson Text", Georgia, serif;
-      font-size: 14.5px;
-      font-weight: 600;
+      font-family: "IM Fell English", serif;
+      font-size: 15px;
+      font-weight: normal;
       cursor: pointer;
       transition: all 0.2s ease;
       white-space: nowrap;
@@ -479,37 +484,43 @@
       gap: 5px;
     }
     .stock-apply-btn:hover {
-      background: var(--pumpkin);
-      color: var(--ink);
+      background: #4a3324;
+      border-color: #4a3324;
+      color: #fff;
       transform: translateY(-1px);
-      box-shadow: 0 4px 14px rgba(255, 117, 24, 0.4);
+      box-shadow: 0 3px 10px rgba(43, 29, 20, 0.3);
     }
     .stock-apply-btn:active {
       transform: scale(0.96);
     }
 
-    /* Red "Sold out" stamp */
+    /* Muted antique stamps (no harsh red boundaries) */
     .stamp {
       display: none;
       position: absolute;
       top: 12px;
       right: 10px;
-      transform: rotate(10deg);
-      border: 2px solid #9b1c1c;
-      color: #9b1c1c;
-      padding: 0 8px;
+      transform: rotate(6deg);
+      border: 1px solid #781e1e;
+      color: #781e1e;
+      background: rgba(120, 30, 30, 0.05);
+      border-radius: 2px;
+      padding: 1px 8px;
       font-family: "IM Fell English", serif;
-      font-size: 17px;
+      font-size: 16px;
+      letter-spacing: 0.5px;
     }
     .item:disabled .stamp { display: block; }
     .stamp-badge {
       display: inline-block;
-      border: 1px solid #9b1c1c;
-      color: #9b1c1c;
-      padding: 1px 6px;
+      border: 1px solid rgba(138, 74, 28, 0.45);
+      color: #8a4a1c;
+      background: rgba(138, 74, 28, 0.06);
+      border-radius: 2px;
+      padding: 1px 7px;
       font-family: "IM Fell English", serif;
-      font-size: 14px;
-      transform: rotate(-3deg);
+      font-size: 13px;
+      transform: rotate(-2deg);
       margin-left: 6px;
     }
 
@@ -737,12 +748,22 @@
 
     /* Search input inside panel */
     .search-box {
-      background: #fbf5e6;
-      border: 1px solid var(--pumpkin);
-      color: var(--ink);
+      background: rgba(236, 220, 188, 0.08);
+      border: 1px solid rgba(242, 178, 92, 0.35);
+      color: var(--parchment);
       font: inherit;
       padding: 8px 12px;
+      border-radius: 3px;
       width: 240px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .search-box::placeholder {
+      color: rgba(236, 220, 188, 0.5);
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(236, 220, 188, 0.12);
     }
 
     /* Supplier Card */
@@ -1032,7 +1053,7 @@
         </div>
 
         <!-- Featured Reagent Ledger Card matching Screenshot -->
-        <div id="fcFeaturedCard" style="background:var(--parchment); color:var(--ink); border:2px solid var(--pumpkin); box-shadow:inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin); padding:18px 20px; margin-bottom:20px; border-radius:2px;"></div>
+        <div id="fcFeaturedCard" style="background:var(--parchment); color:var(--ink); border:1px solid rgba(43, 29, 20, 0.22); box-shadow:0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45); padding:18px 20px; margin-bottom:20px; border-radius:4px;"></div>
 
         <div id="chartSvgWrapper" style="overflow-x:auto; background:#fbf5e6; border:1px solid var(--pumpkin); padding:16px; border-radius:2px;"></div>
       </div>
@@ -1259,7 +1280,7 @@
         if (it.stock <= it.minStock) {
           shortageCount++;
           var isSoldOut = it.stock <= 0;
-          var statusStamp = isSoldOut ? '<span class="stamp-badge">SOLD OUT</span>' : '<span class="stamp-badge" style="color:#d97706; border-color:#d97706;">LOW STOCK</span>';
+          var statusStamp = isSoldOut ? '<span class="stamp-badge" style="border-color:#781e1e; color:#781e1e; background:rgba(120,30,30,0.06);">SOLD OUT</span>' : '<span class="stamp-badge">LOW STOCK</span>';
           alertBox.innerHTML +=
             '<div style="background:var(--parchment); color:var(--ink); border:1px solid var(--pumpkin); padding:12px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">' +
             '<div>' +
@@ -1327,7 +1348,7 @@
         grid.innerHTML +=
           '<div class="item" style="cursor:default; animation: cardDropIn 0.3s ease-out ' + (i * 0.05) + 's backwards;">' +
           '<strong>' + it.icon + ' ' + it.name + festivalTag + '</strong>' +
-          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : (isLow ? '<span class="stamp-badge" style="color:#d97706; border-color:#d97706; position:absolute; top:12px; right:12px;">LOW STOCK</span>' : '')) +
+          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : (isLow ? '<span class="stamp-badge" style="position:absolute; top:12px; right:12px;">LOW STOCK</span>' : '')) +
           '<div class="potion-gauge" title="Pantry Fill Level: ' + it.stock + '/' + (it.minStock * 2) + ' ' + it.unit + '">' +
           '<div class="' + gaugeClass + '" style="width:' + fillPct + '%;"></div>' +
           '</div>' +
