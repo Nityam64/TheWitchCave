@@ -2,12 +2,7 @@
 import { dbService } from "./db-service.js";
 import { calculateForecastForItem, generateDailyHistoryAndForecast } from "./forecast.js";
 import { detectUnusualConsumption } from "./alerts.js";
-import {
-  getActiveFirebaseConfig,
-  saveActiveFirebaseConfig,
-  clearActiveFirebaseConfig,
-  isConfigPlaceholder
-} from "./firebase-config.js";
+// Local-only mode: no Firebase imports needed.
 
 // Global App State
 export const state = {
@@ -64,45 +59,12 @@ function updateDbStatusUI(res) {
   const badge = document.getElementById("db-status-badge");
   const icon = document.getElementById("db-status-icon");
   const text = document.getElementById("db-status-text");
-  const info = document.getElementById("firebase-connection-info");
 
   if (!badge) return;
 
-  if (res.status === "connected") {
-    badge.className = "db-status-badge status-connected";
-    icon.textContent = "🔥";
-    text.textContent = "Firestore Connected";
-    if (info) {
-      info.innerHTML = `
-        <div style="background:rgba(16,185,129,0.15); border:1px solid #10b981; border-radius:8px; padding:12px; color:#6ee7b7; font-size:0.85rem;">
-          <strong>Cloud Firestore Live!</strong><br>
-          Connected to Firebase Project: <code>${dbService.firestore?.app?.options?.projectId || "Active"}</code>
-        </div>
-      `;
-    }
-  } else if (res.status === "demo") {
-    badge.className = "db-status-badge status-demo";
-    icon.textContent = "⚙️";
-    text.textContent = "Demo Storage (Offline)";
-    if (info) {
-      info.innerHTML = `
-        <div style="background:rgba(245,158,11,0.15); border:1px solid #f59e0b; border-radius:8px; padding:12px; color:#fcd34d; font-size:0.85rem;">
-          <strong>Running in Demo Mode:</strong> Firebase credentials are placeholders. Data is stored safely in browser LocalStorage. Paste your web config below to connect Firestore.
-        </div>
-      `;
-    }
-  } else {
-    badge.className = "db-status-badge status-error";
-    icon.textContent = "⚠️";
-    text.textContent = "Connection Error";
-    if (info) {
-      info.innerHTML = `
-        <div style="background:rgba(244,63,94,0.15); border:1px solid #f43f5e; border-radius:8px; padding:12px; color:#fda4af; font-size:0.85rem;">
-          <strong>Error connecting to Firestore:</strong> ${res.message || "Unknown error"}. Fell back to local storage.
-        </div>
-      `;
-    }
-  }
+  badge.className = "db-status-badge status-demo";
+  icon.textContent = "🧪";
+  text.textContent = "Local Storage";
 }
 
 // --- DATA LOADING ---
@@ -217,7 +179,7 @@ function setupEventListeners() {
   document.getElementById("dash-btn-sale")?.addEventListener("click", () => navigateTo("sale"));
   document.getElementById("dash-btn-add")?.addEventListener("click", () => openItemModal());
   document.getElementById("inv-btn-add")?.addEventListener("click", () => openItemModal());
-  document.getElementById("db-status-badge")?.addEventListener("click", () => navigateTo("suppliers"));
+  // Local storage badge — clicking just shows a friendly info toast
 
   // Inventory Filters
   document.getElementById("inv-search")?.addEventListener("input", renderInventory);
@@ -238,10 +200,6 @@ function setupEventListeners() {
   document.getElementById("btn-add-supplier")?.addEventListener("click", openSupplierModal);
   document.getElementById("btn-open-adjust-modal")?.addEventListener("click", openAdjustModal);
   document.getElementById("btn-reset-sample-data")?.addEventListener("click", handleResetSampleData);
-
-  // Firebase connect actions
-  document.getElementById("btn-save-firebase-config")?.addEventListener("click", handleSaveFirebaseConfig);
-  document.getElementById("btn-clear-firebase-config")?.addEventListener("click", handleClearFirebaseConfig);
 
   // Forecast item selector
   document.getElementById("forecast-item-select")?.addEventListener("change", (e) => {
@@ -1032,17 +990,6 @@ function renderSuppliersPage() {
       </div>
     `;
   }).join("");
-
-  // Firebase Config text area prefill
-  const { config, isCustom } = getActiveFirebaseConfig();
-  const textarea = document.getElementById("firebase-config-input");
-  if (textarea) {
-    if (!textarea.value) {
-      textarea.value = JSON.stringify(config, null, 2);
-    }
-    textarea.scrollTop = 0;
-    textarea.scrollLeft = 0;
-  }
 }
 
 window.hexleyDeliverFromSupplier = (supplierId) => {
@@ -1179,35 +1126,6 @@ async function handleResetSampleData() {
     await loadAllData();
     renderCurrentPage();
   }
-}
-
-// Firebase configuration saves
-async function handleSaveFirebaseConfig() {
-  const raw = document.getElementById("firebase-config-input").value.trim();
-  try {
-    const parsed = JSON.parse(raw);
-    if (isConfigPlaceholder(parsed)) {
-      showToast("Provided config contains placeholder values (e.g. YOUR_PROJECT_ID). Please provide your live Firebase project credentials.", "error");
-      return;
-    }
-    saveActiveFirebaseConfig(parsed);
-    showToast("Firebase configuration saved! Reconnecting...", "info");
-    const res = await dbService.initialize();
-    updateDbStatusUI(res);
-    await loadAllData();
-    renderCurrentPage();
-  } catch (err) {
-    showToast("Invalid JSON Firebase config: " + err.message, "error");
-  }
-}
-
-async function handleClearFirebaseConfig() {
-  clearActiveFirebaseConfig();
-  showToast("Custom credentials cleared. Reverting to Demo mode.", "info");
-  const res = await dbService.initialize();
-  updateDbStatusUI(res);
-  await loadAllData();
-  renderCurrentPage();
 }
 
 // --- UTILITY HELPERS ---

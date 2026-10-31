@@ -1,11 +1,6 @@
-// js/db-service.js - Database Service for Hexley's Potion Pantry
-// Supports Cloud Firestore (v10 Modular SDK via CDN) and Local Storage demo fallback.
-// Never pretends to be connected if credentials are placeholders.
+// js/db-service.js - Local Storage Database for Hexley's Potion Pantry
+// No Firebase. All data lives in browser LocalStorage and is seeded from sample-data.js on first visit.
 
-import {
-  getActiveFirebaseConfig,
-  isConfigPlaceholder
-} from "./firebase-config.js";
 import {
   SAMPLE_INVENTORY,
   SAMPLE_SUPPLIERS,
@@ -16,78 +11,15 @@ import {
 
 class DatabaseService {
   constructor() {
-    this.status = "uninitialized"; // 'connected' | 'demo' | 'error' | 'offline'
-    this.errorMessage = "";
-    this.firestore = null;
-    this.auth = null;
-    this.user = null;
-    this.firebaseModules = null;
+    this.status = "demo";
   }
 
-  async initialize() {
-    const { config } = getActiveFirebaseConfig();
-
-    if (isConfigPlaceholder(config)) {
-      this.status = "demo";
-      this.initLocalStore();
-      return { status: "demo", message: "Running in Demo Mode. Firebase credentials not configured." };
-    }
-
-    try {
-      // Dynamic import from official Firebase v10 CDN
-      const appMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
-      const firestoreMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
-      const authMod = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
-
-      this.firebaseModules = { ...firestoreMod, ...authMod };
-      const app = appMod.initializeApp(config);
-      this.firestore = firestoreMod.getFirestore(app);
-      this.auth = authMod.getAuth(app);
-
-      // Sign in anonymously to authenticate the session for Firestore rules
-      let authWarning = "";
-      try {
-        const userCred = await authMod.signInAnonymously(this.auth);
-        this.user = userCred.user;
-      } catch (authErr) {
-        console.warn("Anonymous auth warning:", authErr.code, authErr.message);
-        if (authErr.code === "auth/operation-not-allowed") {
-          authWarning = "Anonymous Sign-In is disabled. Enable it in Firebase Console > Authentication > Sign-in method.";
-        } else {
-          authWarning = authErr.message;
-        }
-      }
-
-      // Quick connectivity probe on settings collection
-      try {
-        await firestoreMod.getDocs(firestoreMod.collection(this.firestore, "settings"));
-      } catch (probeErr) {
-        console.warn("Firestore probe warning:", probeErr.code, probeErr.message);
-        if (probeErr.code === "permission-denied") {
-          const detail = authWarning ? ` (${authWarning})` : " Check your Firestore Security Rules.";
-          throw new Error("Firestore permission denied." + detail);
-        } else if (probeErr.code === "not-found" || (probeErr.message && probeErr.message.includes("does not exist"))) {
-          throw new Error("Firestore database does not exist yet. Create it under Firebase Console > Build > Firestore Database.");
-        } else {
-          throw probeErr;
-        }
-      }
-
-      this.status = "connected";
-      return { 
-        status: "connected", 
-        message: `Connected to Cloud Firestore (${config.projectId})` + (authWarning ? ` [Auth warning: ${authWarning}]` : "")
-      };
-    } catch (err) {
-      console.error("Firestore Init Error:", err);
-      this.status = "error";
-      this.errorMessage = err.message || "Failed to connect to Firebase Firestore";
-      this.initLocalStore(); // Fallback so app remains functional
-      return { status: "error", message: this.errorMessage };
-    }
+  initialize() {
+    this.initLocalStore();
+    return Promise.resolve({ status: "demo", message: "Running in Local Storage mode. All data saved in this browser." });
   }
 
-  // --- LOCAL STORE FALLBACK HELPERS ---
+  // Seed sample data into LocalStorage on first load (skips if already populated)
   initLocalStore() {
     if (!localStorage.getItem("hexley_inventory")) {
       localStorage.setItem("hexley_inventory", JSON.stringify(SAMPLE_INVENTORY));
@@ -114,46 +46,12 @@ class DatabaseService {
     localStorage.setItem("hexley_settings", JSON.stringify(SAMPLE_SETTINGS));
   }
 
-  // --- INVENTORY API ---
+  // --- INVENTORY ---
   async getInventory() {
-    if (this.status === "connected" && this.firestore) {
-      const { collection, getDocs, doc, setDoc } = this.firebaseModules;
-      const snap = await getDocs(collection(this.firestore, "inventoryItems"));
-      if (snap.empty) {
-        try {
-          for (const it of SAMPLE_INVENTORY) {
-            await setDoc(doc(this.firestore, "inventoryItems", it.id), it);
-          }
-          return SAMPLE_INVENTORY;
-        } catch (seedErr) {
-          console.warn("Auto-seed inventory warning:", seedErr);
-        }
-      }
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
     return JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
   }
 
   async saveInventoryItem(item) {
-    if (this.status === "connected" && this.firestore) {
-      const { collection, doc, setDoc, addDoc, serverTimestamp } = this.firebaseModules;
-      const now = new Date().toISOString();
-      const payload = {
-        ...item,
-        updatedAt: now,
-        serverTime: serverTimestamp ? serverTimestamp() : now
-      };
-      if (item.id) {
-        await setDoc(doc(this.firestore, "inventoryItems", item.id), payload, { merge: true });
-        return item.id;
-      } else {
-        payload.createdAt = now;
-        const ref = await addDoc(collection(this.firestore, "inventoryItems"), payload);
-        return ref.id;
-      }
-    }
-
-    // LocalStorage fallback
     const items = JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
     const now = new Date().toISOString();
     let savedId = item.id;
@@ -173,14 +71,6 @@ class DatabaseService {
   }
 
   async archiveInventoryItem(itemId) {
-    if (this.status === "connected" && this.firestore) {
-      const { doc, updateDoc } = this.firebaseModules;
-      await updateDoc(doc(this.firestore, "inventoryItems", itemId), {
-        isArchived: true,
-        updatedAt: new Date().toISOString()
-      });
-      return;
-    }
     const items = JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
     const item = items.find(i => i.id === itemId);
     if (item) {
@@ -190,83 +80,17 @@ class DatabaseService {
     }
   }
 
-  // --- SALES & ATOMIC TRANSACTION API ---
+  // --- SALES (atomic LocalStorage simulation) ---
   async recordSaleAtomic(saleData) {
-    // saleData: { items: [{ itemId, quantity, unitPrice, itemName }], notes }
     const now = new Date().toISOString();
-
-    if (this.status === "connected" && this.firestore) {
-      const { runTransaction, doc, collection } = this.firebaseModules;
-      const firestore = this.firestore;
-
-      return await runTransaction(firestore, async (transaction) => {
-        const itemReads = [];
-        for (const line of saleData.items) {
-          const itemRef = doc(firestore, "inventoryItems", line.itemId);
-          itemReads.push({ ref: itemRef, line, snapPromise: transaction.get(itemRef) });
-        }
-
-        const resolved = [];
-        for (const itemRead of itemReads) {
-          const snap = await itemRead.snapPromise;
-          if (!snap.exists()) {
-            throw new Error(`Item ${itemRead.line.itemName || itemRead.line.itemId} no longer exists in pantry!`);
-          }
-          const currentData = snap.data();
-          const currentQty = currentData.quantity || 0;
-          if (currentQty < itemRead.line.quantity) {
-            throw new Error(`Insufficient stock for ${currentData.name}! Have: ${currentQty}, Requested: ${itemRead.line.quantity}`);
-          }
-          resolved.push({
-            ref: itemRead.ref,
-            line: itemRead.line,
-            currentData,
-            newQty: currentQty - itemRead.line.quantity
-          });
-        }
-
-        // Apply atomic stock deductions
-        for (const res of resolved) {
-          transaction.update(res.ref, {
-            quantity: res.newQty,
-            updatedAt: now
-          });
-
-          // Create stock movement record
-          const movementRef = doc(collection(firestore, "stockMovements"));
-          transaction.set(movementRef, {
-            itemId: res.currentData.id,
-            itemName: res.currentData.name,
-            type: "sale",
-            quantityDelta: -res.line.quantity,
-            quantityAfter: res.newQty,
-            reason: `Sale ${saleData.notes ? `(${saleData.notes})` : ""}`,
-            timestamp: now
-          });
-        }
-
-        // Create sale record
-        const saleRef = doc(collection(firestore, "sales"));
-        transaction.set(saleRef, {
-          ...saleData,
-          timestamp: now
-        });
-
-        return { success: true, saleId: saleRef.id };
-      });
-    }
-
-    // LocalStorage atomic simulation
     const items = JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
     const movements = JSON.parse(localStorage.getItem("hexley_movements") || "[]");
     const sales = JSON.parse(localStorage.getItem("hexley_sales") || "[]");
 
-    // Pre-flight validation
+    // Validate stock first
     for (const line of saleData.items) {
       const item = items.find(i => i.id === line.itemId);
-      if (!item) {
-        throw new Error(`Ingredient not found: ${line.itemName}`);
-      }
+      if (!item) throw new Error(`Ingredient not found: ${line.itemName}`);
       if (item.quantity < line.quantity) {
         throw new Error(`Cannot sell ${line.quantity} of ${item.name}! Only ${item.quantity} in stock.`);
       }
@@ -291,11 +115,7 @@ class DatabaseService {
     }
 
     const saleId = "sale-" + Date.now();
-    sales.unshift({
-      id: saleId,
-      ...saleData,
-      timestamp: now
-    });
+    sales.unshift({ id: saleId, ...saleData, timestamp: now });
 
     localStorage.setItem("hexley_inventory", JSON.stringify(items));
     localStorage.setItem("hexley_movements", JSON.stringify(movements));
@@ -304,47 +124,12 @@ class DatabaseService {
     return { success: true, saleId };
   }
 
-  // --- STOCK DELIVERIES & MOVEMENTS ---
+  // --- DELIVERIES ---
   async recordDelivery({ itemId, supplierId, quantity, notes }) {
     const qty = parseInt(quantity, 10);
-    if (isNaN(qty) || qty <= 0) {
-      throw new Error("Delivery quantity must be a positive number.");
-    }
+    if (isNaN(qty) || qty <= 0) throw new Error("Delivery quantity must be a positive number.");
     const now = new Date().toISOString();
 
-    if (this.status === "connected" && this.firestore) {
-      const { runTransaction, doc, collection } = this.firebaseModules;
-      const firestore = this.firestore;
-
-      return await runTransaction(firestore, async (transaction) => {
-        const itemRef = doc(firestore, "inventoryItems", itemId);
-        const snap = await transaction.get(itemRef);
-        if (!snap.exists()) throw new Error("Ingredient not found");
-        const item = snap.data();
-        const newQty = (item.quantity || 0) + qty;
-
-        transaction.update(itemRef, {
-          quantity: newQty,
-          updatedAt: now
-        });
-
-        const movementRef = doc(collection(firestore, "stockMovements"));
-        transaction.set(movementRef, {
-          itemId: item.id,
-          itemName: item.name,
-          type: "delivery",
-          supplierId,
-          quantityDelta: qty,
-          quantityAfter: newQty,
-          reason: notes ? `Delivery: ${notes}` : "Supplier Delivery Restock",
-          timestamp: now
-        });
-
-        return { success: true, newQty };
-      });
-    }
-
-    // Local fallback
     const items = JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
     const movements = JSON.parse(localStorage.getItem("hexley_movements") || "[]");
     const item = items.find(i => i.id === itemId);
@@ -372,9 +157,7 @@ class DatabaseService {
 
   async recordStockAdjustment({ itemId, quantityDelta, reason }) {
     const delta = parseInt(quantityDelta, 10);
-    if (isNaN(delta) || delta === 0) {
-      throw new Error("Adjustment must be a non-zero number.");
-    }
+    if (isNaN(delta) || delta === 0) throw new Error("Adjustment must be a non-zero number.");
     const now = new Date().toISOString();
 
     const items = JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
@@ -383,9 +166,7 @@ class DatabaseService {
     if (!item) throw new Error("Item not found");
 
     const newQty = (item.quantity || 0) + delta;
-    if (newQty < 0) {
-      throw new Error(`Cannot adjust below zero. Current stock is ${item.quantity}.`);
-    }
+    if (newQty < 0) throw new Error(`Cannot adjust below zero. Current stock is ${item.quantity}.`);
 
     item.quantity = newQty;
     item.updatedAt = now;
@@ -406,39 +187,13 @@ class DatabaseService {
     return { success: true, newQty };
   }
 
-  // --- SUPPLIERS API ---
+  // --- SUPPLIERS ---
   async getSuppliers() {
-    if (this.status === "connected" && this.firestore) {
-      const { collection, getDocs, doc, setDoc } = this.firebaseModules;
-      const snap = await getDocs(collection(this.firestore, "suppliers"));
-      if (snap.empty) {
-        try {
-          for (const sup of SAMPLE_SUPPLIERS) {
-            await setDoc(doc(this.firestore, "suppliers", sup.id), sup);
-          }
-          return SAMPLE_SUPPLIERS;
-        } catch (seedErr) {
-          console.warn("Auto-seed suppliers warning:", seedErr);
-        }
-      }
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
     return JSON.parse(localStorage.getItem("hexley_suppliers") || "[]");
   }
 
   async saveSupplier(supplier) {
     const now = new Date().toISOString();
-    if (this.status === "connected" && this.firestore) {
-      const { doc, setDoc, addDoc, collection } = this.firebaseModules;
-      if (supplier.id) {
-        await setDoc(doc(this.firestore, "suppliers", supplier.id), { ...supplier, updatedAt: now }, { merge: true });
-        return supplier.id;
-      } else {
-        const ref = await addDoc(collection(this.firestore, "suppliers"), { ...supplier, createdAt: now });
-        return ref.id;
-      }
-    }
-
     const suppliers = JSON.parse(localStorage.getItem("hexley_suppliers") || "[]");
     let savedId = supplier.id;
     if (supplier.id) {
@@ -458,48 +213,22 @@ class DatabaseService {
 
   // --- SALES & MOVEMENTS QUERIES ---
   async getSales() {
-    if (this.status === "connected" && this.firestore) {
-      const { collection, getDocs } = this.firebaseModules;
-      const snap = await getDocs(collection(this.firestore, "sales"));
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
     return JSON.parse(localStorage.getItem("hexley_sales") || "[]");
   }
 
   async getStockMovements() {
-    if (this.status === "connected" && this.firestore) {
-      const { collection, getDocs } = this.firebaseModules;
-      const snap = await getDocs(collection(this.firestore, "stockMovements"));
-      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
     return JSON.parse(localStorage.getItem("hexley_movements") || "[]");
   }
 
-  // --- SETTINGS API ---
+  // --- SETTINGS ---
   async getSettings() {
-    if (this.status === "connected" && this.firestore) {
-      const { doc, getDoc, setDoc } = this.firebaseModules;
-      const snap = await getDoc(doc(this.firestore, "settings", "global"));
-      if (snap.exists()) return snap.data();
-      try {
-        await setDoc(doc(this.firestore, "settings", "global"), SAMPLE_SETTINGS);
-        return SAMPLE_SETTINGS;
-      } catch (seedErr) {
-        console.warn("Auto-seed settings warning:", seedErr);
-      }
-    }
     return JSON.parse(localStorage.getItem("hexley_settings") || JSON.stringify(SAMPLE_SETTINGS));
   }
 
   async saveSettings(settings) {
-    if (this.status === "connected" && this.firestore) {
-      const { doc, setDoc } = this.firebaseModules;
-      await setDoc(doc(this.firestore, "settings", "global"), settings, { merge: true });
-    }
     localStorage.setItem("hexley_settings", JSON.stringify(settings));
     return settings;
   }
 }
 
 export const dbService = new DatabaseService();
-
