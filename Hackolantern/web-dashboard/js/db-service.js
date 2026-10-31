@@ -19,21 +19,50 @@ class DatabaseService {
     return Promise.resolve({ status: "demo", message: "Running in Local Storage mode. All data saved in this browser." });
   }
 
-  // Seed sample data into LocalStorage on first load (skips if already populated)
+  // Seed sample data into LocalStorage on first load (re-seeds if empty or incomplete)
   initLocalStore() {
-    if (!localStorage.getItem("hexley_inventory")) {
+    try {
+      const inv = JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
+      if (!Array.isArray(inv) || inv.length < 6) {
+        localStorage.setItem("hexley_inventory", JSON.stringify(SAMPLE_INVENTORY));
+      }
+    } catch {
       localStorage.setItem("hexley_inventory", JSON.stringify(SAMPLE_INVENTORY));
     }
-    if (!localStorage.getItem("hexley_suppliers")) {
+
+    try {
+      const sup = JSON.parse(localStorage.getItem("hexley_suppliers") || "[]");
+      if (!Array.isArray(sup) || sup.length === 0) {
+        localStorage.setItem("hexley_suppliers", JSON.stringify(SAMPLE_SUPPLIERS));
+      }
+    } catch {
       localStorage.setItem("hexley_suppliers", JSON.stringify(SAMPLE_SUPPLIERS));
     }
-    if (!localStorage.getItem("hexley_sales")) {
+
+    try {
+      const sal = JSON.parse(localStorage.getItem("hexley_sales") || "[]");
+      if (!Array.isArray(sal) || sal.length < 5) {
+        localStorage.setItem("hexley_sales", JSON.stringify(SAMPLE_SALES));
+      }
+    } catch {
       localStorage.setItem("hexley_sales", JSON.stringify(SAMPLE_SALES));
     }
-    if (!localStorage.getItem("hexley_movements")) {
+
+    try {
+      const mov = JSON.parse(localStorage.getItem("hexley_movements") || "[]");
+      if (!Array.isArray(mov) || mov.length < 4) {
+        localStorage.setItem("hexley_movements", JSON.stringify(SAMPLE_MOVEMENTS));
+      }
+    } catch {
       localStorage.setItem("hexley_movements", JSON.stringify(SAMPLE_MOVEMENTS));
     }
-    if (!localStorage.getItem("hexley_settings")) {
+
+    try {
+      const set = JSON.parse(localStorage.getItem("hexley_settings") || "{}");
+      if (!set || Object.keys(set).length === 0) {
+        localStorage.setItem("hexley_settings", JSON.stringify(SAMPLE_SETTINGS));
+      }
+    } catch {
       localStorage.setItem("hexley_settings", JSON.stringify(SAMPLE_SETTINGS));
     }
   }
