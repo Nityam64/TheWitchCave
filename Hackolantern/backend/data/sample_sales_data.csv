@@ -1,0 +1,428 @@
+date,ingredient_id,ingredient_name,category,current_stock,safety_stock,supplier,lead_time_days,is_cursed,units_sold
+2026-09-01,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-02,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-09-03,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-09-04,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-05,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-06,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-09-07,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-08,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-09,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-09-10,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-09-11,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-12,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-13,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-09-14,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-15,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-16,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-09-17,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-09-18,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-19,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-20,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-09-21,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-22,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-23,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-09-24,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-09-25,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-26,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-27,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-09-28,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-09-29,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-30,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-10-01,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-10-02,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-03,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-04,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-10-05,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-06,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-07,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-10-08,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-10-09,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-10,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-11,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-10-12,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-13,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-14,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-10-15,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-10-16,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-17,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-18,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-10-19,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-20,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-21,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-10-22,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-10-23,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-24,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-25,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,28
+2026-10-26,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-27,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-10-28,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-10-29,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,7
+2026-10-30,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,9
+2026-10-31,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-09-01,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-02,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-09-03,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-04,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-05,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-06,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-07,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-08,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-09,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-09-10,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-11,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-12,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-13,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-14,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-15,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-16,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-09-17,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-18,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-19,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-20,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-21,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-22,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-23,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-09-24,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-25,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-26,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-27,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-28,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-29,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-09-30,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-10-01,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-02,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-03,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-04,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-05,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-06,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-07,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-10-08,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-09,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-10,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-11,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-12,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-13,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-14,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-10-15,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-16,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-17,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-18,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-19,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-20,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-21,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-10-22,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-23,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-24,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-25,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-26,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-27,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-28,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-10-29,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-10-30,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-10-31,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-09-01,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-02,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-09-03,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-04,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-09-05,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-06,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-07,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-08,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-09,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-09-10,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-11,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-09-12,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-13,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-14,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-15,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-16,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-09-17,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-18,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-09-19,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-20,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-21,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-22,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-23,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-09-24,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-25,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-09-26,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-27,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-28,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-09-29,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-30,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-10-01,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-02,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-10-03,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-04,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-05,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-06,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-07,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-10-08,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-09,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-10-10,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-11,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-12,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-13,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-14,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-10-15,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-16,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-10-17,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-18,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-19,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-20,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-21,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-10-22,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-23,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-10-24,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-25,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-26,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-27,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-10-28,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-10-29,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-10-30,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-10-31,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,10
+2026-09-01,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-02,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-03,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-09-04,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-05,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-06,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-07,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-08,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-09,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-10,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-09-11,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-12,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-13,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-14,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-15,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-16,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-17,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-09-18,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-19,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-20,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-21,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-22,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-23,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-24,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-09-25,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-26,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-27,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-28,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-09-29,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-30,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-01,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-10-02,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-03,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-04,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-05,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-06,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-07,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-08,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-10-09,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-10,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-11,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-12,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-13,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-14,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-15,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-10-16,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-17,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-18,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-19,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-20,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-21,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-22,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-10-23,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-24,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-25,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-26,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-27,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-28,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-10-29,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,7
+2026-10-30,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-10-31,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-09-01,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-02,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-09-03,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-04,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-05,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-06,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-07,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-08,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-09,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-09-10,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-11,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-12,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-13,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-14,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-15,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-16,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-09-17,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-18,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-19,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-20,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-21,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-22,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-23,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-09-24,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-25,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-26,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-27,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-28,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-29,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-09-30,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-10-01,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-02,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-03,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-04,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-05,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-06,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-07,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-10-08,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-09,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-10,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-11,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-12,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-13,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-14,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-10-15,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-16,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-17,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-18,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-19,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-20,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-21,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-10-22,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-23,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-24,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-25,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-26,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-27,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-28,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,5
+2026-10-29,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-10-30,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,4
+2026-10-31,moonpetal_dust,Moonpetal Dust,Powders,50,15,Silver Vale,3,True,3
+2026-09-01,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-02,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-03,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-04,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-05,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-06,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-07,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-08,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-09,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-10,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-11,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-12,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-13,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-14,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-15,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-16,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-17,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-18,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-19,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-20,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-21,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-22,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-23,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-24,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-25,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-26,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-27,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-28,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-29,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-09-30,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-01,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-02,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-03,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-04,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-05,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-06,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-07,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-08,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-09,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-10,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-11,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-12,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-13,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-14,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-15,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-16,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-17,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-18,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-19,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-20,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-21,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-22,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-23,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-24,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-25,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-26,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-27,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-28,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-29,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-10-30,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,3
+2026-10-31,frost_honey,Frost Honey,Sweeteners,35,12,Hollow Hive,2,False,2
+2026-09-01,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-02,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-09-03,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-04,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-05,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-06,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-07,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-08,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-09,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-09-10,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-11,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-12,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-13,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-14,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-15,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-16,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-09-17,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-18,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-19,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-20,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-21,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-22,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-23,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-09-24,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-25,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-26,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-27,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-28,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-09-29,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-09-30,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-10-01,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-02,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-03,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-04,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-05,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-06,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-07,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-10-08,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-09,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-10,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-11,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-12,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-13,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-14,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-10-15,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-16,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-17,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-18,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-19,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-20,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-21,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-10-22,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-23,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-24,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-25,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-26,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-27,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-28,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-10-29,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-10-30,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-10-31,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5

@@ -1,0 +1,7 @@
+serviceAccountKey.json
+*.pyc
+__pycache__/
+node_modules/
+.env
+dist/
+dist
