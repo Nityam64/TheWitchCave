@@ -1,0 +1,15 @@
+{
+  "appId": "com.hexley.potionpantry",
+  "appName": "Hexley's Potion Pantry",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": true
+  }
+}
+
