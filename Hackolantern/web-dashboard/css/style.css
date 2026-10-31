@@ -1,36 +1,59 @@
-/* css/style.css - Hexley's Potion Pantry Stylesheet */
-:root {
-  --bg-primary: #12091c;
-  --bg-surface: #1e1130;
-  --bg-card: #27173e;
-  --bg-elevated: #331f52;
-  --border-subtle: #4c2d77;
-  --border-focus: #9d4edd;
-  
-  --text-main: #fcf7ed;
-  --text-cream: #faedd9;
-  --text-muted: #cbb4db;
-  --text-dim: #8e72a4;
-  
-  --accent-purple: #9d4edd;
-  --accent-plum: #5a189a;
-  --accent-green: #10b981;
-  --accent-green-bg: #064e3b;
-  --accent-amber: #f59e0b;
-  --accent-amber-bg: #78350f;
-  --accent-rose: #f43f5e;
-  --accent-rose-bg: #881337;
-  --accent-festival: #ff9e00;
+/* css/style.css - Hexley's Potion Pantry 
+   Art-directed Victorian Apothecary at Midnight (Halloween Aesthetic)
+*/
 
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Victorian Apothecary Midnight Palette */
+  --bg-primary: #110c18;       /* Deep charcoal-plum midnight void */
+  --bg-surface: #171120;       /* Dark polished cabinet shelf */
+  --bg-card: #1c1527;          /* Solid dark apothecary box */
+  --bg-elevated: #231b31;      /* Elevated velvet drawer */
+  --bg-parchment: #f4ecdc;     /* Authentic aged parchment paper */
+  --bg-parchment-subtle: #21192e; 
+  --bg-parchment-tint: rgba(244, 236, 220, 0.04);
+
+  /* Hairline Antique Borders & Ruled Lines */
+  --border-subtle: #362945;     /* Dark bronze-plum rule */
+  --border-card: #453657;       /* Cabinet edge */
+  --border-focus: #c86d3b;      /* Warm copper focus */
+  --border-copper: #c86d3b;     /* Restrained burnished copper */
+  --border-copper-dim: #6d3a1d; /* Shadowed copper */
+  --border-parchment: #c8b99d;  /* Aged paper rule */
+
+  /* Legible Victorian Typography */
+  --text-main: #f5eedf;        /* Warm cream */
+  --text-cream: #faf2e3;       /* Unblemished ivory parchment */
+  --text-parchment: #e8dec8;   /* Aged parchment text */
+  --text-muted: #ab9eb8;       /* Heather slate-violet */
+  --text-dim: #7a6e88;         /* Subdued apothecary ledger note */
+  --text-copper: #dc7a42;      /* Burnt-orange / copper callout */
+
+  /* Restrained Accents & Urgency Indicators */
+  --accent-copper: #c86d3b;
+  --accent-copper-hover: #dc7a42;
+  --accent-copper-glow: rgba(200, 109, 59, 0.2);
+  --accent-amber: #d97706;      /* Amber glass / depleting caution */
+  --accent-amber-bg: #271407;
+  --accent-urgent-rose: #be123c;/* Crimson sealing wax / out of stock */
+  --accent-urgent-bg: #2b0b14;
+  --accent-sage: #2d6a4f;       /* Dried herbal sage / in stock */
+  --accent-sage-bg: #0f281d;
+  --accent-festival: #d97736;   /* Full moon copper */
+
+  /* Typographic Pairing */
   --font-serif: "Cinzel", Georgia, "Times New Roman", serif;
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 15px rgba(157, 78, 221, 0.25);
+  --font-editorial: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Architectural Radii & Restrained Shadows */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 12px rgba(6, 4, 9, 0.6);
   --transition-fast: 0.15s ease;
 }
 
@@ -44,9 +67,11 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-main);
   font-family: var(--font-sans);
-  line-height: 1.5;
+  line-height: 1.55;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(circle at 50% 0%, #1c1328 0%, #110c18 60%);
+  background-attachment: fixed;
 }
 
 /* Reduced motion accessibility */
@@ -58,20 +83,22 @@ body {
   }
 }
 
-/* App Header & Top Navigation */
+/* =========================================================
+   1. APP HEADER & NAVIGATION (VICTORIAN CABINET LEDGER)
+   ========================================================= */
 .app-header {
-  background: linear-gradient(180deg, #1d0f30 0%, #160c26 100%);
-  border-bottom: 1px solid var(--border-subtle);
+  background: #150f1e;
+  border-bottom: 2px solid #281d36;
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
 
 .header-inner {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 12px 20px;
+  padding: 10px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -82,40 +109,44 @@ body {
 .brand-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   text-decoration: none;
   color: var(--text-cream);
+  padding: 4px 0;
 }
 
 .brand-logo-svg {
-  width: 38px;
-  height: 38px;
-  filter: drop-shadow(0 0 6px rgba(255, 158, 0, 0.4));
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
 
 .brand-title {
   font-family: var(--font-serif);
-  font-size: 1.25rem;
+  font-size: 1.22rem;
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
   color: var(--text-cream);
   display: flex;
   flex-direction: column;
+  line-height: 1.15;
 }
 
 .brand-sub {
   font-family: var(--font-sans);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--accent-festival);
-  letter-spacing: 0.05em;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent-copper);
+  letter-spacing: 0.1em;
   text-transform: uppercase;
+  margin-top: 3px;
 }
 
 /* Top Nav Tabs */
 .main-nav {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   overflow-x: auto;
   padding-bottom: 2px;
 }
@@ -124,9 +155,9 @@ body {
   background: transparent;
   color: var(--text-muted);
   border: 1px solid transparent;
-  padding: 8px 14px;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  padding: 8px 13px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   display: inline-flex;
@@ -134,6 +165,14 @@ body {
   gap: 8px;
   white-space: nowrap;
   transition: all var(--transition-fast);
+}
+
+.nav-icon {
+  width: 15px;
+  height: 15px;
+  opacity: 0.75;
+  stroke: currentColor;
+  flex-shrink: 0;
 }
 
 .nav-btn:hover {
@@ -143,242 +182,585 @@ body {
 }
 
 .nav-btn.active {
-  background: var(--bg-elevated);
+  background: #20172c;
   color: var(--text-cream);
-  border-color: var(--accent-purple);
-  box-shadow: var(--shadow-glow);
+  border: 1px solid var(--border-copper-dim);
+  border-bottom: 2px solid var(--accent-copper);
 }
 
+.nav-btn.active .nav-icon {
+  opacity: 1;
+  stroke: var(--accent-copper);
+}
+
+/* Database Status Badge (Apothecary Stamp) */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-/* Database Connection Banner */
 .db-status-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: 20px;
-  cursor: pointer;
-  border: 1px solid transparent;
+  gap: 7px;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  background: #1d1527;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  cursor: default;
 }
 
-.status-demo {
-  background: rgba(245, 158, 11, 0.15);
-  color: var(--accent-amber);
-  border-color: var(--accent-amber);
+.apothecary-seal-pip {
+  color: #10b981;
+  font-size: 1rem;
+  line-height: 0;
 }
 
-.status-connected {
-  background: rgba(16, 185, 129, 0.15);
-  color: var(--accent-green);
-  border-color: var(--accent-green);
-}
-
-.status-error {
-  background: rgba(244, 63, 94, 0.15);
-  color: var(--accent-rose);
-  border-color: var(--accent-rose);
-}
-
-/* Main Container */
+/* =========================================================
+   2. MAIN CONTAINER & PAGE HEADERS
+   ========================================================= */
 .main-container {
   max-width: 1360px;
   margin: 0 auto;
-  padding: 24px 20px 80px 20px;
+  padding: 24px 24px 80px 24px;
 }
 
-/* Page Section Container */
 .page-section {
   display: none;
 }
 
 .page-section.active {
   display: block;
+  animation: pageFadeIn 0.2s ease-out;
 }
 
-/* Page Headers */
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.apothecary-meta-tag {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-copper);
+  margin-bottom: 4px;
 }
 
 .page-title {
   font-family: var(--font-serif);
-  font-size: 1.75rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
   color: var(--text-cream);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  line-height: 1.2;
 }
 
 .page-desc {
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   margin-top: 4px;
+  max-width: 720px;
 }
 
-/* Buttons */
+/* =========================================================
+   3. BUTTONS (RESTRAINED COPPER & ANTIQUE SURFACES)
+   ========================================================= */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
-  border-radius: var(--radius-md);
-  font-size: 0.95rem;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all var(--transition-fast);
   text-decoration: none;
-  min-height: 42px;
+  min-height: 38px;
+  white-space: nowrap;
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #7b2cbf 0%, #5a189a 100%);
-  color: #fff;
-  border-color: #9d4edd;
+  background: #251622;
+  color: var(--text-cream);
+  border: 1px solid var(--accent-copper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .btn-primary:hover {
-  filter: brightness(1.15);
-  box-shadow: var(--shadow-glow);
-}
-
-.btn-festival {
-  background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+  background: var(--accent-copper);
   color: #fff;
-  border-color: #f97316;
-}
-
-.btn-festival:hover {
-  filter: brightness(1.15);
+  border-color: #e5874c;
 }
 
 .btn-secondary {
   background: var(--bg-surface);
-  color: var(--text-cream);
-  border-color: var(--border-subtle);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
 }
 
 .btn-secondary:hover {
   background: var(--bg-elevated);
-  border-color: var(--accent-purple);
+  border-color: var(--border-card);
+  color: var(--text-cream);
 }
 
 .btn-danger {
-  background: rgba(244, 63, 94, 0.2);
+  background: var(--accent-urgent-bg);
   color: #fda4af;
-  border-color: var(--accent-rose);
+  border: 1px solid var(--accent-urgent-rose);
 }
 
 .btn-danger:hover {
-  background: var(--accent-rose);
+  background: var(--accent-urgent-rose);
   color: #fff;
 }
 
 .btn-sm {
-  padding: 6px 12px;
-  font-size: 0.85rem;
-  min-height: 32px;
+  padding: 5px 11px;
+  font-size: 0.8rem;
+  min-height: 30px;
 }
 
-/* Card Grids */
+/* =========================================================
+   4. HERO: FULL MOON FESTIVAL ALERT (ENGRAVED APOTHECARY PLATE)
+   ========================================================= */
+.hero-festival-plate {
+  background: linear-gradient(135deg, #241416 0%, #1c1322 45%, #181120 100%);
+  border: 1px solid var(--border-copper);
+  outline: 1px solid rgba(200, 109, 59, 0.3);
+  outline-offset: -4px;
+  border-radius: var(--radius-sm);
+  padding: 22px 24px;
+  margin-bottom: 26px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(200, 109, 59, 0.05);
+}
+
+.festival-plate-inner {
+  display: grid;
+  grid-template-columns: 84px 1fr auto;
+  gap: 22px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .festival-plate-inner {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.festival-lunar-crest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lunar-medallion-svg {
+  width: 76px;
+  height: 76px;
+  filter: drop-shadow(0 0 10px rgba(200, 109, 59, 0.3));
+}
+
+.lunar-phase-badge {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-copper);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.festival-content {
+  min-width: 0;
+}
+
+.festival-header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.apothecary-dispatch-stamp {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-copper);
+  text-transform: uppercase;
+}
+
+.festival-pill-active {
+  background: rgba(200, 109, 59, 0.15);
+  border: 1px solid var(--accent-copper);
+  color: #ffcd75;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.festival-hero-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-cream);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+.festival-hero-desc {
+  font-size: 0.88rem;
+  color: var(--text-parchment);
+  line-height: 1.45;
+  max-width: 760px;
+  margin-bottom: 12px;
+}
+
+.festival-affected-block {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.affected-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.affected-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.apothecary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #19101f;
+  border: 1px solid var(--border-copper);
+  color: #faeed7;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
+
+.pill-moon {
+  color: var(--accent-copper);
+  font-size: 0.85rem;
+}
+
+.apothecary-pill-empty {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.festival-cta-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .festival-cta-column {
+    align-items: flex-start;
+  }
+}
+
+.btn-copper-hero {
+  background: #2e1814;
+  color: #fff;
+  border: 1px solid var(--accent-copper);
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-copper-hero:hover {
+  background: var(--accent-copper);
+  color: #fff;
+  border-color: #e5874c;
+}
+
+.festival-safety-note {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* =========================================================
+   5. STOCK METRICS HIERARCHY (NOT ALL CARDS LOOK IDENTICAL!)
+   ========================================================= */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 26px;
 }
 
 .stat-card {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 18px;
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
-}
-
-.stat-card:hover {
-  border-color: var(--accent-purple);
-  transform: translateY(-2px);
+  transition: border-color var(--transition-fast);
+  box-shadow: var(--shadow-sm);
 }
 
 .stat-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.stat-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .stat-label {
-  font-size: 0.85rem;
-  font-weight: 600;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
-.stat-icon {
-  font-size: 1.25rem;
+.urgency-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.stat-icon-wrap {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
 }
 
 .stat-value {
-  font-size: 2rem;
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
   font-weight: 700;
+  line-height: 1.1;
   color: var(--text-cream);
   font-feature-settings: "tnum";
 }
 
 .stat-sub {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-dim);
-  margin-top: 4px;
+  margin-top: 6px;
+  line-height: 1.35;
 }
 
-/* Alert Boxes */
+/* --- HIERARCHY VARIANT 1: OUT OF STOCK (URGENT DEFICIT - OXBLOOD) --- */
+.stat-card.stat-critical {
+  background: linear-gradient(180deg, #280e16 0%, #1d0a11 100%);
+  border: 1px solid #881337;
+  outline: 1px solid rgba(190, 18, 60, 0.35);
+  outline-offset: -3px;
+}
+
+.stat-card.stat-critical .stat-label {
+  color: #fca5a5;
+}
+
+.urgency-critical {
+  background: rgba(190, 18, 60, 0.25);
+  border: 1px solid #be123c;
+  color: #fda4af;
+}
+
+.icon-critical {
+  background: rgba(190, 18, 60, 0.15);
+  color: #f43f5e;
+}
+
+.stat-card.stat-critical .stat-value {
+  color: #fecdd3;
+}
+
+.stat-card.stat-critical .stat-sub {
+  color: #f87171;
+}
+
+/* --- HIERARCHY VARIANT 2: LOW STOCK (URGENT DEPLETION - SMOKY AMBER) --- */
+.stat-card.stat-warning {
+  background: linear-gradient(180deg, #241408 0%, #1a0f06 100%);
+  border: 1px solid #92400e;
+  outline: 1px solid rgba(217, 119, 6, 0.3);
+  outline-offset: -3px;
+}
+
+.stat-card.stat-warning .stat-label {
+  color: #fde68a;
+}
+
+.urgency-warning {
+  background: rgba(217, 119, 6, 0.2);
+  border: 1px solid #d97706;
+  color: #fcd34d;
+}
+
+.icon-warning {
+  background: rgba(217, 119, 6, 0.15);
+  color: #f59e0b;
+}
+
+.stat-card.stat-warning .stat-value {
+  color: #fef08a;
+}
+
+.stat-card.stat-warning .stat-sub {
+  color: #fbbf24;
+}
+
+/* --- HIERARCHY VARIANT 3: STOCKOUT < 7 DAYS (PROPHECY COUNTDOWN) --- */
+.stat-card.stat-prophecy {
+  background: linear-gradient(180deg, #20152b 0%, #180f22 100%);
+  border: 1px solid #583770;
+  border-top: 2px solid var(--accent-copper);
+}
+
+.stat-card.stat-prophecy .stat-label {
+  color: #faedd9;
+}
+
+.urgency-prophecy {
+  background: rgba(200, 109, 59, 0.2);
+  border: 1px solid var(--accent-copper);
+  color: #ffcd75;
+}
+
+.icon-prophecy {
+  background: rgba(200, 109, 59, 0.15);
+  color: var(--accent-copper);
+}
+
+.stat-card.stat-prophecy .stat-value {
+  color: #fcd34d;
+}
+
+.stat-card.stat-prophecy .stat-sub {
+  color: var(--text-copper);
+}
+
+/* --- HIERARCHY VARIANT 4 & 5: QUIET APOTHECARY LEDGER CARDS --- */
+.stat-card.stat-quiet {
+  background: #171120;
+  border: 1px solid var(--border-subtle);
+}
+
+.urgency-quiet {
+  background: #231b31;
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+}
+
+.icon-quiet {
+  background: #231b31;
+  color: var(--text-muted);
+}
+
+.stat-card.stat-quiet .stat-value {
+  color: var(--text-main);
+}
+
+/* =========================================================
+   6. ANOMALY ALERTS (UNUSUAL CONSUMPTION)
+   ========================================================= */
 .alert-box {
   background: var(--bg-surface);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-sm);
   border: 1px solid var(--border-subtle);
   padding: 16px 20px;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
   display: flex;
   align-items: flex-start;
   gap: 16px;
 }
 
-.alert-festival {
-  background: linear-gradient(90deg, rgba(120, 53, 15, 0.3) 0%, rgba(30, 17, 48, 0.8) 100%);
-  border-color: var(--accent-festival);
-  box-shadow: 0 0 16px rgba(255, 158, 0, 0.15);
-}
-
 .alert-warning {
-  background: rgba(120, 53, 15, 0.25);
-  border-color: var(--accent-amber);
+  background: #20130a;
+  border: 1px solid #92400e;
 }
 
 .alert-critical {
-  background: rgba(136, 19, 55, 0.3);
-  border-color: var(--accent-rose);
+  background: #260c15;
+  border: 1px solid #9f1239;
 }
 
-.alert-icon {
-  font-size: 1.75rem;
-  line-height: 1;
+.alert-icon-box {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.3);
 }
 
 .alert-content {
@@ -386,6 +768,7 @@ body {
 }
 
 .alert-title {
+  font-family: var(--font-serif);
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--text-cream);
@@ -393,67 +776,135 @@ body {
 }
 
 .alert-text {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  line-height: 1.4;
+  font-size: 0.88rem;
+  color: var(--text-parchment);
+  line-height: 1.45;
 }
 
 .alert-meta {
   display: flex;
   gap: 16px;
   margin-top: 8px;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
 }
 
-/* Stock Status Badges */
-.badge {
-  display: inline-flex;
+/* =========================================================
+   7. RECENT ACTIVITY LEDGER CARDS
+   ========================================================= */
+.sale-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .sale-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 20px;
+  min-width: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-ledger {
+  background: #171120;
+  border: 1px solid var(--border-subtle);
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--text-cream);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
+  justify-content: space-between;
+}
+
+.title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-with-badge svg {
+  stroke: var(--accent-copper);
+}
+
+.nav-shortcut {
+  color: var(--accent-copper);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-shortcut:hover {
+  text-decoration: underline;
+  color: #ffcd75;
+}
+
+.ledger-entry-row {
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(54, 41, 69, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ledger-entry-row:last-child {
+  border-bottom: none;
+}
+
+.ledger-item-name {
+  font-weight: 600;
+  color: var(--text-cream);
+  font-size: 0.92rem;
+}
+
+.ledger-meta {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.ledger-amount-copper {
+  font-family: var(--font-serif);
   font-weight: 700;
-  white-space: nowrap;
+  color: var(--accent-copper);
+  font-size: 1.05rem;
 }
 
-.badge-in-stock {
-  background: var(--accent-green-bg);
-  color: #6ee7b7;
-  border: 1px solid var(--accent-green);
+.card-footer-note {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-align: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.badge-low-stock {
-  background: var(--accent-amber-bg);
-  color: #fcd34d;
-  border: 1px solid var(--accent-amber);
-}
-
-.badge-out-of-stock {
-  background: var(--accent-rose-bg);
-  color: #fda4af;
-  border: 1px solid var(--accent-rose);
-}
-
-.badge-festival {
-  background: #451a03;
-  color: #fdba74;
-  border: 1px solid var(--accent-festival);
-}
-
-.badge-archived {
-  background: #27272a;
-  color: #a1a1aa;
-  border: 1px solid #52525b;
-}
-
-/* Tables */
+/* =========================================================
+   8. TABLES & APOTHECARY REGISTERS
+   ========================================================= */
 .table-container {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
   box-shadow: var(--shadow-sm);
 }
 
@@ -464,20 +915,22 @@ body {
 }
 
 .pantry-table th {
-  background: #170c26;
+  background: #130d1a;
   padding: 12px 16px;
-  font-size: 0.8rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: var(--text-muted);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 2px solid var(--border-subtle);
+  white-space: nowrap;
 }
 
 .pantry-table td {
-  padding: 14px 16px;
-  font-size: 0.9rem;
-  border-bottom: 1px solid rgba(76, 45, 119, 0.4);
+  padding: 13px 16px;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #231b31;
   vertical-align: middle;
 }
 
@@ -486,22 +939,74 @@ body {
 }
 
 .pantry-table tr:hover td {
-  background: rgba(157, 78, 221, 0.06);
+  background: rgba(200, 109, 59, 0.04);
 }
 
-/* Item Name in table */
 .item-cell-title {
+  font-family: var(--font-serif);
   font-weight: 700;
   color: var(--text-cream);
   font-size: 0.95rem;
+  letter-spacing: 0.02em;
 }
 
 .item-cell-sub {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--text-dim);
+  margin-top: 2px;
 }
 
-/* Filter and Search Bar */
+/* Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.badge-dot {
+  font-size: 0.85rem;
+  line-height: 0;
+}
+
+.badge-in-stock {
+  background: var(--accent-sage-bg);
+  color: #6ee7b7;
+  border: 1px solid var(--accent-sage);
+}
+
+.badge-low-stock {
+  background: var(--accent-amber-bg);
+  color: #fcd34d;
+  border: 1px solid var(--accent-amber);
+}
+
+.badge-out-of-stock {
+  background: var(--accent-urgent-bg);
+  color: #fda4af;
+  border: 1px solid var(--accent-urgent-rose);
+}
+
+.badge-festival {
+  background: #33180c;
+  color: #ffcd75;
+  border: 1px solid var(--accent-copper);
+}
+
+.badge-archived {
+  background: #1f1b26;
+  color: #8c8299;
+  border: 1px solid #3d354a;
+}
+
+/* =========================================================
+   9. SEARCH, FILTERS & FORMS
+   ========================================================= */
 .filter-bar {
   display: flex;
   align-items: center;
@@ -514,35 +1019,142 @@ body {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
   min-width: 240px;
   flex: 1;
 }
 
 .search-input:focus, .filter-select:focus, .form-control:focus {
   outline: none;
-  border-color: var(--border-focus);
-  box-shadow: var(--shadow-glow);
+  border-color: var(--border-copper);
+  box-shadow: 0 0 0 1px var(--border-copper);
 }
 
 .filter-select {
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
   color: var(--text-main);
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  font-size: 0.9rem;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
   cursor: pointer;
 }
 
-/* Modals */
+.form-group {
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-cream);
+  margin-bottom: 6px;
+}
+
+.form-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  background: #140d1c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-cream);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-copper);
+}
+
+/* =========================================================
+   10. SALE BUILDER & CART ITEMS
+   ========================================================= */
+.item-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.pantry-item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pantry-item-card:hover {
+  border-color: var(--border-card);
+  background: var(--bg-elevated);
+}
+
+.pantry-item-card.selected {
+  border-color: var(--accent-copper);
+  background: #251620;
+}
+
+.cart-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(54, 41, 69, 0.6);
+}
+
+.cart-item-row:last-child {
+  border-bottom: none;
+}
+
+.cart-qty-input {
+  width: 65px;
+  background: #140d1c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px 6px;
+  color: #fff;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* =========================================================
+   11. MODALS
+   ========================================================= */
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(10, 5, 18, 0.85);
-  backdrop-filter: blur(4px);
+  background: rgba(8, 5, 12, 0.88);
+  backdrop-filter: blur(3px);
   z-index: 100;
   display: none;
   align-items: center;
@@ -555,18 +1167,20 @@ body {
 }
 
 .modal-panel {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
+  background: #191222;
+  border: 1px solid var(--border-copper-dim);
+  outline: 1px solid rgba(200, 109, 59, 0.2);
+  outline-offset: -3px;
+  border-radius: var(--radius-sm);
   max-width: 580px;
   width: 100%;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), var(--shadow-glow);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
 }
 
 .modal-header {
-  padding: 18px 24px;
+  padding: 16px 22px;
   border-bottom: 1px solid var(--border-subtle);
   display: flex;
   align-items: center;
@@ -577,6 +1191,7 @@ body {
   font-family: var(--font-serif);
   font-size: 1.25rem;
   color: var(--text-cream);
+  letter-spacing: 0.02em;
 }
 
 .modal-close {
@@ -593,187 +1208,20 @@ body {
 }
 
 .modal-body {
-  padding: 24px;
+  padding: 22px;
 }
 
 .modal-footer {
-  padding: 16px 24px;
+  padding: 14px 22px;
   border-top: 1px solid var(--border-subtle);
   display: flex;
   justify-content: flex-end;
   gap: 12px;
 }
 
-/* Forms */
-.form-group {
-  margin-bottom: 18px;
-  min-width: 0;
-}
-
-.form-label {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-cream);
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.form-hint {
-  font-size: 0.75rem;
-  color: var(--text-dim);
-  margin-top: 6px;
-  line-height: 1.35;
-}
-
-.form-control {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  box-sizing: border-box;
-  background: #170c26;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 10px 14px;
-  color: var(--text-main);
-  font-family: inherit;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-textarea.form-control {
-  min-height: 180px;
-  padding: 14px;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 0.85rem;
-  line-height: 1.55;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-x: auto;
-  overflow-y: auto;
-  resize: vertical;
-  tab-size: 2;
-  -webkit-overflow-scrolling: touch;
-}
-
-#firebase-config-input {
-  min-height: 260px;
-  height: 260px;
-  padding: 14px 16px;
-  font-size: 0.82rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
-  word-break: break-word;
-  overflow-y: auto;
-  overflow-x: hidden;
-  box-sizing: border-box;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.95rem;
-  color: var(--text-cream);
-  cursor: pointer;
-}
-
-.checkbox-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent-festival);
-}
-
-/* Sale Builder Layout */
-.sale-layout {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 24px;
-  min-width: 0;
-}
-
-@media (max-width: 900px) {
-  .sale-layout {
-    grid-template-columns: 1fr;
-  }
-}
-
-.card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  margin-bottom: 20px;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-
-.card-title {
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  color: var(--text-cream);
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.item-selector-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.pantry-item-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pantry-item-card:hover {
-  border-color: var(--accent-purple);
-  background: var(--bg-elevated);
-}
-
-.pantry-item-card.selected {
-  border-color: var(--accent-festival);
-  box-shadow: 0 0 10px rgba(255, 158, 0, 0.3);
-}
-
-.cart-item-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(76, 45, 119, 0.4);
-}
-
-.cart-item-row:last-child {
-  border-bottom: none;
-}
-
-.cart-qty-input {
-  width: 70px;
-  background: #170c26;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-sm);
-  padding: 6px 8px;
-  color: #fff;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-/* Toast Messages */
+/* =========================================================
+   12. TOAST NOTIFICATIONS
+   ========================================================= */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -785,38 +1233,44 @@ textarea.form-control {
 }
 
 .toast {
-  background: var(--bg-surface);
-  border-radius: var(--radius-md);
-  padding: 12px 18px;
+  background: #1c1527;
+  border-radius: var(--radius-sm);
+  padding: 11px 16px;
   box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 600;
-  border-left: 4px solid var(--accent-purple);
-  animation: toastFade 0.25s ease-out;
+  border-left: 3px solid var(--accent-copper);
+  border-top: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  animation: toastFade 0.2s ease-out;
 }
 
 .toast-success {
-  border-left-color: var(--accent-green);
-  color: #6ee7b7;
+  border-left-color: var(--accent-sage);
+  color: #a7f3d0;
 }
 
 .toast-error {
-  border-left-color: var(--accent-rose);
-  color: #fda4af;
+  border-left-color: var(--accent-urgent-rose);
+  color: #fecdd3;
 }
 
 @keyframes toastFade {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Forecast Visualizer SVG Chart */
+/* =========================================================
+   13. FORECAST VISUALIZER (ANTIQUE CHART SVG)
+   ========================================================= */
 .chart-wrapper {
-  background: #160c26;
-  border-radius: var(--radius-md);
+  background: #140d1a;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
   padding: 16px;
   margin-top: 16px;
   overflow-x: auto;
@@ -828,7 +1282,9 @@ textarea.form-control {
   height: 220px;
 }
 
-/* Responsive adjust */
+/* =========================================================
+   14. RESPONSIVE ADJUSTMENTS
+   ========================================================= */
 @media (max-width: 768px) {
   .header-inner {
     flex-direction: column;
@@ -843,17 +1299,4 @@ textarea.form-control {
   .card {
     padding: 16px;
   }
-  textarea.form-control {
-    min-height: 160px;
-    padding: 12px;
-    font-size: 0.82rem;
-  }
-  #firebase-config-input {
-    min-height: 270px;
-    height: 270px;
-    padding: 14px;
-    font-size: 0.8rem;
-    line-height: 1.55;
-  }
 }
-
