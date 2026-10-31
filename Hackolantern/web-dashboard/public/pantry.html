@@ -652,6 +652,81 @@
     #inventory .legend .ember { color: #d0672f; font-weight: 600; }
     @keyframes invDraw { to { stroke-dashoffset: 0; } }
 
+    /* Graph Variant Switcher & Interactive Elements */
+    #inventory .chart-variant-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 14px;
+      margin-bottom: 6px;
+    }
+    #inventory .chart-pill {
+      background: rgba(43, 29, 20, 0.08);
+      border: 1px solid rgba(184, 148, 99, 0.4);
+      color: #6d5440;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 13.5px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #inventory .chart-pill:hover {
+      border-color: #d0672f;
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+    #inventory .chart-pill.active {
+      background: #1d1410;
+      color: #f3dcb0;
+      border-color: #d0672f;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    #inventory .trend-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 8px;
+    }
+    #inventory .trend-tooltip {
+      position: absolute;
+      background: rgba(29, 20, 16, 0.95);
+      color: #f3dcb0;
+      border: 1px solid #d0672f;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 13.5px;
+      font-family: "EB Garamond", Georgia, serif;
+      pointer-events: none;
+      z-index: 50;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+      transform: translate(-50%, -125%);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+    #inventory .trend-tooltip.show {
+      opacity: 1;
+    }
+    #inventory .chart-node {
+      transition: r 0.2s ease, stroke-width 0.2s ease;
+      cursor: pointer;
+    }
+    #inventory .chart-node:hover {
+      r: 6.5;
+      stroke-width: 2.5;
+    }
+    #inventory .chart-bar-rect {
+      transition: height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), y 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+    }
+    #inventory .chart-bar-rect:hover {
+      opacity: 0.85;
+      filter: brightness(1.15);
+    }
+
     #inventory #detail {
       position: relative;
       background: var(--parchment);
@@ -1621,6 +1696,13 @@
       drawInv();
     }
 
+    var chartVariant = "curve"; // "curve", "line", "bars", "balance"
+
+    window.setChartVariant = function(v) {
+      chartVariant = v;
+      drawDetail();
+    };
+
     function drawDetail() {
       var detailEl = document.getElementById("detail");
       if (!detailEl || !items[cur]) return;
@@ -1629,6 +1711,7 @@
       var low = i.stock < minVal;
       var bought = i.buy ? i.buy.reduce(function(a, b) { return a + b; }, 0) : 0;
       var sold = i.sold ? i.sold.reduce(function(a, b) { return a + b; }, 0) : 0;
+      var netVelocity = bought - sold;
       var supplierName = i.supplier || i.from || "Apothecary Vault";
 
       detailEl.innerHTML =
@@ -1642,7 +1725,20 @@
             '<span class="note">' + i.unit + ' in vault, min ' + minVal + '</span>' +
           '</div>' +
         '</div>' +
-        trendSvg(i) +
+        '<div class="chart-variant-bar">' +
+          '<span style="font-size:13.5px; color:#6d5440; margin-right:4px; font-weight:600;">Chart Variant:</span>' +
+          '<button class="chart-pill ' + (chartVariant === "curve" ? "active" : "") + '" onclick="setChartVariant(\'curve\')">🌊 Spline Area</button>' +
+          '<button class="chart-pill ' + (chartVariant === "line" ? "active" : "") + '" onclick="setChartVariant(\'line\')">📈 Dual Lines</button>' +
+          '<button class="chart-pill ' + (chartVariant === "bars" ? "active" : "") + '" onclick="setChartVariant(\'bars\')">📊 Phial Columns</button>' +
+          '<button class="chart-pill ' + (chartVariant === "balance" ? "active" : "") + '" onclick="setChartVariant(\'balance\')">⚖️ Net Velocity</button>' +
+          '<span style="margin-left:auto; font-size:13px; color:' + (netVelocity >= 0 ? '#4f6d36' : '#d0672f') + '; font-weight:bold;">' +
+            '6-Mo Net: ' + (netVelocity >= 0 ? '+' : '') + netVelocity + ' ' + i.unit +
+          '</span>' +
+        '</div>' +
+        '<div class="trend-wrapper">' +
+          trendSvg(i) +
+          '<div class="trend-tooltip" id="trendTooltip"></div>' +
+        '</div>' +
         '<div class="det-bottom">' +
           '<span>Bought, last 6 months: <b>' + bought + '</b></span>' +
           '<span>Sold, last 6 months: <b>' + sold + '</b></span>' +
@@ -1656,6 +1752,26 @@
 
       var countEl = document.getElementById("count");
       if (countEl) countEl.textContent = (cur + 1) + " of " + items.length;
+      attachTrendHover(i);
+    }
+
+    function getSplinePath(pts) {
+      if (pts.length < 2) return "";
+      var d = "M " + pts[0].x + " " + pts[0].y;
+      for (var i = 0; i < pts.length - 1; i++) {
+        var p0 = pts[i === 0 ? 0 : i - 1];
+        var p1 = pts[i];
+        var p2 = pts[i + 1];
+        var p3 = pts[i + 2] || p2;
+
+        var cp1x = p1.x + (p2.x - p0.x) / 6;
+        var cp1y = p1.y + (p2.y - p0.y) / 6;
+        var cp2x = p2.x - (p3.x - p1.x) / 6;
+        var cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += " C " + cp1x.toFixed(1) + " " + cp1y.toFixed(1) + ", " + cp2x.toFixed(1) + " " + cp2y.toFixed(1) + ", " + p2.x.toFixed(1) + " " + p2.y.toFixed(1);
+      }
+      return d;
     }
 
     function trendSvg(i) {
@@ -1663,25 +1779,172 @@
       var buyArr = i.buy || [0, 0, 0, 0, 0, 0];
       var soldArr = i.sold || [0, 0, 0, 0, 0, 0];
       var max = Math.max(1, Math.max.apply(null, buyArr), Math.max.apply(null, soldArr));
-      var pts = function(arr) {
-        return arr.map(function(v, k) {
-          return (40 + k * 104) + "," + (165 - (v / max) * 140);
-        }).join(" ");
-      };
+
+      var buyPts = buyArr.map(function(v, k) {
+        return { x: 40 + k * 104, y: 165 - (v / max) * 140, val: v, month: months[k] };
+      });
+      var soldPts = soldArr.map(function(v, k) {
+        return { x: 40 + k * 104, y: 165 - (v / max) * 140, val: v, month: months[k] };
+      });
 
       var labelsHtml = months.map(function(m, k) {
         return '<text x="' + (40 + k * 104) + '" y="190" text-anchor="middle">' + m + '</text>';
       }).join("");
 
+      var defsHtml =
+        '<defs>' +
+          '<linearGradient id="invGradBuy" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="#4f6d36" stop-opacity="0.45"/>' +
+            '<stop offset="100%" stop-color="#4f6d36" stop-opacity="0.0"/>' +
+          '</linearGradient>' +
+          '<linearGradient id="invGradSold" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="#d0672f" stop-opacity="0.45"/>' +
+            '<stop offset="100%" stop-color="#d0672f" stop-opacity="0.0"/>' +
+          '</linearGradient>' +
+        '</defs>';
+
+      var mainContentHtml = "";
+      var legendHtml = '<div class="legend"><span class="green">&bull; Bought</span> &nbsp; <span class="ember">&bull; Sold</span></div>';
+
+      if (chartVariant === "curve") {
+        var splineBuy = getSplinePath(buyPts);
+        var areaBuy = splineBuy + " L " + buyPts[buyPts.length - 1].x + " 165 L " + buyPts[0].x + " 165 Z";
+        var splineSold = getSplinePath(soldPts);
+        var areaSold = splineSold + " L " + soldPts[soldPts.length - 1].x + " 165 L " + soldPts[0].x + " 165 Z";
+
+        var nodesHtml = "";
+        for (var k = 0; k < 6; k++) {
+          nodesHtml += '<circle cx="' + buyPts[k].x + '" cy="' + buyPts[k].y + '" r="4.5" fill="#4f6d36" stroke="#f8efd9" stroke-width="1.8" class="chart-node"><title>' + months[k] + ' Bought: ' + buyArr[k] + '</title></circle>';
+          nodesHtml += '<circle cx="' + soldPts[k].x + '" cy="' + soldPts[k].y + '" r="4.5" fill="#d0672f" stroke="#f8efd9" stroke-width="1.8" class="chart-node"><title>' + months[k] + ' Sold: ' + soldArr[k] + '</title></circle>';
+        }
+
+        mainContentHtml =
+          '<path d="' + areaBuy + '" fill="url(#invGradBuy)"/>' +
+          '<path d="' + areaSold + '" fill="url(#invGradSold)"/>' +
+          '<path pathLength="1" d="' + splineBuy + '" fill="none" stroke="#4f6d36" stroke-width="3.2" stroke-linecap="round" style="stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards;"/>' +
+          '<path pathLength="1" d="' + splineSold + '" fill="none" stroke="#d0672f" stroke-width="3.2" stroke-linecap="round" style="stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards;"/>' +
+          nodesHtml;
+      } else if (chartVariant === "bars") {
+        var barsHtml = "";
+        for (var k = 0; k < 6; k++) {
+          var xMid = 40 + k * 104;
+          var hBuy = Math.max(3, (buyArr[k] / max) * 140);
+          var yBuy = 165 - hBuy;
+          var hSold = Math.max(3, (soldArr[k] / max) * 140);
+          var ySold = 165 - hSold;
+
+          barsHtml +=
+            '<rect class="chart-bar-rect" x="' + (xMid - 16) + '" y="' + yBuy + '" width="14" height="' + hBuy + '" fill="#4f6d36" rx="3"><title>' + months[k] + ' Bought: ' + buyArr[k] + '</title></rect>' +
+            '<rect class="chart-bar-rect" x="' + (xMid + 2) + '" y="' + ySold + '" width="14" height="' + hSold + '" fill="#d0672f" rx="3"><title>' + months[k] + ' Sold: ' + soldArr[k] + '</title></rect>' +
+            '<text x="' + (xMid - 9) + '" y="' + (yBuy - 5) + '" font-size="11" fill="#4f6d36" font-weight="bold" text-anchor="middle">' + buyArr[k] + '</text>' +
+            '<text x="' + (xMid + 9) + '" y="' + (ySold - 5) + '" font-size="11" fill="#d0672f" font-weight="bold" text-anchor="middle">' + soldArr[k] + '</text>';
+        }
+        mainContentHtml = barsHtml;
+      } else if (chartVariant === "balance") {
+        var baseY = 100;
+        var maxDiff = Math.max(1, Math.max.apply(null, buyArr.map(function(v, k) { return Math.abs(v - soldArr[k]); })));
+        var balanceHtml = '<line class="axis" x1="40" y1="' + baseY + '" x2="600" y2="' + baseY + '" stroke-dasharray="4,4" opacity="0.6"></line>';
+        var balancePts = [];
+
+        for (var k = 0; k < 6; k++) {
+          var xMid = 40 + k * 104;
+          var diff = buyArr[k] - soldArr[k];
+          var hDiff = (Math.abs(diff) / maxDiff) * 65;
+          var yDiff = diff >= 0 ? (baseY - hDiff) : baseY;
+          var barColor = diff >= 0 ? "#4f6d36" : "#d0672f";
+
+          balanceHtml +=
+            '<rect class="chart-bar-rect" x="' + (xMid - 10) + '" y="' + yDiff + '" width="20" height="' + Math.max(4, hDiff) + '" fill="' + barColor + '" rx="3">' +
+              '<title>' + months[k] + ' Net Balance: ' + (diff >= 0 ? '+' : '') + diff + '</title>' +
+            '</rect>' +
+            '<text x="' + xMid + '" y="' + (diff >= 0 ? yDiff - 5 : yDiff + hDiff + 14) + '" font-size="12" fill="' + barColor + '" font-weight="bold" text-anchor="middle">' +
+              (diff >= 0 ? '+' : '') + diff +
+            '</text>';
+        }
+        mainContentHtml = balanceHtml;
+        legendHtml = '<div class="legend"><span class="green">&bull; Net Surplus (+)</span> &nbsp; <span class="ember">&bull; Net Deficit (−)</span></div>';
+      } else {
+        // "line" (Classic Stepped Dual Polyline)
+        var ptsStr = function(arr) {
+          return arr.map(function(v, k) {
+            return (40 + k * 104) + "," + (165 - (v / max) * 140);
+          }).join(" ");
+        };
+        var lineNodes = "";
+        for (var k = 0; k < 6; k++) {
+          lineNodes += '<circle cx="' + buyPts[k].x + '" cy="' + buyPts[k].y + '" r="4.5" fill="#4f6d36" stroke="#f8efd9" stroke-width="1.8" class="chart-node"></circle>';
+          lineNodes += '<circle cx="' + soldPts[k].x + '" cy="' + soldPts[k].y + '" r="4.5" fill="#d0672f" stroke="#f8efd9" stroke-width="1.8" class="chart-node"></circle>';
+        }
+
+        mainContentHtml =
+          '<polyline pathLength="1" class="line-buy" points="' + ptsStr(buyArr) + '"></polyline>' +
+          '<polyline pathLength="1" class="line-sold" points="' + ptsStr(soldArr) + '"></polyline>' +
+          lineNodes;
+      }
+
       return (
-        '<svg class="trend" viewBox="0 0 600 200" role="img" aria-label="Bought and sold, last 6 months">' +
+        '<svg id="invTrendSvg" class="trend" viewBox="0 0 600 200" role="img" aria-label="Bought and sold, last 6 months">' +
+          defsHtml +
           '<line class="axis" x1="40" y1="165" x2="600" y2="165"></line>' +
-          '<polyline pathLength="1" class="line-buy" points="' + pts(buyArr) + '"></polyline>' +
-          '<polyline pathLength="1" class="line-sold" points="' + pts(soldArr) + '"></polyline>' +
+          mainContentHtml +
+          '<line id="trendGuide" x1="0" y1="20" x2="0" y2="165" stroke="#d0672f" stroke-width="1.2" stroke-dasharray="3,3" style="display:none;"></line>' +
           labelsHtml +
         '</svg>' +
-        '<div class="legend"><span class="green">&bull; Bought</span> &nbsp; <span class="ember">&bull; Sold</span></div>'
+        legendHtml
       );
+    }
+
+    function attachTrendHover(item) {
+      var svg = document.getElementById("invTrendSvg");
+      var tooltip = document.getElementById("trendTooltip");
+      var guide = document.getElementById("trendGuide");
+      if (!svg || !tooltip) return;
+
+      var months = getMonthLabels();
+      var buyArr = item.buy || [0, 0, 0, 0, 0, 0];
+      var soldArr = item.sold || [0, 0, 0, 0, 0, 0];
+
+      svg.addEventListener("mousemove", function(e) {
+        var rect = svg.getBoundingClientRect();
+        var svgX = ((e.clientX - rect.left) / rect.width) * 600;
+
+        // Find closest month index (columns at x = 40 + k*104)
+        var closestIdx = 0;
+        var minDist = 9999;
+        for (var k = 0; k < 6; k++) {
+          var colX = 40 + k * 104;
+          var dist = Math.abs(svgX - colX);
+          if (dist < minDist) {
+            minDist = dist;
+            closestIdx = k;
+          }
+        }
+
+        var colX = 40 + closestIdx * 104;
+        if (guide) {
+          guide.setAttribute("x1", colX);
+          guide.setAttribute("x2", colX);
+          guide.style.display = "block";
+        }
+
+        var bVal = buyArr[closestIdx];
+        var sVal = soldArr[closestIdx];
+        var diff = bVal - sVal;
+        tooltip.innerHTML =
+          '<strong>' + months[closestIdx] + '</strong> &bull; ' +
+          '<span style="color:#7fff5a;">+' + bVal + ' Bought</span>, ' +
+          '<span style="color:#ff7518;">−' + sVal + ' Sold</span> ' +
+          '<span style="color:' + (diff >= 0 ? '#7fff5a' : '#ff7518') + ';">(Net ' + (diff >= 0 ? '+' : '') + diff + ')</span>';
+
+        tooltip.style.left = ((colX / 600) * rect.width) + "px";
+        tooltip.style.top = "60px";
+        tooltip.classList.add("show");
+      });
+
+      svg.addEventListener("mouseleave", function() {
+        if (guide) guide.style.display = "none";
+        tooltip.classList.remove("show");
+      });
     }
 
     function drawDeck() {
