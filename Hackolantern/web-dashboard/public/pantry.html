@@ -1281,13 +1281,23 @@
           shortageCount++;
           var isSoldOut = it.stock <= 0;
           var statusStamp = isSoldOut ? '<span class="stamp-badge" style="border-color:#781e1e; color:#781e1e; background:rgba(120,30,30,0.06);">SOLD OUT</span>' : '<span class="stamp-badge">LOW STOCK</span>';
+          var suggestedQty = Math.max(10, (it.minStock * 2) - it.stock);
           alertBox.innerHTML +=
-            '<div style="background:var(--parchment); color:var(--ink); border:1px solid var(--pumpkin); padding:12px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">' +
+            '<div style="background:var(--parchment); color:var(--ink); border:1px solid rgba(43, 29, 20, 0.22); box-shadow:0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45); border-radius:4px; padding:14px 16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">' +
             '<div>' +
-            '<strong>' + it.icon + ' ' + it.name + '</strong> ' + statusStamp +
-            '<div style="font-size:15px; color:#6b5440;">In stock: <strong>' + it.stock + ' ' + it.unit + '</strong> (Safety target: ' + it.minStock + ')</div>' +
+            '<strong style="font-family:\'IM Fell English\', serif; font-size:20px;">' + it.icon + ' ' + it.name + '</strong> ' + statusStamp +
+            '<div style="font-size:15px; color:#6b5440; margin-top:2px;">In stock: <strong style="color:var(--ink); font-size:16px;">' + it.stock + ' ' + it.unit + '</strong> (Safety target: ' + it.minStock + ')</div>' +
             '</div>' +
-            '<button class="btn-sm" onclick="quickRestockItem(' + i + ', 20)">+ Restock 20</button>' +
+            '<div style="display:flex; align-items:center; gap:8px;">' +
+            '<div class="stock-input-wrap">' +
+            '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'dashRestock_' + i + '\', -5)" title="Decrease restock quantity">&minus;</button>' +
+            '<input type="number" id="dashRestock_' + i + '" class="stock-num-input" value="' + suggestedQty + '" min="1" max="9999" onkeydown="if(event.key===\'Enter\') quickRestockFromInput(' + i + ', event)" title="Enter custom restock amount">' +
+            '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'dashRestock_' + i + '\', 5)" title="Increase restock quantity">+</button>' +
+            '</div>' +
+            '<button class="stock-apply-btn" type="button" onclick="quickRestockFromInput(' + i + ', event)">' +
+            '<span>+ Restock</span>' +
+            '</button>' +
+            '</div>' +
             '</div>';
         }
       }
@@ -1302,6 +1312,16 @@
       document.getElementById("dashVaultValue").textContent = "¢" + totalWorth.toFixed(2);
     }
 
+    function quickRestockFromInput(index, evt) {
+      var inputEl = document.getElementById("dashRestock_" + index);
+      var qty = inputEl ? parseInt(inputEl.value, 10) : 20;
+      if (isNaN(qty) || qty <= 0) {
+        alert("Please enter a valid positive restock quantity.");
+        return;
+      }
+      quickRestockItem(index, qty, evt);
+    }
+
     function quickRestockItem(index, amount, evt) {
       var qty = amount || 20;
       items[index].stock += qty;
@@ -1314,9 +1334,13 @@
       });
       saveState();
       renderDashboard();
+      if (document.getElementById("view-inventory").classList.contains("active")) {
+        renderInventoryGrid();
+      }
       if (document.getElementById("view-forecast").classList.contains("active")) {
         renderForecastPage();
       }
+      updateSaleItems();
     }
 
     // ==================== INVENTORY ====================
