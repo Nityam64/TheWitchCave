@@ -502,14 +502,16 @@
     .supplier-dispatch { color: #6b5440; font-size: 15px; margin-bottom: 8px; }
     .supplier-meta { display: flex; justify-content: space-between; font-size: 14px; color: #2f5e2a; font-weight: 600; }
 
-    /* Forecast & Restock Page 3 Art-Directed Theme (matching Reference) */
+    /* Forecast & Restock Page 3 Art-Directed Theme (matching Screenshot) */
     .fc-card {
-      background: #140d1e;
-      border: 1px solid #2e1c40;
-      border-radius: 8px;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin), 0 6px 24px rgba(0, 0, 0, 0.45);
+      border-radius: 2px;
       padding: 24px 28px;
       margin-bottom: 24px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      position: relative;
     }
     .fc-card-header {
       display: flex;
@@ -518,24 +520,27 @@
       flex-wrap: wrap;
       gap: 12px;
       margin-bottom: 20px;
+      border-bottom: 1px dashed var(--pumpkin);
+      padding-bottom: 14px;
     }
     .fc-card-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: #f5eedf;
+      font-size: 26px;
+      font-weight: normal;
+      color: var(--ink);
       margin: 0;
+      font-family: "IM Fell English", serif;
       letter-spacing: -0.01em;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     .fc-select {
-      background: #1c112b;
-      color: #f5eedf;
-      border: 1px solid #4a3363;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font: inherit;
-      font-size: 14px;
+      background: #fbf5e6;
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      border-radius: 2px;
+      padding: 8px 14px;
+      font-family: "Crimson Text", Georgia, serif;
+      font-size: 16px;
       cursor: pointer;
+      box-shadow: inset 0 0 0 1px var(--parchment);
     }
     .fc-select:focus {
       outline: 2px solid var(--gold);
@@ -544,67 +549,77 @@
       width: 100%;
       border-collapse: collapse;
       text-align: left;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
     }
     .fc-table th {
-      font-size: 11.5px;
+      font-size: 15px;
       font-weight: 700;
-      letter-spacing: 0.05em;
-      color: #8e7a9e;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      background: #ddcbb0;
       text-transform: uppercase;
       padding: 12px 14px;
-      border-bottom: 1px solid #2d1c3e;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      border-bottom: 2px solid var(--pumpkin);
+      font-family: "IM Fell English", serif;
     }
     .fc-table td {
-      padding: 16px 14px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      color: #f5eedf;
-      font-size: 15px;
+      padding: 14px 14px;
+      border-bottom: 1px dashed #d1bda2;
+      color: var(--ink);
+      font-size: 16px;
       vertical-align: middle;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: "Crimson Text", Georgia, serif;
     }
     .fc-table tr:last-child td {
       border-bottom: none;
     }
     .fc-table tr:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: #fbf5e6;
     }
     .fc-item-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
+      font-family: "IM Fell English", serif;
+      font-size: 20px;
+      font-weight: normal;
+      color: var(--ink);
     }
     .fc-item-sub {
-      font-size: 12.5px;
-      color: #9d8ba8;
-      margin-top: 3px;
+      font-size: 14px;
+      color: #6b5440;
+      margin-top: 2px;
     }
     .fc-reorder-val {
-      font-size: 16px;
+      font-family: "IM Fell English", serif;
+      font-size: 18px;
       font-weight: 700;
-      color: #dc7a42;
+      color: #8a4a1c;
     }
     .fc-reorder-sufficient {
-      font-size: 15px;
+      font-family: "IM Fell English", serif;
+      font-size: 17px;
       font-weight: 600;
-      color: #6ee7b7;
+      color: #2f5e2a;
     }
     .fc-btn-restock {
-      background: #1c112b;
-      color: #f5eedf;
-      border: 1px solid #4a3363;
-      border-radius: 6px;
-      padding: 7px 16px;
-      font-size: 13px;
+      background: #181122;
+      color: var(--parchment);
+      border: 2px solid var(--pumpkin);
+      border-radius: 2px;
+      padding: 6px 14px;
+      font-size: 15px;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: "Crimson Text", Georgia, serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .fc-btn-restock:hover {
-      background: #ff7518;
-      color: #140a1d;
-      border-color: #ff7518;
+      background: var(--pumpkin);
+      color: var(--ink);
+      transform: translateY(-1px);
     }
 
     /* Animations */
@@ -754,7 +769,10 @@
           </div>
         </div>
 
-        <div id="chartSvgWrapper" style="overflow-x:auto;"></div>
+        <!-- Featured Reagent Ledger Card matching Screenshot -->
+        <div id="fcFeaturedCard" style="background:var(--parchment); color:var(--ink); border:2px solid var(--pumpkin); box-shadow:inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin); padding:18px 20px; margin-bottom:20px; border-radius:2px;"></div>
+
+        <div id="chartSvgWrapper" style="overflow-x:auto; background:#fbf5e6; border:1px solid var(--pumpkin); padding:16px; border-radius:2px;"></div>
       </div>
 
       <!-- Card 2: All Pantry Restock Recommendations Table -->
@@ -1192,6 +1210,28 @@
       selectedForecastIndex = parseInt(sel.value, 10);
       var item = items[selectedForecastIndex];
       var fc = calculateForecast(item);
+
+      // Render Featured Reagent Ledger Card matching screenshot exactly
+      var card = document.getElementById("fcFeaturedCard");
+      if (card) {
+        var festTag = item.festival ? ' <span style="color:#ff7518; font-size:16px; font-weight:normal;">[🌕 ' + item.festivalMul + 'x Festival]</span>' : '';
+        card.innerHTML =
+          '<div style="font-family:\'IM Fell English\', serif; font-size:24px; color:var(--ink); margin-bottom:4px;">' +
+          item.icon + ' ' + item.name + festTag +
+          '</div>' +
+          '<div style="color:#2f5e2a; font-weight:600; font-size:18px; margin-bottom:4px;">' +
+          'Vault Stock: ' + item.stock + ' ' + item.unit + ' (Min: ' + item.minStock + ')' +
+          '</div>' +
+          '<div style="color:#8a4a1c; font-size:16px; margin-bottom:12px;">' +
+          '¢' + item.price.toFixed(2) + ' / ' + item.unit + ' &bull; ' + item.supplier +
+          '</div>' +
+          '<div style="display:flex; gap:10px;">' +
+          '<button style="background:#181122; color:var(--parchment); border:2px solid var(--pumpkin); padding:4px 14px; font-weight:600; font-size:15px; cursor:pointer; font-family:\'Crimson Text\', serif;" onclick="adjustInventory(' + selectedForecastIndex + ', 5); renderForecastPage();">+5</button>' +
+          '<button style="background:#181122; color:var(--parchment); border:2px solid var(--pumpkin); padding:4px 14px; font-weight:600; font-size:15px; cursor:pointer; font-family:\'Crimson Text\', serif;" onclick="adjustInventory(' + selectedForecastIndex + ', 20); renderForecastPage();">+20</button>' +
+          '<button style="background:#4a2d52; color:var(--parchment); border:2px solid var(--pumpkin); padding:4px 14px; font-weight:600; font-size:15px; cursor:pointer; font-family:\'Crimson Text\', serif;" onclick="adjustInventory(' + selectedForecastIndex + ', -1); renderForecastPage();">-1</button>' +
+          '</div>';
+      }
+
       renderForecastSvgChart(item, fc);
     }
 
@@ -1241,14 +1281,14 @@
         var y = padTop + plotH - (val / maxVal) * plotH;
 
         if (!pt.isFuture) {
-          // Historical Bar (purple with peach outline)
+          // Historical Bar (dark ink with pumpkin border matching screenshot)
           var barH = Math.max(6, (pt.actual / maxVal) * plotH);
           var barY = padTop + plotH - barH;
           barsHtml +=
-            '<rect x="' + (x - 12) + '" y="' + barY + '" width="24" height="' + barH + '" fill="#241432" stroke="#c86d3b" stroke-width="1.1" rx="2">' +
+            '<rect x="' + (x - 12) + '" y="' + barY + '" width="24" height="' + barH + '" fill="#181122" stroke="#ff7518" stroke-width="1.8" rx="2">' +
             '<title>' + pt.label + ': ' + pt.actual + ' actual sales</title>' +
             '</rect>' +
-            '<text x="' + x + '" y="' + (barY - 6) + '" font-size="11" fill="#ecdcbc" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.actual + '</text>';
+            '<text x="' + x + '" y="' + (barY - 6) + '" font-size="12" fill="#2b1d14" font-weight="bold" font-family="Crimson Text, Georgia, serif" text-anchor="middle">' + pt.actual + '</text>';
         } else {
           // Forecast Curve connection
           if (!pathD) {
@@ -1261,25 +1301,25 @@
             pathD += " L " + x + " " + y;
           }
           barsHtml +=
-            '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="#f8b072" stroke="#ffffff" stroke-width="1">' +
+            '<circle cx="' + x + '" cy="' + y + '" r="5" fill="#ff7518" stroke="#181122" stroke-width="1.5">' +
             '<title>' + pt.label + ': ' + pt.forecast + ' projected</title>' +
             '</circle>' +
-            '<text x="' + x + '" y="' + (y - 8) + '" font-size="11" fill="#f8b072" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.forecast + '</text>';
+            '<text x="' + x + '" y="' + (y - 8) + '" font-size="12" fill="#8a4a1c" font-weight="bold" font-family="Crimson Text, Georgia, serif" text-anchor="middle">' + pt.forecast + '</text>';
         }
 
         // X-axis label
-        barsHtml += '<text x="' + x + '" y="' + (svgH - 10) + '" font-size="9.5" fill="#756284" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.label + '</text>';
+        barsHtml += '<text x="' + x + '" y="' + (svgH - 10) + '" font-size="11" fill="#6b5440" font-family="Crimson Text, Georgia, serif" text-anchor="middle">' + pt.label + '</text>';
       }
 
       container.innerHTML =
         '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%; height:auto; display:block;">' +
-        '<line x1="' + padLeft + '" y1="' + (padTop + plotH) + '" x2="' + (svgW - padRight) + '" y2="' + (padTop + plotH) + '" stroke="#2d1c3e" stroke-width="1"/>' +
-        (pathD ? '<path d="' + pathD + '" fill="none" stroke="#f8b072" stroke-width="2" stroke-dasharray="4,4"/>' : '') +
+        '<line x1="' + padLeft + '" y1="' + (padTop + plotH) + '" x2="' + (svgW - padRight) + '" y2="' + (padTop + plotH) + '" stroke="#ff7518" stroke-width="1.2" opacity="0.6"/>' +
+        (pathD ? '<path d="' + pathD + '" fill="none" stroke="#ff7518" stroke-width="2.5" stroke-dasharray="5,4"/>' : '') +
         barsHtml +
         '</svg>' +
-        '<div style="display:flex; justify-content:center; align-items:center; gap:22px; font-size:12px; margin-top:14px; color:#9d8ba8; font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">' +
-        '<span style="display:flex; align-items:center; gap:7px;"><span style="display:inline-block; width:12px; height:12px; background:#8a3ab9; border-radius:2px;"></span> Actual Sales</span>' +
-        '<span style="display:flex; align-items:center; gap:7px;"><span style="display:inline-block; width:16px; height:2px; background:#f8b072; border-bottom:2px dashed #f8b072;"></span> 7-Day Forecast Curve</span>' +
+        '<div style="display:flex; justify-content:center; align-items:center; gap:26px; font-size:14px; margin-top:14px; color:#2b1d14; font-family:\'Crimson Text\', Georgia, serif;">' +
+        '<span style="display:flex; align-items:center; gap:8px;"><span style="display:inline-block; width:14px; height:12px; background:#181122; border:2px solid #ff7518; border-radius:2px;"></span> <strong>Actual Sales</strong></span>' +
+        '<span style="display:flex; align-items:center; gap:8px;"><span style="display:inline-block; width:18px; height:2px; background:#ff7518; border-bottom:2px dashed #ff7518;"></span> <strong>7-Day Forecast Curve</strong></span>' +
         '</div>';
     }
 
@@ -1301,16 +1341,16 @@
         tbody.innerHTML +=
           '<tr>' +
           '<td>' +
-          '<div class="fc-item-title">' + item.name + '</div>' +
+          '<div class="fc-item-title">' + item.icon + ' ' + item.name + '</div>' +
           '<div class="fc-item-sub">' + subText + '</div>' +
           '</td>' +
-          '<td><strong style="color:#ffffff;">' + item.stock + '</strong></td>' +
-          '<td>' + item.minStock + '</td>' +
-          '<td>' + fc.forecast7d + '</td>' +
+          '<td><strong style="color:var(--ink); font-size:17px;">' + item.stock + '</strong> <span style="font-size:14px; color:#6b5440;">' + item.unit + '</span></td>' +
+          '<td><span style="color:#2f5e2a; font-weight:600;">' + item.minStock + '</span> <span style="font-size:14px; color:#6b5440;">' + item.unit + '</span></td>' +
+          '<td><strong>' + fc.forecast7d + '</strong> <span style="font-size:14px; color:#6b5440;">' + item.unit + '</span></td>' +
           '<td>' + reorderHtml + '</td>' +
           '<td>' + item.supplier + ' (' + item.leadDays + 'd)</td>' +
           '<td>' +
-          '<button class="fc-btn-restock" onclick="quickRestockItem(' + i + ', ' + (fc.reorderQty > 0 ? fc.reorderQty : 20) + ')">Order Restock</button>' +
+          '<button class="fc-btn-restock" onclick="quickRestockItem(' + i + ', ' + (fc.reorderQty > 0 ? fc.reorderQty : 20) + ', event)">Order Restock</button>' +
           '</td>' +
           '</tr>';
       }
