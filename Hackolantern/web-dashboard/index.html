@@ -367,10 +367,126 @@
     .item .stock { display: block; color: #2f5e2a; font-weight: 600; }
     .item .price { display: block; color: #8a4a1c; }
     .item:hover:not(:disabled) {
-      transform: translateY(-3px);
-      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin), 0 0 22px var(--violet);
+      transform: translateY(-4px) rotate(-0.4deg);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin), 0 10px 28px rgba(138, 79, 209, 0.4);
     }
     .item:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Potion stock level gauge */
+    .potion-gauge {
+      height: 6px;
+      background: rgba(43, 29, 20, 0.12);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 8px 0;
+      border: 1px solid rgba(43, 29, 20, 0.15);
+    }
+    .potion-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2f5e2a, #7fff5a);
+      border-radius: 3px;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .potion-fill.low {
+      background: linear-gradient(90deg, #8a4a1c, #ff7518);
+    }
+    .potion-fill.depleted {
+      background: linear-gradient(90deg, #9b1c1c, #e63946);
+    }
+
+    /* Aesthetic Victorian Stock Adjustment Box */
+    .stock-control {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(43, 29, 20, 0.05);
+      border: 1px dashed var(--pumpkin);
+      padding: 6px 10px;
+      border-radius: 2px;
+    }
+    .stock-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: #fbf5e6;
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 1px var(--parchment);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .stock-btn-stepper {
+      background: #181122;
+      color: var(--gold);
+      border: none;
+      width: 28px;
+      height: 32px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .stock-btn-stepper:hover {
+      background: var(--pumpkin);
+      color: var(--ink);
+    }
+    .stock-btn-stepper:active {
+      transform: scale(0.92);
+    }
+    .stock-num-input {
+      width: 60px;
+      height: 32px;
+      border: none;
+      border-left: 1px solid var(--pumpkin);
+      border-right: 1px solid var(--pumpkin);
+      background: transparent;
+      color: var(--ink);
+      font-family: "IM Fell English", serif;
+      font-size: 18px;
+      font-weight: 600;
+      text-align: center;
+      padding: 0 4px;
+      box-sizing: border-box;
+      -moz-appearance: textfield;
+    }
+    .stock-num-input::-webkit-outer-spin-button,
+    .stock-num-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .stock-num-input:focus {
+      outline: none;
+      background: #ffffff;
+      box-shadow: inset 0 0 6px rgba(255, 117, 24, 0.35);
+    }
+    .stock-apply-btn {
+      background: #181122;
+      color: var(--parchment);
+      border: 2px solid var(--pumpkin);
+      border-radius: 2px;
+      padding: 6px 14px;
+      font-family: "Crimson Text", Georgia, serif;
+      font-size: 14.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stock-apply-btn:hover {
+      background: var(--pumpkin);
+      color: var(--ink);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(255, 117, 24, 0.4);
+    }
+    .stock-apply-btn:active {
+      transform: scale(0.96);
+    }
 
     /* Red "Sold out" stamp */
     .stamp {
@@ -1203,23 +1319,72 @@
         if (currentFilter === "festival" && !it.festival) continue;
 
         var isOut = it.stock <= 0;
-        var festivalTag = it.festival ? ' <span style="font-size:13px; color:#ff7518;">[🌕 ' + it.festivalMul + 'x Festival]</span>' : '';
+        var isLow = it.stock > 0 && it.stock <= it.minStock;
+        var fillPct = Math.min(100, Math.max(5, Math.round((it.stock / Math.max(1, it.minStock * 2)) * 100)));
+        var gaugeClass = isOut ? "potion-fill depleted" : (isLow ? "potion-fill low" : "potion-fill");
+        var festivalTag = it.festival ? ' <span style="font-size:14px; color:#ff7518; font-weight:normal;">[🌕 ' + it.festivalMul + 'x Festival]</span>' : '';
+
         grid.innerHTML +=
-          '<div class="item" style="cursor:default;">' +
+          '<div class="item" style="cursor:default; animation: cardDropIn 0.3s ease-out ' + (i * 0.05) + 's backwards;">' +
           '<strong>' + it.icon + ' ' + it.name + festivalTag + '</strong>' +
-          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : '') +
-          '<span class="stock">Vault Stock: ' + it.stock + ' ' + it.unit + ' (Min: ' + it.minStock + ')</span>' +
+          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : (isLow ? '<span class="stamp-badge" style="color:#d97706; border-color:#d97706; position:absolute; top:12px; right:12px;">LOW STOCK</span>' : '')) +
+          '<div class="potion-gauge" title="Pantry Fill Level: ' + it.stock + '/' + (it.minStock * 2) + ' ' + it.unit + '">' +
+          '<div class="' + gaugeClass + '" style="width:' + fillPct + '%;"></div>' +
+          '</div>' +
+          '<span class="stock">Vault Stock: ' + it.stock + ' ' + it.unit + ' <span style="color:#6b5440; font-weight:normal;">(Min target: ' + it.minStock + ')</span></span>' +
           '<span class="price">¢' + it.price.toFixed(2) + ' / ' + it.unit + ' &bull; ' + it.supplier + '</span>' +
-          '<div style="margin-top:10px; display:flex; gap:8px;">' +
-          '<button class="btn-sm" onclick="adjustInventory(' + i + ', 5)">+5</button>' +
-          '<button class="btn-sm" onclick="adjustInventory(' + i + ', 20)">+20</button>' +
-          (it.stock > 0 ? '<button class="btn-sm" style="background:#4a2d52;" onclick="adjustInventory(' + i + ', -1)">-1</button>' : '') +
+          '<div class="stock-control">' +
+          '<span style="font-size:14px; color:#6b5440; font-weight:600;">Adjust Stock:</span>' +
+          '<div class="stock-input-wrap">' +
+          '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'invInput_' + i + '\', -1)">−</button>' +
+          '<input type="number" id="invInput_' + i + '" class="stock-num-input" value="' + it.stock + '" min="0" onkeydown="if(event.key===\'Enter\') setDirectStock(' + i + ', this.value, event)" title="Type any value and press Enter or Update">' +
+          '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'invInput_' + i + '\', 1)">+</button>' +
+          '</div>' +
+          '<button class="stock-apply-btn" type="button" onclick="setDirectStock(' + i + ', document.getElementById(\'invInput_' + i + '\').value, event)">' +
+          '<span>Update</span>' +
+          '</button>' +
           '</div>' +
           '</div>';
       }
     }
 
-    function adjustInventory(index, delta) {
+    function stepStockInput(inputId, delta) {
+      var el = document.getElementById(inputId);
+      if (!el) return;
+      var val = parseInt(el.value, 10);
+      if (isNaN(val)) val = 0;
+      val = Math.max(0, val + delta);
+      el.value = val;
+    }
+
+    function setDirectStock(index, newQtyStr, evt) {
+      var newQty = parseInt(newQtyStr, 10);
+      if (isNaN(newQty) || newQty < 0) {
+        alert("Please enter a valid stock number.");
+        return;
+      }
+      var oldQty = items[index].stock;
+      var delta = newQty - oldQty;
+      items[index].stock = newQty;
+
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: delta >= 0 ? "Restock" : "Sale",
+        text: items[index].name + " " + (delta >= 0 ? "+" : "") + delta + " " + items[index].unit + " (Set to " + newQty + ")",
+        note: "Direct ledger update via apothecary input box"
+      });
+
+      spawnParticle((delta >= 0 ? "+" : "") + delta + " " + items[index].icon, delta >= 0 ? "var(--slime)" : "#ff7518", evt);
+      saveState();
+      renderInventoryGrid();
+      renderDashboard();
+      if (document.getElementById("view-forecast").classList.contains("active")) {
+        renderForecastPage();
+      }
+      updateSaleItems();
+    }
+
+    function adjustInventory(index, delta, evt) {
       if (items[index].stock + delta < 0) return;
       items[index].stock += delta;
       movements.unshift({
@@ -1228,8 +1393,13 @@
         text: items[index].name + " " + (delta > 0 ? "+" : "") + delta + " " + items[index].unit,
         note: "Manual ledger adjustment in inventory vault"
       });
+      spawnParticle((delta > 0 ? "+" : "") + delta + " " + items[index].icon, delta > 0 ? "var(--slime)" : "#ff7518", evt);
       saveState();
       renderInventoryGrid();
+      renderDashboard();
+      if (document.getElementById("view-forecast").classList.contains("active")) {
+        renderForecastPage();
+      }
       updateSaleItems();
     }
 
@@ -1361,20 +1531,30 @@
       var card = document.getElementById("fcFeaturedCard");
       if (card) {
         var festTag = item.festival ? ' <span style="color:#ff7518; font-size:16px; font-weight:normal;">[🌕 ' + item.festivalMul + 'x Festival]</span>' : '';
+        var pct = Math.min(100, Math.round((item.stock / Math.max(item.minStock * 2, 40)) * 100));
+        var gaugeColor = item.stock <= 0 ? "#9b1c1c" : item.stock <= item.minStock ? "#ff7518" : "#2f5e2a";
+        var statusLabel = item.stock <= 0 ? "Depleted" : item.stock <= item.minStock ? "Critical Threshold" : "Abundant";
+
         card.innerHTML =
           '<div style="font-family:\'IM Fell English\', serif; font-size:24px; color:var(--ink); margin-bottom:4px;">' +
           item.icon + ' ' + item.name + festTag +
           '</div>' +
           '<div style="color:#2f5e2a; font-weight:600; font-size:18px; margin-bottom:4px;">' +
-          'Vault Stock: ' + item.stock + ' ' + item.unit + ' (Min: ' + item.minStock + ')' +
+          'Vault Stock: <span style="color:var(--ink); font-size:20px;">' + item.stock + '</span> ' + item.unit + ' <span style="font-size:14px; color:#6b5440;">(Min: ' + item.minStock + ' &bull; ' + statusLabel + ')</span>' +
           '</div>' +
-          '<div style="color:#8a4a1c; font-size:16px; margin-bottom:12px;">' +
+          '<div style="color:#8a4a1c; font-size:16px; margin-bottom:10px;">' +
           '¢' + item.price.toFixed(2) + ' / ' + item.unit + ' &bull; ' + item.supplier +
           '</div>' +
-          '<div style="display:flex; gap:10px;">' +
-          '<button style="background:#181122; color:var(--parchment); border:2px solid var(--pumpkin); padding:4px 14px; font-weight:600; font-size:15px; cursor:pointer; font-family:\'Crimson Text\', serif;" onclick="adjustInventory(' + selectedForecastIndex + ', 5); renderForecastPage();">+5</button>' +
-          '<button style="background:#181122; color:var(--parchment); border:2px solid var(--pumpkin); padding:4px 14px; font-weight:600; font-size:15px; cursor:pointer; font-family:\'Crimson Text\', serif;" onclick="adjustInventory(' + selectedForecastIndex + ', 20); renderForecastPage();">+20</button>' +
-          '<button style="background:#4a2d52; color:var(--parchment); border:2px solid var(--pumpkin); padding:4px 14px; font-weight:600; font-size:15px; cursor:pointer; font-family:\'Crimson Text\', serif;" onclick="adjustInventory(' + selectedForecastIndex + ', -1); renderForecastPage();">-1</button>' +
+          '<div class="potion-gauge" title="Potion Level: ' + pct + '%" style="margin-bottom:14px;">' +
+          '<div class="potion-fill" style="width:' + pct + '%; background:' + gaugeColor + ';"></div>' +
+          '</div>' +
+          '<div class="stock-control" style="margin-top:4px;">' +
+          '<div class="stock-input-wrap">' +
+          '<button type="button" class="stock-btn-stepper" onclick="stepStockInput(\'fcStockInput\', -1)" title="Decrease stock by 1">&minus;</button>' +
+          '<input type="number" id="fcStockInput" class="stock-num-input" value="' + item.stock + '" min="0" max="9999" onkeydown="if(event.key===\'Enter\'){setDirectStock(' + selectedForecastIndex + ', this.value, event); renderForecastPage();}" title="Enter custom stock quantity and press Enter or Update">' +
+          '<button type="button" class="stock-btn-stepper" onclick="stepStockInput(\'fcStockInput\', 1)" title="Increase stock by 1">+</button>' +
+          '</div>' +
+          '<button type="button" class="stock-apply-btn" onclick="setDirectStock(' + selectedForecastIndex + ', document.getElementById(\'fcStockInput\').value, event); renderForecastPage();" title="Commit stock adjustment">Update</button>' +
           '</div>';
       }
 
