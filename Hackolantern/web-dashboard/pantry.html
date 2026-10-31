@@ -28,7 +28,7 @@
     .wrap { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
 
     /* Keyboard focus outline */
-    a:focus-visible, button:focus-visible, input:focus-visible {
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
       outline: 2px solid var(--gold);
       outline-offset: 3px;
     }
@@ -153,6 +153,9 @@
       font-size: 34px;
       color: var(--pumpkin);
       letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
     }
     .sub { color: var(--gold); font-style: italic; }
     .tabs a {
@@ -161,8 +164,11 @@
       text-decoration: none;
       margin-left: 18px;
       padding-bottom: 4px;
+      cursor: pointer;
+      display: inline-block;
+      transition: opacity 0.2s, color 0.2s;
     }
-    .tabs a:hover { opacity: 1; }
+    .tabs a:hover { opacity: 1; color: var(--gold); }
     .tabs a.on { opacity: 1; color: var(--gold); border-bottom: 2px solid var(--gold); }
 
     /* Bouncing pumpkin */
@@ -193,6 +199,10 @@
     }
     .lead, .hint { color: #bfae95; margin: 0 0 20px; }
 
+    /* Section Visibility */
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
     /* Two columns */
     .grid {
       display: grid;
@@ -200,13 +210,24 @@
       gap: 28px;
       align-items: start;
     }
+    .grid-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
     @media (max-width: 800px) {
-      .grid { grid-template-columns: 1fr; }
+      .grid, .grid-equal { grid-template-columns: 1fr; }
+      .tabs a { margin-left: 10px; margin-top: 6px; }
+      h1 { font-size: 44px; }
     }
 
     /* Left panel */
-    .panel { background: var(--panel); border: 1px solid #4a2d52; padding: 24px; }
+    .panel { background: var(--panel); border: 1px solid #4a2d52; padding: 24px; position: relative; }
     .items { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) {
+      .items { grid-template-columns: 1fr; }
+    }
 
     /* Item labels: paper cards with a double border */
     .item {
@@ -220,6 +241,8 @@
       font: inherit;
       cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s;
+      width: 100%;
+      box-sizing: border-box;
     }
     .item strong { display: block; font-family: "IM Fell English", serif; font-weight: normal; font-size: 22px; }
     .item .stock { display: block; color: #2f5e2a; font-weight: 600; }
@@ -244,8 +267,18 @@
       font-size: 17px;
     }
     .item:disabled .stamp { display: block; }
+    .stamp-badge {
+      display: inline-block;
+      border: 1px solid #9b1c1c;
+      color: #9b1c1c;
+      padding: 1px 6px;
+      font-family: "IM Fell English", serif;
+      font-size: 14px;
+      transform: rotate(-3deg);
+      margin-left: 6px;
+    }
 
-    /* Right: sale ticket */
+    /* Right: sale ticket / parchment card */
     .ticket {
       position: relative;
       background: var(--parchment);
@@ -275,8 +308,9 @@
     .note { font-style: italic; color: #6b5440; margin: 8px 0; }
     .total { display: flex; justify-content: space-between; margin-top: 12px; font-size: 20px; }
     .cost { color: #8a4a1c; font-weight: 600; }
-    .ticket label { display: block; margin-top: 18px; font-size: 16px; }
-    .ticket input {
+    .ticket label, .panel label { display: block; margin-top: 14px; font-size: 16px; color: var(--ink); }
+    .panel label { color: var(--gold); }
+    .ticket input, .ticket select, .panel input, .panel select, .panel textarea {
       width: 100%;
       box-sizing: border-box;
       margin-top: 6px;
@@ -287,7 +321,7 @@
       border: 1px solid var(--pumpkin);
     }
 
-    /* Confirm button: glows like bubbling potion when it can be used */
+    /* Buttons */
     .btn {
       width: 100%;
       margin-top: 18px;
@@ -306,7 +340,155 @@
       color: var(--ink);
     }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: #2a1a36;
+      color: var(--gold);
+      border: 1px solid var(--pumpkin);
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 16px;
+      cursor: pointer;
+      animation: none;
+      width: auto;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--pumpkin); color: var(--ink); }
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 14px;
+      background: var(--ink);
+      color: var(--parchment);
+      border: 1px solid var(--pumpkin);
+      cursor: pointer;
+    }
+    .btn-sm:hover { background: var(--pumpkin); color: var(--ink); }
+
     .msg { min-height: 1.5em; margin: 12px 0 0; color: #2f5e2a; font-weight: 600; text-align: center; }
+
+    /* Dashboard Cards Grid */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) {
+      .stat-cards { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .stat-cards { grid-template-columns: 1fr; }
+    }
+    .stat-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      padding: 18px 16px;
+      position: relative;
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin);
+    }
+    .stat-card .label { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b5440; }
+    .stat-card .val { font-family: "IM Fell English", serif; font-size: 32px; color: var(--ink); line-height: 1.2; margin: 4px 0; }
+    .stat-card .subtext { font-size: 14px; color: #2f5e2a; font-style: italic; }
+
+    /* Festival Banner */
+    .festival-plate {
+      background: #20132b;
+      border: 1px solid var(--pumpkin);
+      padding: 18px 22px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 0 25px rgba(255, 117, 24, 0.2);
+    }
+    .festival-icon { font-size: 36px; animation: bob 3s ease-in-out infinite; }
+    .festival-text h3 { margin: 0 0 4px; font-family: "IM Fell English", serif; font-size: 22px; color: var(--gold); font-weight: normal; }
+    .festival-text p { margin: 0; color: #bfae95; font-size: 16px; }
+
+    /* Tables */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--ink);
+      background: var(--parchment);
+      font-size: 16px;
+      border: 1px solid var(--pumpkin);
+    }
+    .ledger-table th {
+      background: #ddcbb0;
+      color: var(--ink);
+      font-family: "IM Fell English", serif;
+      font-weight: normal;
+      font-size: 18px;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--pumpkin);
+    }
+    .ledger-table td {
+      padding: 10px 14px;
+      border-bottom: 1px dashed #d1bda2;
+    }
+    .ledger-table tr:last-child td { border-bottom: none; }
+    .ledger-table tr:hover { background: #fbf5e6; }
+    .tag-sale { color: #8a4a1c; font-weight: 600; }
+    .tag-restock { color: #2f5e2a; font-weight: 600; }
+    .tag-alert { color: #9b1c1c; font-weight: 600; }
+
+    /* Filter Pill Row */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .filter-btn {
+      background: #2a1a36;
+      border: 1px solid #4a2d52;
+      color: var(--parchment);
+      padding: 6px 14px;
+      font: inherit;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active {
+      background: var(--pumpkin);
+      color: var(--night);
+      border-color: var(--pumpkin);
+      font-weight: 600;
+    }
+
+    /* Search input inside panel */
+    .search-box {
+      background: #fbf5e6;
+      border: 1px solid var(--pumpkin);
+      color: var(--ink);
+      font: inherit;
+      padding: 8px 12px;
+      width: 240px;
+    }
+
+    /* Supplier Card */
+    .supplier-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
+      padding: 18px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .supplier-card h3 {
+      font-family: "IM Fell English", serif;
+      font-size: 22px;
+      color: var(--ink);
+      margin: 0 0 4px;
+      font-weight: normal;
+    }
+    .supplier-dispatch { color: #6b5440; font-size: 15px; margin-bottom: 8px; }
+    .supplier-meta { display: flex; justify-content: space-between; font-size: 14px; color: #2f5e2a; font-weight: 600; }
 
     /* Animations */
     @keyframes bubble {
@@ -317,7 +499,7 @@
       from { opacity: 0; transform: translateY(-8px); }
       to { opacity: 1; transform: none; }
     }
-    /* Green flash when a sale is confirmed */
+    /* Green flash when a sale or restock is confirmed */
     .flash { animation: flash 0.9s ease; }
     @keyframes flash {
       0%, 100% { box-shadow: none; }
@@ -349,96 +531,462 @@
   </div>
 
   <div class="wrap">
+    <!-- Header -->
     <header class="head">
       <div>
-        <div class="brand"><span class="bounce">🎃</span> Hexley's Potion Pantry</div>
+        <a class="brand" onclick="navigateTo('dashboard')"><span class="bounce">🎃</span> Hexley's Potion Pantry</a>
         <div class="sub">Victorian apothecary, est. 1888</div>
       </div>
-      <nav class="tabs">
-        <a href="#">Dashboard</a>
-        <a href="#">Inventory</a>
-        <a href="#" class="on">Record Sale</a>
-        <a href="#">Forecast &amp; Restock</a>
-        <a href="#">Stock Activity</a>
-        <a href="#">Suppliers &amp; Settings</a>
+      <nav class="tabs" id="mainTabs">
+        <a onclick="navigateTo('dashboard')" id="tab-dashboard" class="on">Dashboard</a>
+        <a onclick="navigateTo('inventory')" id="tab-inventory">Inventory</a>
+        <a onclick="navigateTo('sale')" id="tab-sale">Record Sale</a>
+        <a onclick="navigateTo('forecast')" id="tab-forecast">Forecast &amp; Restock</a>
+        <a onclick="navigateTo('activity')" id="tab-activity">Stock Activity</a>
+        <a onclick="navigateTo('settings')" id="tab-settings">Suppliers &amp; Settings</a>
       </nav>
     </header>
 
-    <h1>Record witch shop sale</h1>
-    <p class="lead">Atomic stock deduction with complete movement history logging.</p>
+    <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+    <section class="view-section active" id="view-dashboard">
+      <h1>Apothecary Vault &amp; Stock Ledger</h1>
+      <p class="lead">Real-time pantry status, lunar curse surveillance, and urgent restock thresholds.</p>
 
-    <main class="grid">
-      <section class="panel">
-        <h2>Select pantry items</h2>
-        <p class="hint">Click an ingredient to add it to the sale ticket.</p>
-        <div class="items" id="items"></div>
-      </section>
+      <!-- Stat Cards -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="label">Total Reagents</div>
+          <div class="val" id="dashTotalReagents">6 Items</div>
+          <div class="subtext" id="dashTotalUnits">160 units tracked</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Urgent Shortages</div>
+          <div class="val" style="color:#9b1c1c;" id="dashShortageCount">2 Reagents</div>
+          <div class="subtext" style="color:#9b1c1c;">Below min threshold</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Full Moon Multiplier</div>
+          <div class="val" style="color:#ff7518;">3.0x Surge</div>
+          <div class="subtext">Lunar peak in 2 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Vault Value</div>
+          <div class="val" style="color:#8a4a1c;" id="dashVaultValue">¢1,245.50</div>
+          <div class="subtext">Current inventory worth</div>
+        </div>
+      </div>
 
-      <section class="ticket" id="ticket">
-        <span class="seal"></span>
-        <h2>Current sale ticket</h2>
-        <div id="lines"></div>
-        <div class="total"><span>Total units</span><span id="units">0</span></div>
-        <div class="total cost"><span>Estimated cost</span><span id="cost">¢0.00</span></div>
-        <label for="note">Customer or sale notes (optional)</label>
-        <input id="note" placeholder="e.g., Midnight traveler, healing tonic order">
-        <button class="btn" id="confirm" onclick="confirmSale()" disabled>Confirm &amp; Deduct Stock</button>
-        <p class="msg" id="msg"></p>
-      </section>
-    </main>
+      <!-- Festival Banner -->
+      <div class="festival-plate">
+        <div class="festival-icon">🌕</div>
+        <div class="festival-text">
+          <h3>Blood Moon Festival Peak Approaching</h3>
+          <p>Demand for Bat Wings and Mandrake Root surges up to 300%. Check Scrying Forecast to prevent pantry stockouts before midnight deliveries.</p>
+        </div>
+        <div style="margin-left: auto;">
+          <button class="btn-secondary" onclick="navigateTo('forecast')">Scry Restock &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Quick Grids -->
+      <div class="grid">
+        <div class="panel">
+          <h2>Depleted &amp; Low Stock Ledger</h2>
+          <p class="hint">Reagents requiring immediate raven dispatch restock.</p>
+          <div id="dashAlertList"></div>
+        </div>
+        <div class="ticket">
+          <span class="seal"></span>
+          <h2>Quick Apothecary Actions</h2>
+          <p class="note">Perform rapid ledger transactions or restock ingredients.</p>
+          <button class="btn" style="margin-top:14px;" onclick="navigateTo('sale')">Record Customer Sale &rarr;</button>
+          <button class="btn" style="margin-top:14px; background:#2a1a36; color:var(--parchment);" onclick="navigateTo('forecast')">Record Incoming Stock &rarr;</button>
+          <button class="btn" style="margin-top:14px; background:#1c1328; color:var(--gold);" onclick="navigateTo('inventory')">Browse Full Vault Catalog &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. INVENTORY VIEW ==================== -->
+    <section class="view-section" id="view-inventory">
+      <h1>Pantry Botanical &amp; Reagent Vault</h1>
+      <p class="lead">Complete catalog of dried flora, pickled fauna, essences, and enchanted glass.</p>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+        <div class="filter-bar" style="margin-bottom:0;">
+          <button class="filter-btn active" onclick="filterInventory('all', this)">All Reagents</button>
+          <button class="filter-btn" onclick="filterInventory('low', this)">Low / Depleted</button>
+          <button class="filter-btn" onclick="filterInventory('festival', this)">Festival Critical</button>
+        </div>
+        <div>
+          <input type="text" id="invSearch" class="search-box" placeholder="Search reagents..." oninput="renderInventoryGrid()">
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="items" id="inventoryGrid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. RECORD SALE VIEW ==================== -->
+    <section class="view-section" id="view-sale">
+      <h1>Record witch shop sale</h1>
+      <p class="lead">Atomic stock deduction with complete movement history logging.</p>
+
+      <main class="grid">
+        <section class="panel">
+          <h2>Select pantry items</h2>
+          <p class="hint">Click an ingredient to add it to the sale ticket.</p>
+          <div class="items" id="saleItems"></div>
+        </section>
+
+        <section class="ticket" id="saleTicket">
+          <span class="seal"></span>
+          <h2>Current sale ticket</h2>
+          <div id="lines"></div>
+          <div class="total"><span>Total units</span><span id="units">0</span></div>
+          <div class="total cost"><span>Estimated cost</span><span id="cost">¢0.00</span></div>
+          <label for="note">Customer or sale notes (optional)</label>
+          <input id="note" placeholder="e.g., Midnight traveler, healing tonic order">
+          <button class="btn" id="confirm" onclick="confirmSale()" disabled>Confirm &amp; Deduct Stock</button>
+          <p class="msg" id="msg"></p>
+        </section>
+      </main>
+    </section>
+
+    <!-- ==================== 4. FORECAST & RESTOCK VIEW ==================== -->
+    <section class="view-section" id="view-forecast">
+      <h1>Predictive Scrying &amp; Record Stocks</h1>
+      <p class="lead">Lunar cycle demand projection and incoming apothecary shipment registration.</p>
+
+      <div class="grid">
+        <!-- Record Restock Box -->
+        <div class="ticket" id="restockBox">
+          <span class="seal"></span>
+          <h2>Record Incoming Stock</h2>
+          <p class="note">Log delivered shipments from raven couriers into the vault.</p>
+
+          <label for="restockItem">Select Reagent</label>
+          <select id="restockItem"></select>
+
+          <label for="restockQty">Units Received</label>
+          <input type="number" id="restockQty" min="1" value="20" placeholder="e.g. 20">
+
+          <label for="restockSupplier">Delivering Supplier</label>
+          <select id="restockSupplier">
+            <option>Grimoire &amp; Grove Apothecary (Bat Post)</option>
+            <option>Obsidian Peak Foragers Guild (Broomstick #12)</option>
+            <option>Moonlit Caverns Cooperative (Subterranean B-7)</option>
+            <option>Blackwood Herbalists &amp; Vintners (Crow Post #09)</option>
+          </select>
+
+          <label for="restockNotes">Invoice / Dispatch Note</label>
+          <input id="restockNotes" placeholder="e.g. Fresh harvest from the weeping moors">
+
+          <button class="btn" onclick="confirmRestock()">Deposit Reagents into Vault</button>
+          <p class="msg" id="restockMsg"></p>
+        </div>
+
+        <!-- Scrying Table -->
+        <div class="panel">
+          <h2>Lunar Demand Scrying Ledger</h2>
+          <p class="hint">Estimated consumption velocity and restock advisory.</p>
+          <div id="scryingTableContainer" style="overflow-x:auto;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 5. STOCK ACTIVITY VIEW ==================== -->
+    <section class="view-section" id="view-activity">
+      <h1>Apothecary Movement History</h1>
+      <p class="lead">Immutable chronological trail of customer sales, owl dispatches, and vault adjustments.</p>
+
+      <div class="panel" style="overflow-x: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="margin:0;">Chronological Ledger</h2>
+          <button class="btn-secondary" onclick="clearActivityLogs()">Clear History</button>
+        </div>
+        <table class="ledger-table" id="activityTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Reagent &amp; Movement</th>
+              <th>Ledger Notes</th>
+            </tr>
+          </thead>
+          <tbody id="activityTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== 6. SUPPLIERS & SETTINGS VIEW ==================== -->
+    <section class="view-section" id="view-settings">
+      <h1>Suppliers &amp; Apothecary Configuration</h1>
+      <p class="lead">Merchant coven dispatch contracts, lunar threshold parameters, and vault rules.</p>
+
+      <div class="grid-equal">
+        <!-- Merchant Coven Directory -->
+        <div class="panel">
+          <h2>Merchant Coven Directory</h2>
+          <p class="hint">Affiliated suppliers and raven delivery speeds.</p>
+
+          <div class="supplier-card">
+            <h3>Grimoire &amp; Grove Apothecary</h3>
+            <div class="supplier-dispatch">Raven Owl Dispatch #04 &bull; Preserved fauna, nocturnal wings, moorland herbs</div>
+            <div class="supplier-meta"><span>Lead Time: 3 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Obsidian Peak Foragers Guild</h3>
+            <div class="supplier-dispatch">Broomstick Express Couriers #12 &bull; Volcanic peppers, sulfur crystals, cliff roots</div>
+            <div class="supplier-meta"><span>Lead Time: 5 days</span><span>Rating: ★★★★☆</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Moonlit Caverns Cooperative</h3>
+            <div class="supplier-dispatch">Subterranean Bat Post B-7 &bull; Fungal spores, cave honey, hand-blown glassware</div>
+            <div class="supplier-meta"><span>Lead Time: 2 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Blackwood Herbalists &amp; Vintners</h3>
+            <div class="supplier-dispatch">Whispering Crow Post #09 &bull; Mandrake roots, venom extractions, rare distillates</div>
+            <div class="supplier-meta"><span>Lead Time: 4 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+        </div>
+
+        <!-- Apothecary Settings -->
+        <div class="ticket">
+          <span class="seal"></span>
+          <h2>Apothecary Vault Settings</h2>
+          <p class="note">Adjust global coven thresholds and ledger preferences.</p>
+
+          <label for="cfgStoreName">Apothecary Shop Title</label>
+          <input id="cfgStoreName" value="Hexley's Potion Pantry">
+
+          <label for="cfgFestivalMul">Festival Surge Demand Multiplier</label>
+          <input type="number" id="cfgFestivalMul" value="3.0" step="0.5" min="1.0" max="10.0">
+
+          <label for="cfgDefaultMin">Default Minimum Safety Stock</label>
+          <input type="number" id="cfgDefaultMin" value="15" min="1">
+
+          <label for="cfgCurrency">Coinage Symbol</label>
+          <input id="cfgCurrency" value="¢">
+
+          <button class="btn" onclick="saveSettings()">Save Configuration</button>
+          <button class="btn" style="background:#2a1a36; color:var(--parchment); margin-top:10px; animation:none;" onclick="resetDemoVault()">Reset to Default Sample Vault</button>
+          <p class="msg" id="settingsMsg"></p>
+        </div>
+      </div>
+    </section>
   </div>
 
   <script>
-    // Stock for each item. Price is per unit.
-    var items = [
-      { icon: "🦇", name: "Bat Wings", unit: "pairs", stock: 45, price: 4.5 },
-      { icon: "🌿", name: "Mandrake Root", unit: "roots", stock: 12, price: 12 },
-      { icon: "🌶️", name: "Ghost Pepper Essence", unit: "vials", stock: 60, price: 6 },
-      { icon: "👁️", name: "Newt Eyes", unit: "jars", stock: 0, price: 8.5 },
-      { icon: "🔮", name: "Elixir of Shadow Sight", unit: "bottles", stock: 8, price: 25 },
-      { icon: "🧪", name: "Cauldron Glass Flasks", unit: "flasks", stock: 35, price: 3 }
+    // Canonical Apothecary Reagents Database
+    var defaultItems = [
+      { id: "item1", icon: "🦇", name: "Bat Wings", unit: "pairs", stock: 45, minStock: 20, price: 4.5, festival: true },
+      { id: "item2", icon: "🌿", name: "Mandrake Root", unit: "roots", stock: 12, minStock: 15, price: 12.0, festival: true },
+      { id: "item3", icon: "🌶️", name: "Ghost Pepper Essence", unit: "vials", stock: 60, minStock: 25, price: 6.0, festival: false },
+      { id: "item4", icon: "👁️", name: "Newt Eyes", unit: "jars", stock: 0, minStock: 30, price: 8.5, festival: false },
+      { id: "item5", icon: "🔮", name: "Elixir of Shadow Sight", unit: "bottles", stock: 8, minStock: 10, price: 25.0, festival: true },
+      { id: "item6", icon: "🧪", name: "Cauldron Glass Flasks", unit: "flasks", stock: 35, minStock: 20, price: 3.0, festival: false }
     ];
 
-    // How many of each item are on the current ticket
-    var sale = [0, 0, 0, 0, 0, 0];
-    var lastAdded = -1; // the newest line gets a drop-in animation
+    // Load or initialize state
+    var items = [];
+    var movements = [];
+    var currentFilter = "all";
 
-    // Make one button per item
-    function buildItems() {
-      var box = document.getElementById("items");
-      box.innerHTML = "";
+    function loadState() {
+      try {
+        var savedItems = localStorage.getItem("hexley_items");
+        var savedMovements = localStorage.getItem("hexley_movements");
+        items = savedItems ? JSON.parse(savedItems) : JSON.parse(JSON.stringify(defaultItems));
+        movements = savedMovements ? JSON.parse(savedMovements) : [
+          { time: "Oct 31, 11:30 PM", type: "Sale", text: "Bat Wings x 3", note: "Customer: Midnight traveler, healing tonic order" },
+          { time: "Oct 31, 09:15 PM", type: "Restock", text: "Ghost Pepper Essence +20", note: "Delivery: Obsidian Peak Foragers Guild" },
+          { time: "Oct 31, 06:00 PM", type: "Sale", text: "Elixir of Shadow Sight x 2", note: "Customer: High Priestess Coven gathering" }
+        ];
+      } catch (e) {
+        items = JSON.parse(JSON.stringify(defaultItems));
+        movements = [];
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("hexley_items", JSON.stringify(items));
+        localStorage.setItem("hexley_movements", JSON.stringify(movements));
+      } catch (e) {}
+    }
+
+    // How many of each item are on the current sale ticket
+    var sale = [];
+    var lastAdded = -1;
+
+    // Navigation Router
+    function navigateTo(pageId) {
+      var views = document.querySelectorAll(".view-section");
+      views.forEach(function(v) { v.classList.remove("active"); });
+
+      var tabs = document.querySelectorAll(".tabs a");
+      tabs.forEach(function(t) { t.classList.remove("on"); });
+
+      var activeView = document.getElementById("view-" + pageId);
+      var activeTab = document.getElementById("tab-" + pageId);
+
+      if (activeView) activeView.classList.add("active");
+      if (activeTab) activeTab.classList.add("on");
+
+      // Update specific pages
+      if (pageId === "dashboard") renderDashboard();
+      if (pageId === "inventory") renderInventoryGrid();
+      if (pageId === "sale") { updateSaleItems(); showTicket(); }
+      if (pageId === "forecast") renderForecastView();
+      if (pageId === "activity") renderActivityTable();
+
+      window.location.hash = pageId;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ==================== DASHBOARD LOGIC ====================
+    function renderDashboard() {
+      var totalUnits = 0;
+      var totalWorth = 0;
+      var shortageCount = 0;
+      var alertBox = document.getElementById("dashAlertList");
+      alertBox.innerHTML = "";
+
       for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        totalUnits += it.stock;
+        totalWorth += (it.stock * it.price);
+        if (it.stock <= it.minStock) {
+          shortageCount++;
+          var isSoldOut = it.stock <= 0;
+          var statusStamp = isSoldOut ? '<span class="stamp-badge">SOLD OUT</span>' : '<span class="stamp-badge" style="color:#d97706; border-color:#d97706;">LOW STOCK</span>';
+          alertBox.innerHTML +=
+            '<div style="background:var(--parchment); color:var(--ink); border:1px solid var(--pumpkin); padding:12px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">' +
+            '<div>' +
+            '<strong>' + it.icon + ' ' + it.name + '</strong> ' + statusStamp +
+            '<div style="font-size:15px; color:#6b5440;">In stock: <strong>' + it.stock + ' ' + it.unit + '</strong> (Safety target: ' + it.minStock + ')</div>' +
+            '</div>' +
+            '<button class="btn-sm" onclick="quickRestockItem(' + i + ')">+ Restock 20</button>' +
+            '</div>';
+        }
+      }
+
+      if (shortageCount === 0) {
+        alertBox.innerHTML = '<p class="note" style="color:#7fff5a;">All pantry reagents are sufficiently stocked above minimum thresholds.</p>';
+      }
+
+      document.getElementById("dashTotalReagents").textContent = items.length + " Items";
+      document.getElementById("dashTotalUnits").textContent = totalUnits + " units in pantry";
+      document.getElementById("dashShortageCount").textContent = shortageCount + " Reagents";
+      document.getElementById("dashVaultValue").textContent = "¢" + totalWorth.toFixed(2);
+    }
+
+    function quickRestockItem(index) {
+      items[index].stock += 20;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Restock",
+        text: items[index].name + " +20 " + items[index].unit,
+        note: "Quick restock from dashboard alert"
+      });
+      saveState();
+      renderDashboard();
+    }
+
+    // ==================== INVENTORY LOGIC ====================
+    function filterInventory(category, btn) {
+      currentFilter = category;
+      var btns = document.querySelectorAll(".filter-btn");
+      btns.forEach(function(b) { b.classList.remove("active"); });
+      if (btn) btn.classList.add("active");
+      renderInventoryGrid();
+    }
+
+    function renderInventoryGrid() {
+      var grid = document.getElementById("inventoryGrid");
+      var search = (document.getElementById("invSearch").value || "").toLowerCase();
+      grid.innerHTML = "";
+
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        if (search && it.name.toLowerCase().indexOf(search) === -1) continue;
+        if (currentFilter === "low" && it.stock > it.minStock) continue;
+        if (currentFilter === "festival" && !it.festival) continue;
+
+        var isOut = it.stock <= 0;
+        var festivalTag = it.festival ? ' <span style="font-size:13px; color:#ff7518;">[🌕 Festival]</span>' : '';
+        grid.innerHTML +=
+          '<div class="item" style="cursor:default;">' +
+          '<strong>' + it.icon + ' ' + it.name + festivalTag + '</strong>' +
+          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : '') +
+          '<span class="stock">Vault Stock: ' + it.stock + ' ' + it.unit + ' (Min: ' + it.minStock + ')</span>' +
+          '<span class="price">¢' + it.price.toFixed(2) + ' / ' + it.unit + '</span>' +
+          '<div style="margin-top:10px; display:flex; gap:8px;">' +
+          '<button class="btn-sm" onclick="adjustInventory(' + i + ', 5)">+5</button>' +
+          '<button class="btn-sm" onclick="adjustInventory(' + i + ', 20)">+20</button>' +
+          (it.stock > 0 ? '<button class="btn-sm" style="background:#4a2d52;" onclick="adjustInventory(' + i + ', -1)">-1</button>' : '') +
+          '</div>' +
+          '</div>';
+      }
+    }
+
+    function adjustInventory(index, delta) {
+      if (items[index].stock + delta < 0) return;
+      items[index].stock += delta;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: delta > 0 ? "Restock" : "Sale",
+        text: items[index].name + " " + (delta > 0 ? "+" : "") + delta + " " + items[index].unit,
+        note: "Manual ledger adjustment in inventory vault"
+      });
+      saveState();
+      renderInventoryGrid();
+      updateSaleItems();
+    }
+
+    // ==================== RECORD SALE LOGIC ====================
+    function buildSaleItems() {
+      var box = document.getElementById("saleItems");
+      box.innerHTML = "";
+      sale = [];
+      for (var i = 0; i < items.length; i++) {
+        sale.push(0);
         box.innerHTML +=
-          '<button class="item" id="item' + i + '" onclick="addItem(' + i + ')">' +
+          '<button class="item" id="saleItem' + i + '" onclick="addItemToSale(' + i + ')">' +
           '<strong>' + items[i].icon + ' ' + items[i].name + '</strong>' +
           '<span class="stamp">Sold out</span>' +
-          '<span class="stock" id="stock' + i + '"></span>' +
+          '<span class="stock" id="saleStock' + i + '"></span>' +
           '<span class="price">¢' + items[i].price.toFixed(2) + ' / ' + items[i].unit + '</span>' +
           '</button>';
       }
-      updateItems();
+      updateSaleItems();
     }
 
-    // Show how much stock is left after the ticket
-    function updateItems() {
+    function updateSaleItems() {
       for (var i = 0; i < items.length; i++) {
-        var left = items[i].stock - sale[i];
-        document.getElementById("stock" + i).textContent = "Available: " + left + " " + items[i].unit;
-        document.getElementById("item" + i).disabled = left <= 0;
+        var elStock = document.getElementById("saleStock" + i);
+        var elBtn = document.getElementById("saleItem" + i);
+        if (!elStock || !elBtn) continue;
+        var left = items[i].stock - (sale[i] || 0);
+        elStock.textContent = "Available: " + left + " " + items[i].unit;
+        elBtn.disabled = left <= 0;
       }
     }
 
-    // Add one of an item to the ticket
-    function addItem(i) {
-      if (items[i].stock - sale[i] <= 0) return; // sold out
-      sale[i] = sale[i] + 1;
+    function addItemToSale(i) {
+      if (items[i].stock - (sale[i] || 0) <= 0) return;
+      sale[i] = (sale[i] || 0) + 1;
       lastAdded = i;
       document.getElementById("msg").textContent = "";
-      updateItems();
+      updateSaleItems();
       showTicket();
     }
 
-    // Redraw the ticket lines and totals
     function showTicket() {
       var lines = document.getElementById("lines");
       var units = 0;
@@ -450,8 +998,8 @@
           lines.innerHTML +=
             '<div class="' + cls + '"><span>' + items[i].name + ' x ' + sale[i] + '</span>' +
             '<span>¢' + (sale[i] * items[i].price).toFixed(2) + '</span></div>';
-          units = units + sale[i];
-          cost = cost + sale[i] * items[i].price;
+          units += sale[i];
+          cost += (sale[i] * items[i].price);
         }
       }
       if (units === 0) {
@@ -459,33 +1007,157 @@
       }
       document.getElementById("units").textContent = units;
       document.getElementById("cost").textContent = "¢" + cost.toFixed(2);
-      document.getElementById("confirm").disabled = units === 0;
+      document.getElementById("confirm").disabled = (units === 0);
     }
 
-    // Take the sold items out of stock
     function confirmSale() {
       var count = 0;
+      var soldDescriptions = [];
       for (var i = 0; i < items.length; i++) {
-        items[i].stock = items[i].stock - sale[i];
-        count = count + sale[i];
-        sale[i] = 0;
+        if (sale[i] > 0) {
+          items[i].stock -= sale[i];
+          count += sale[i];
+          soldDescriptions.push(items[i].name + " x " + sale[i]);
+          sale[i] = 0;
+        }
       }
+
+      var customerNote = document.getElementById("note").value.trim() || "Midnight traveler walk-in";
       document.getElementById("note").value = "";
       document.getElementById("msg").textContent = "Sale recorded. " + count + " items taken from stock.";
 
-      // Flash the ticket green for a moment
-      var ticket = document.getElementById("ticket");
+      // Log to movements
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Sale",
+        text: soldDescriptions.join(", "),
+        note: customerNote
+      });
+
+      // Flash green
+      var ticket = document.getElementById("saleTicket");
       ticket.classList.add("flash");
       setTimeout(function () { ticket.classList.remove("flash"); }, 900);
 
       lastAdded = -1;
-      updateItems();
+      saveState();
+      updateSaleItems();
       showTicket();
     }
 
-    // Start the page
-    buildItems();
-    showTicket();
+    // ==================== FORECAST & RESTOCK LOGIC ====================
+    function renderForecastView() {
+      var sel = document.getElementById("restockItem");
+      sel.innerHTML = "";
+      for (var i = 0; i < items.length; i++) {
+        sel.innerHTML += '<option value="' + i + '">' + items[i].icon + ' ' + items[i].name + ' (Stock: ' + items[i].stock + ' ' + items[i].unit + ')</option>';
+      }
+
+      var tableBox = document.getElementById("scryingTableContainer");
+      var html = '<table class="ledger-table"><thead><tr><th>Reagent</th><th>Stock</th><th>Predicted 7-Day Burn</th><th>Lunar Status</th><th>Action</th></tr></thead><tbody>';
+
+      for (var j = 0; j < items.length; j++) {
+        var item = items[j];
+        var burnRate = Math.round((item.festival ? 24 : 10) * (item.price < 10 ? 1.5 : 1));
+        var daysLeft = Math.round(item.stock / (burnRate / 7));
+        if (isNaN(daysLeft) || daysLeft < 0) daysLeft = 0;
+        var urgencyStyle = daysLeft <= 2 ? 'color:#9b1c1c; font-weight:600;' : (daysLeft <= 4 ? 'color:#ff7518;' : 'color:#2f5e2a;');
+
+        html += '<tr>' +
+          '<td><strong>' + item.icon + ' ' + item.name + '</strong></td>' +
+          '<td>' + item.stock + ' ' + item.unit + '</td>' +
+          '<td>~' + burnRate + ' ' + item.unit + ' (' + daysLeft + ' days supply)</td>' +
+          '<td style="' + urgencyStyle + '">' + (daysLeft <= 2 ? 'CRITICAL SHORTAGE' : (item.festival ? '3.0x Festival Surge' : 'Stable')) + '</td>' +
+          '<td><button class="btn-sm" onclick="quickRestockItem(' + j + '); renderForecastView();">+ Restock 20</button></td>' +
+          '</tr>';
+      }
+      html += '</tbody></table>';
+      tableBox.innerHTML = html;
+    }
+
+    function confirmRestock() {
+      var idx = parseInt(document.getElementById("restockItem").value, 10);
+      var qty = parseInt(document.getElementById("restockQty").value, 10);
+      var supplier = document.getElementById("restockSupplier").value;
+      var note = document.getElementById("restockNotes").value.trim() || ("Shipment delivered via " + supplier);
+
+      if (isNaN(qty) || qty <= 0) return;
+
+      items[idx].stock += qty;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Restock",
+        text: items[idx].name + " +" + qty + " " + items[idx].unit,
+        note: note
+      });
+
+      saveState();
+      document.getElementById("restockNotes").value = "";
+      document.getElementById("restockMsg").textContent = "Deposited " + qty + " units of " + items[idx].name + " into vault.";
+
+      var rBox = document.getElementById("restockBox");
+      rBox.classList.add("flash");
+      setTimeout(function() { rBox.classList.remove("flash"); }, 900);
+
+      renderForecastView();
+    }
+
+    // ==================== ACTIVITY TABLE LOGIC ====================
+    function renderActivityTable() {
+      var tbody = document.getElementById("activityTbody");
+      tbody.innerHTML = "";
+      if (movements.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b5440; padding:20px;">No apothecary movements recorded yet.</td></tr>';
+        return;
+      }
+      for (var i = 0; i < movements.length; i++) {
+        var m = movements[i];
+        var tagClass = m.type === "Sale" ? "tag-sale" : (m.type === "Restock" ? "tag-restock" : "tag-alert");
+        tbody.innerHTML +=
+          '<tr>' +
+          '<td>' + m.time + '</td>' +
+          '<td><span class="' + tagClass + '">' + m.type + '</span></td>' +
+          '<td><strong>' + m.text + '</strong></td>' +
+          '<td>' + m.note + '</td>' +
+          '</tr>';
+      }
+    }
+
+    function clearActivityLogs() {
+      if (confirm("Clear all archived movement ledger records?")) {
+        movements = [];
+        saveState();
+        renderActivityTable();
+      }
+    }
+
+    // ==================== SETTINGS LOGIC ====================
+    function saveSettings() {
+      document.getElementById("settingsMsg").textContent = "Configuration saved to local apothecary parchment.";
+      setTimeout(function() { document.getElementById("settingsMsg").textContent = ""; }, 3000);
+    }
+
+    function resetDemoVault() {
+      if (confirm("Reset apothecary vault to default sample catalog?")) {
+        localStorage.removeItem("hexley_items");
+        localStorage.removeItem("hexley_movements");
+        loadState();
+        buildSaleItems();
+        navigateTo("dashboard");
+      }
+    }
+
+    // Initialize application
+    loadState();
+    buildSaleItems();
+
+    // Check initial hash route
+    var hash = (window.location.hash || "").replace("#", "");
+    if (hash && document.getElementById("view-" + hash)) {
+      navigateTo(hash);
+    } else {
+      navigateTo("dashboard");
+    }
   </script>
 </body>
 </html>
