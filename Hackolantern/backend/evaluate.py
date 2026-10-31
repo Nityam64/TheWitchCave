@@ -132,3 +132,158 @@ def evaluate_models(csv_path: str = None):
 if __name__ == "__main__":
     evaluate_models()
 
+
+def evaluate_csv_content(csv_content: str) -> dict:
+    """
+    Parses raw CSV content, evaluates forecasting models (7-day MA, same-weekday 4w, Holt-Winters),
+    detects anomalies, and returns structured evaluation metrics for judges.
+    """
+    import io
+    from ml_engine.ai_core import detect_strange_happenings
+
+    if not csv_content or not csv_content.strip():
+        raise ValueError("CSV content is empty.")
+
+    df = pd.read_csv(io.StringIO(csv_content))
+    if df.empty:
+        raise ValueError("Uploaded CSV contains no rows.")
+
+    col_map = {str(c).lower().strip(): c for c in df.columns}
+    date_col = col_map.get("date", col_map.get("dt", col_map.get("day", col_map.get("timestamp"))))
+    name_col = col_map.get("ingredient_name", col_map.get("name", col_map.get("ingredient", col_map.get("item"))))
+    id_col = col_map.get("ingredient_id", col_map.get("id", name_col))
+    units_col = col_map.get("units_sold", col_map.get("quantity", col_map.get("qty", col_map.get("sales", col_map.get("sold")))))
+
+    if not date_col:
+        date_candidates = [c for c in df.columns if "date" in str(c).lower() or "time" in str(c).lower()]
+        date_col = date_candidates[0] if date_candidates else df.columns[0]
+
+    if not units_col:
+        numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
+        units_col = numeric_cols[-1] if numeric_cols else df.columns[-1]
+
+    if not name_col:
+        text_cols = [c for c in df.columns if c not in [date_col, units_col]]
+        name_col = text_cols[0] if text_cols else id_col or df.columns[0]
+
+    if not id_col:
+        id_col = name_col
+
+    df["dt"] = pd.to_datetime(df[date_col], errors="coerce")
+    df = df.dropna(subset=["dt"]).sort_values("dt")
+    df["units"] = pd.to_numeric(df[units_col], errors="coerce").fillna(0.0)
+
+    results = []
+    best_per_ingredient = {}
+    all_anomalies = []
+    model_totals = {
+        "moving_average_7d": {"mae": 0.0, "mape": 0.0, "count": 0},
+        "same_weekday_4w": {"mae": 0.0, "mape": 0.0, "count": 0},
+        "holt_winters": {"mae": 0.0, "mape": 0.0, "count": 0}
+    }
+
+    for (ing_id, ing_name), group in df.groupby([id_col, name_col]):
+        group = group.sort_values("dt")
+        dates = group["dt"].dt.strftime("%Y-%m-%d").tolist()
+        series = group["units"].astype(float).tolist()
+
+        if len(series) < 8:
+            continue
+
+        test_size = 14 if len(series) >= 18 else max(2, len(series) // 4)
+        train_dates = dates[:-test_size]
+        train_series = series[:-test_size]
+        test_dates = dates[-test_size:]
+        test_series = np.array(series[-test_size:], dtype=float)
+
+        models_eval = {}
+
+        # 1. 7-day Moving Average
+        preds_ma, _ = predict_moving_average_7d(train_series, steps=test_size)
+        preds_ma_arr = np.array(preds_ma[:test_size])
+        mae_ma = float(np.mean(np.abs(test_series - preds_ma_arr)))
+        mape_ma = float(np.mean(np.abs(test_series - preds_ma_arr) / np.maximum(test_series, 1.0))) * 100
+        models_eval["moving_average_7d"] = {"mae": round(mae_ma, 2), "mape": round(mape_ma, 1)}
+
+        # 2. Same-Weekday Average
+        preds_sw, _ = predict_same_weekday_4w(train_dates, train_series, test_dates)
+        preds_sw_arr = np.array(preds_sw[:test_size])
+        mae_sw = float(np.mean(np.abs(test_series - preds_sw_arr)))
+        mape_sw = float(np.mean(np.abs(test_series - preds_sw_arr) / np.maximum(test_series, 1.0))) * 100
+        models_eval["same_weekday_4w"] = {"mae": round(mae_sw, 2), "mape": round(mape_sw, 1)}
+
+        # 3. Holt-Winters
+        preds_hw, _ = predict_holt_winters(train_dates, train_series, test_dates)
+        preds_hw_arr = np.array(preds_hw[:test_size])
+        mae_hw = float(np.mean(np.abs(test_series - preds_hw_arr)))
+        mape_hw = float(np.mean(np.abs(test_series - preds_hw_arr) / np.maximum(test_series, 1.0))) * 100
+        models_eval["holt_winters"] = {"mae": round(mae_hw, 2), "mape": round(mape_hw, 1)}
+
+        # Determine winner
+        best_model = min(models_eval, key=lambda m: models_eval[m]["mae"])
+        best_per_ingredient[str(ing_id)] = best_model
+
+        for m_name, m_stats in models_eval.items():
+            model_totals[m_name]["mae"] += m_stats["mae"]
+            model_totals[m_name]["mape"] += m_stats["mape"]
+            model_totals[m_name]["count"] += 1
+
+        # Anomaly detection for this ingredient
+        daily_dict = {d: int(q) for d, q in zip(dates, series)}
+        ing_anomalies = detect_strange_happenings(
+            sales_history=[int(s) for s in series],
+            daily_sales=daily_dict
+        )
+        for a in ing_anomalies:
+            a_dict = dict(a)
+            a_dict["ingredient"] = str(ing_name)
+            a_dict["ingredient_id"] = str(ing_id)
+            all_anomalies.append(a_dict)
+
+        # 14-day future forecast using the best model
+        next_dates = [(pd.to_datetime(dates[-1]) + pd.Timedelta(days=i)).strftime("%Y-%m-%d") for i in range(1, 15)]
+        if best_model == "same_weekday_4w":
+            future_preds, _ = predict_same_weekday_4w(dates, series, next_dates)
+        elif best_model == "holt_winters":
+            future_preds, _ = predict_holt_winters(dates, series, next_dates)
+        else:
+            future_preds, _ = predict_moving_average_7d(series, steps=14)
+
+        results.append({
+            "ingredient_id": str(ing_id),
+            "ingredient_name": str(ing_name),
+            "records_count": len(series),
+            "best_model": best_model,
+            "models": models_eval,
+            "forecast_14d": [
+                {"date": d, "predicted": round(float(p), 1)}
+                for d, p in zip(next_dates, future_preds[:14])
+            ]
+        })
+
+    # Overall Summary
+    overall_best = None
+    min_overall_mae = float("inf")
+    summary_stats = {}
+    for m_name, stats in model_totals.items():
+        if stats["count"] > 0:
+            avg_mae = round(stats["mae"] / stats["count"], 2)
+            avg_mape = round(stats["mape"] / stats["count"], 1)
+            summary_stats[m_name] = {"avg_mae": avg_mae, "avg_mape": avg_mape}
+            if avg_mae < min_overall_mae:
+                min_overall_mae = avg_mae
+                overall_best = m_name
+
+    return {
+        "status": "success",
+        "evaluated_at": datetime.now().isoformat(),
+        "total_records": len(df),
+        "ingredients_evaluated": len(results),
+        "overall_summary": {
+            "winning_model_overall": overall_best or "same_weekday_4w",
+            "lowest_avg_mae": min_overall_mae if min_overall_mae != float("inf") else 0.0,
+            "model_stats": summary_stats
+        },
+        "per_ingredient": results,
+        "anomalies_detected": all_anomalies
+    }

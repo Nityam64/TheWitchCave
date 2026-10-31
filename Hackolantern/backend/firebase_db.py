@@ -1,7 +1,9 @@
+from __future__ import annotations
 import os
 import uuid
 import logging
-from datetime import datetime, timedelta
+from typing import Optional, List, Dict, Any, Union
+from datetime import datetime, timedelta, timezone
 
 logger = logging.getLogger("firebase_db")
 
@@ -249,6 +251,78 @@ def get_all_ingredients():
 
     results.sort(key=lambda x: str(x["id"]))
     return results
+
+def add_ingredient(payload: dict) -> dict:
+    """
+    Creates a new ingredient with initialized expected_stock = current_stock
+    and default baseline daily_sales.
+    Persists across MongoDB (if configured), Firestore (if configured), and in-memory store.
+    """
+    global _mongo_db, _firestore_db, _in_memory_db
+
+    all_items = get_all_ingredients()
+    existing_numeric_ids = [
+        int(item["id"]) for item in all_items
+        if str(item.get("id", "")).isdigit()
+    ]
+    new_id = (max(existing_numeric_ids) + 1) if existing_numeric_ids else (len(all_items) + 1)
+
+    current_stock = int(payload.get("current_stock", 50))
+    safety_stock = int(payload.get("safety_stock", 20))
+    lead_time_days = int(payload.get("lead_time_days", 3))
+    name = str(payload.get("name", f"Ingredient {new_id}")).strip()
+    supplier = str(payload.get("supplier") or "General Supplier").strip()
+    category = str(payload.get("category") or "Raw Ingredients").strip()
+    unit = str(payload.get("unit") or "units").strip()
+
+    today = datetime.now().date()
+    default_daily = payload.get("daily_sales")
+    if not default_daily:
+        default_daily = {
+            (today - timedelta(days=13 - idx)).strftime("%Y-%m-%d"): 5
+            for idx in range(14)
+        }
+
+    item_data = {
+        "id": new_id,
+        "name": name,
+        "category": category,
+        "unit": unit,
+        "current_stock": current_stock,
+        "expected_stock": current_stock,
+        "safety_stock": safety_stock,
+        "supplier": supplier,
+        "lead_time_days": lead_time_days,
+        "is_cursed": bool(payload.get("is_cursed", False)),
+        "daily_sales": default_daily,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            mongo_doc = dict(item_data, _id=str(new_id))
+            coll.insert_one(mongo_doc)
+            logger.info(f"Ingredient {new_id} added to MongoDB.")
+        except Exception as e:
+            logger.error(f"Error adding ingredient to MongoDB: {e}")
+
+    # 2. Firestore
+    if _firestore_db is not None:
+        try:
+            _firestore_db.collection("pantry_ingredients").document(str(new_id)).set(item_data)
+            logger.info(f"Ingredient {new_id} added to Firestore.")
+        except Exception as e:
+            logger.error(f"Error adding ingredient to Firestore: {e}")
+
+    # 3. In-Memory
+    _in_memory_db[new_id] = dict(item_data)
+
+    result = dict(item_data)
+    result["sales"] = get_last_14_days_sales(result["daily_sales"])
+    result["is_cursed"] = is_ingredient_cursed(new_id) or result.get("is_cursed", False)
+    return result
 
 def get_ingredient(item_id):
     global _mongo_db, _firestore_db, _in_memory_db
@@ -654,7 +728,7 @@ def get_all_events() -> list[dict]:
     events.sort(key=lambda x: str(x.get("start_date", "")))
     return events
 
-def get_event(event_id: str) -> dict | None:
+def get_event(event_id: str) -> Optional[dict]:
     """Fetches a single event by ID."""
     global _mongo_db, _firestore_db, _in_memory_events
     s_id = str(event_id)

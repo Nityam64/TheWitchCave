@@ -1,7 +1,7 @@
-// js/alerts.js - Unusual-Consumption Anomaly Detection Engine
-// Flags items whose today or recent consumption exceeds 2x their average daily sales.
+// js/alerts.js - Full-History Anomaly Detection Scanner
+// Scans daily sales history using rolling statistics and Z-score (>2.0) to flag all anomalous spike dates and missing stock.
 
-export function detectUnusualConsumption(inventory, salesHistory) {
+export function detectUnusualConsumption(inventory, salesHistory, backendAnomalies = []) {
   const alerts = [];
   const now = new Date();
   const todayStr = now.toISOString().split("T")[0];
@@ -9,61 +9,78 @@ export function detectUnusualConsumption(inventory, salesHistory) {
   for (const item of inventory) {
     if (item.isArchived) continue;
 
-    // Collect all historic sales for this item
-    const itemSales = [];
+    // Collect daily sales grouped by dateStr
+    const dailyMap = {};
     for (const sale of salesHistory) {
       if (!sale.items || !Array.isArray(sale.items)) continue;
       const saleDateStr = new Date(sale.timestamp).toISOString().split("T")[0];
       for (const line of sale.items) {
         if (line.itemId === item.id) {
-          itemSales.push({
-            quantity: Number(line.quantity) || 0,
-            dateStr: saleDateStr,
-            timestamp: sale.timestamp
-          });
+          dailyMap[saleDateStr] = (dailyMap[saleDateStr] || 0) + (Number(line.quantity) || 0);
         }
       }
     }
 
-    // Require at least 3 historical sale records across distinct days to establish a meaningful baseline
-    const distinctDays = [...new Set(itemSales.map(s => s.dateStr))];
-    if (distinctDays.length < 3) {
-      continue; // Avoid misleading alerts when history is insufficient
+    const dateKeys = Object.keys(dailyMap).sort();
+    if (dateKeys.length < 3) continue;
+
+    const values = dateKeys.map(d => dailyMap[d]);
+    const totalQty = values.reduce((a, b) => a + b, 0);
+    const mean = totalQty / values.length;
+    const variance = values.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / values.length;
+    const std = Math.max(Math.sqrt(variance), 1.0);
+
+    for (let i = 0; i < dateKeys.length; i++) {
+      const dStr = dateKeys[i];
+      const qty = dailyMap[dStr];
+      const zScore = (qty - mean) / std;
+      const ratio = Math.round((qty / (mean || 1)) * 10) / 10;
+
+      // Spike criteria: Z-score > 2.0 or (ratio >= 2.5 and qty > 5)
+      if ((zScore > 2.0 || ratio >= 2.5) && qty > 5) {
+        const isToday = dStr === todayStr;
+        alerts.push({
+          itemId: item.id,
+          itemName: item.name,
+          unit: item.unit || "jars",
+          severity: zScore > 3.0 || ratio >= 3 ? "critical" : "warning",
+          type: "CONSUMPTION_SPIKE",
+          date: isToday ? "Today" : dStr,
+          rawDate: dStr,
+          zScore: Math.round(zScore * 10) / 10,
+          qty: qty,
+          headline: `Consumption Surge: ${qty} ${item.unit || "jars"} on ${isToday ? "Today" : dStr} (${ratio}x normal, Z=${Math.round(zScore * 10) / 10}σ)`,
+          measuredUsage: `${qty} ${item.unit || "jars"}`,
+          normalAverage: `${Math.round(mean * 10) / 10} ${item.unit || "jars"}/day`,
+          ratio,
+          suggestion: `Unusual demand spike detected on ${dStr}. Check ritual batch orders or potential shrinkage.`,
+          timestamp: dStr
+        });
+      }
     }
+  }
 
-    // Baseline calculation: Exclude today to find the pre-existing average daily sales
-    const pastSales = itemSales.filter(s => s.dateStr !== todayStr);
-    const pastDays = distinctDays.filter(d => d !== todayStr);
-
-    if (pastDays.length < 2) continue;
-
-    const totalPastQuantity = pastSales.reduce((acc, s) => acc + s.quantity, 0);
-    const baselineDailyAvg = Math.round((totalPastQuantity / pastDays.length) * 10) / 10;
-
-    if (baselineDailyAvg <= 0) continue;
-
-    // Today's consumption
-    const todaySales = itemSales.filter(s => s.dateStr === todayStr);
-    const todayQuantity = todaySales.reduce((acc, s) => acc + s.quantity, 0);
-
-    // Threshold: Today's usage is more than 2x the normal average
-    const ratio = Math.round((todayQuantity / baselineDailyAvg) * 10) / 10;
-    if (todayQuantity >= 2 * baselineDailyAvg && todayQuantity > 5) {
-      alerts.push({
-        itemId: item.id,
-        itemName: item.name,
-        unit: item.unit,
-        severity: ratio >= 3 ? "critical" : "warning",
-        headline: `Sudden Surge: ${todayQuantity} ${item.unit} consumed today (${ratio}x normal rate)`,
-        measuredUsage: `${todayQuantity} ${item.unit}`,
-        normalAverage: `${baselineDailyAvg} ${item.unit}/day`,
-        ratio,
-        suggestion: "Inspect recent sales and stock movements for unexpected shrinkage, sudden retail spikes, or unrecorded shrinkage.",
-        timestamp: new Date().toISOString()
-      });
+  // Also include backend anomalies if supplied
+  if (Array.isArray(backendAnomalies)) {
+    for (const ba of backendAnomalies) {
+      if (ba.type === "MISSING_STOCK") {
+        alerts.push({
+          itemId: ba.ingredient_id,
+          itemName: ba.ingredient || "Vault Stock",
+          severity: "critical",
+          type: "MISSING_STOCK",
+          date: "Current Audit",
+          headline: ba.message || `MISSING STOCK: ${ba.missing_units} units vanished without a sale!`,
+          measuredUsage: `Deficit: ${ba.missing_units} units`,
+          normalAverage: "Audit Discrepancy",
+          suggestion: "Reconcile shelf ledger immediately.",
+          timestamp: new Date().toISOString()
+        });
+      }
     }
   }
 
   return alerts;
 }
+
 

@@ -105,6 +105,141 @@ class _PantryMobileScreenState extends State<PantryMobileScreen> {
     }
   }
 
+  void openAddIngredientDialog() {
+    final nameCtrl = TextEditingController();
+    final stockCtrl = TextEditingController(text: "50");
+    final safetyCtrl = TextEditingController(text: "15");
+    final supplierCtrl = TextEditingController(text: "Diagon Alley Apothecary");
+    final leadTimeCtrl = TextEditingController(text: "3");
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF1B112C),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.add_circle, color: Color(0xFF10B981)),
+            SizedBox(width: 8),
+            Text("Add New Ingredient", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: "Ingredient Name",
+                  hintText: "e.g. Phoenix Feather",
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: stockCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Current Stock",
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: safetyCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Safety Stock Threshold",
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: supplierCtrl,
+                decoration: const InputDecoration(
+                  labelText: "Supplier",
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: leadTimeCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Lead Time (Days)",
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981)),
+            onPressed: () async {
+              final name = nameCtrl.text.trim();
+              if (name.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please enter ingredient name")),
+                );
+                return;
+              }
+              Navigator.pop(ctx);
+              await addNewIngredient({
+                "name": name,
+                "current_stock": int.tryParse(stockCtrl.text.trim()) ?? 50,
+                "safety_stock": int.tryParse(safetyCtrl.text.trim()) ?? 15,
+                "supplier": supplierCtrl.text.trim(),
+                "lead_time_days": int.tryParse(leadTimeCtrl.text.trim()) ?? 3,
+              });
+            },
+            child: const Text("Add to Pantry", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> addNewIngredient(Map<String, dynamic> payload) async {
+    setState(() => isLoading = true);
+    try {
+      final sanitizedBase = serverBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+      final res = await http.post(
+        Uri.parse("$sanitizedBase/api/pantry"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(payload),
+      );
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("✨ Successfully added ${payload['name']} to pantry!"),
+            backgroundColor: const Color(0xFF10B981),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to add: HTTP ${res.statusCode}")),
+        );
+      }
+      await testAndFetchPantry();
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error adding ingredient: $e")),
+      );
+      setState(() => isLoading = false);
+    }
+  }
+
   void openSettingsDialog() {
     final controller = TextEditingController(text: serverBaseUrl);
     showDialog(
@@ -387,14 +522,48 @@ class _PantryMobileScreenState extends State<PantryMobileScreen> {
                                       for (var alert in anomalies)
                                         Container(
                                           margin: const EdgeInsets.only(top: 4),
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                                           decoration: BoxDecoration(
                                             color: const Color(0xFF7F1D1D),
                                             borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: const Color(0xFFDC2626).withOpacity(0.4)),
                                           ),
-                                          child: Text(
-                                            "⚠️ $alert",
-                                            style: const TextStyle(fontSize: 11, color: Colors.white),
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              const Text("⚠️ ", style: TextStyle(fontSize: 12)),
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    if (alert is Map && alert['date'] != null)
+                                                      Container(
+                                                        margin: const EdgeInsets.only(bottom: 2),
+                                                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.black45,
+                                                          borderRadius: BorderRadius.circular(3),
+                                                        ),
+                                                        child: Text(
+                                                          "${alert['date']} • Z-Score: ${alert['z_score'] ?? 'N/A'}σ",
+                                                          style: const TextStyle(
+                                                            fontSize: 10,
+                                                            fontWeight: FontWeight.bold,
+                                                            color: Color(0xFFFCA5A5),
+                                                            fontFamily: 'monospace',
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    Text(
+                                                      alert is Map
+                                                          ? (alert['message'] ?? "Anomaly detected")
+                                                          : alert.toString(),
+                                                      style: const TextStyle(fontSize: 11, color: Colors.white),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                     ],
@@ -423,6 +592,13 @@ class _PantryMobileScreenState extends State<PantryMobileScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFF10B981),
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text("Add Ingredient", style: TextStyle(fontWeight: FontWeight.bold)),
+        onPressed: openAddIngredientDialog,
       ),
     );
   }

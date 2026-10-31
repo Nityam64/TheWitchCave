@@ -385,37 +385,92 @@ def run_prophecy_and_restock(
     }
 
 # =====================================================================
-# Anomaly Detection
+# Anomaly Detection (Full-History Rolling Z-Score + IQR)
 # =====================================================================
 
+class AnomalyAlert(dict):
+    """Dictionary representation of an anomaly alert that prints its message when stringified."""
+    def __str__(self):
+        return self.get("message", super().__str__())
+    def __repr__(self):
+        return self.get("message", super().__repr__())
+
 def detect_strange_happenings(
-    sales_history: list[int],
-    expected_stock: int,
-    actual_stock: int,
-    current_multiplier: float = 1.0
-) -> list[str]:
+    sales_history: list[int] = None,
+    expected_stock: int = 0,
+    actual_stock: int = 0,
+    current_multiplier: float = 1.0,
+    daily_sales: dict = None
+) -> list:
     """
-    Detects shrinkage (missing stock) and Z-score consumption spikes adjusted for active surge events.
+    Detects shrinkage (missing stock) and scans entire daily_sales history
+    using rolling mean/std (Z-score > 2.0) and IQR outlier detection to return
+    a list of ALL historical spike dates in addition to real-time MISSING_STOCK.
     """
     alerts = []
-    # 1. Missing Stock / Shrinkage check
+
+    # 1. Real-time Missing Stock / Shrinkage check
     if actual_stock < expected_stock:
-        alerts.append(f"MISSING STOCK: {expected_stock - actual_stock} units vanished without a sale!")
+        missing = expected_stock - actual_stock
+        alerts.append(AnomalyAlert({
+            "type": "MISSING_STOCK",
+            "missing_units": int(missing),
+            "message": f"MISSING STOCK: {missing} units vanished without a sale!"
+        }))
 
-    # 2. Z-Score Consumption Spike check (Event-Adjusted)
-    if len(sales_history) >= 5:
-        baseline = sales_history[:-1]
-        mean = float(np.mean(baseline))
-        std = float(np.std(baseline)) or 1.0
+    # 2. Build chronological series of (date_str, qty)
+    series_points = []
+    if daily_sales and isinstance(daily_sales, dict) and len(daily_sales) > 0:
+        for d_str, qty in sorted(daily_sales.items(), key=lambda x: str(x[0])):
+            try:
+                series_points.append((str(d_str), float(qty)))
+            except (ValueError, TypeError):
+                continue
+    elif sales_history and len(sales_history) > 0:
+        today = datetime.now().date()
+        for idx, qty in enumerate(sales_history):
+            d_str = (today - timedelta(days=len(sales_history) - 1 - idx)).strftime("%Y-%m-%d")
+            series_points.append((d_str, float(qty)))
 
-        multiplier = max(float(current_multiplier), 1.0)
-        expected_sale = mean * multiplier
+    if len(series_points) >= 4:
+        all_quantities = np.array([p[1] for p in series_points], dtype=float)
 
-        z_score = (sales_history[-1] - expected_sale) / std
-        if z_score > 2.0:
-            alerts.append(
-                f"CONSUMPTION SPIKE: Latest sale ({sales_history[-1]}) is {round(z_score, 1)}σ above "
-                f"event-adjusted expected ({round(expected_sale, 1)})!"
-            )
+        q25, q75 = np.percentile(all_quantities, [25, 75])
+        iqr = q75 - q25
+        iqr_threshold = q75 + (1.5 * iqr) if iqr > 0 else float("inf")
+
+        seen_spikes = set()
+
+        for idx, (d_str, qty) in enumerate(series_points):
+            if idx >= 4:
+                window = all_quantities[max(0, idx - 30):idx]
+            else:
+                window = np.delete(all_quantities, idx)
+
+            if len(window) < 3:
+                continue
+
+            mean = float(np.mean(window))
+            std = float(np.std(window))
+            if std < 0.5:
+                std = max(float(mean * 0.2), 1.0)
+
+            effective_mult = float(current_multiplier) if (idx == len(series_points) - 1 and current_multiplier > 1.0) else 1.0
+            expected_sale = mean * effective_mult
+
+            z_score = (qty - expected_sale) / std
+            is_z_outlier = z_score > 2.0
+            is_iqr_outlier = (qty > iqr_threshold and z_score > 1.5)
+
+            if (is_z_outlier or is_iqr_outlier) and d_str not in seen_spikes and qty > 0:
+                seen_spikes.add(d_str)
+                alerts.append(AnomalyAlert({
+                    "date": d_str,
+                    "type": "CONSUMPTION_SPIKE",
+                    "qty": int(qty),
+                    "z_score": round(float(z_score), 1),
+                    "baseline_mean": round(float(mean), 1),
+                    "message": f"CONSUMPTION SPIKE on {d_str}: {int(qty)} units ({round(float(z_score), 1)}σ above baseline {round(float(mean), 1)})"
+                }))
 
     return alerts

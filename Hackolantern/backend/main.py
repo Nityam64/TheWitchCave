@@ -1,9 +1,11 @@
-from fastapi import FastAPI, HTTPException, Query
+from __future__ import annotations
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Union
 from datetime import datetime, timedelta
 from ml_engine.ai_core import run_prophecy_and_restock, detect_strange_happenings, generate_forecast
+from evaluate import evaluate_csv_content
 import firebase_db
 import import_sample_data
 import os
@@ -30,6 +32,15 @@ class StockUpdate(BaseModel):
 
 class AuditRequest(BaseModel):
     missing_amount: int = 5  # Units that vanished during audit
+
+class IngredientCreate(BaseModel):
+    name: str
+    current_stock: int
+    safety_stock: Optional[int] = 10
+    supplier: Optional[str] = "Diagon Alley Apothecary"
+    lead_time_days: Optional[int] = 3
+    unit: Optional[str] = "jars"
+    category: Optional[str] = "Potions & Herbs"
 
 class CurseRequest(BaseModel):
     ingredient_ids: list  # Up to 3 ingredients for 3x Full Moon Festival spike
@@ -75,7 +86,8 @@ def get_full_pantry_status():
             sales_history=sales_history,
             expected_stock=item.get("expected_stock", 0),
             actual_stock=item.get("current_stock", 0),
-            current_multiplier=current_multiplier
+            current_multiplier=current_multiplier,
+            daily_sales=daily_sales
         )
         results.append({
             **item,
@@ -85,6 +97,11 @@ def get_full_pantry_status():
             "events": events
         })
     return {"pantry": results}
+
+@app.post("/api/pantry")
+def create_ingredient(payload: IngredientCreate):
+    created = firebase_db.add_ingredient(payload.dict())
+    return {"status": "created", "item": created}
 
 @app.get("/api/ingredients/{item_id}/history")
 def get_ingredient_history(item_id: str, days: int = Query(60, ge=1, le=365)):
@@ -183,3 +200,50 @@ def trigger_midnight_curse(payload: CurseRequest):
         "cursed_ids": payload.ingredient_ids,
         "event": event
     }
+
+# =====================================================================
+# Judge CSV Upload & Evaluation Endpoint
+# =====================================================================
+
+@app.post("/api/evaluate-csv")
+async def evaluate_csv_endpoint(
+    request: Request,
+    file: Optional[UploadFile] = File(None)
+):
+    csv_text = ""
+    # 1. Check if multipart file was provided
+    if file is not None:
+        try:
+            content_bytes = await file.read()
+            csv_text = content_bytes.decode("utf-8", errors="replace")
+        except Exception:
+            pass
+
+    # 2. Check JSON payload or raw body if file was not provided or empty
+    if not csv_text.strip():
+        content_type = request.headers.get("content-type", "")
+        if "application/json" in content_type:
+            try:
+                body_json = await request.json()
+                csv_text = body_json.get("csv_text") or body_json.get("content") or body_json.get("csv") or ""
+            except Exception:
+                pass
+        if not csv_text.strip():
+            try:
+                body_bytes = await request.body()
+                csv_text = body_bytes.decode("utf-8", errors="replace")
+            except Exception:
+                pass
+
+    if not csv_text.strip():
+        raise HTTPException(
+            status_code=400,
+            detail="No CSV content found. Upload a file via multipart form or send CSV text in body."
+        )
+
+    try:
+        report = evaluate_csv_content(csv_text)
+        return {"status": "success", "report": report}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to evaluate CSV: {str(e)}")
+
