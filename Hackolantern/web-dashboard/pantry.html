@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Hexley’s Potion Pantry | Magical Inventory & Forecast</title>
+  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Header & Top Navigation -->
+  <header class="app-header">
+    <div class="header-inner">
+      <a href="#dashboard" class="brand-wrapper" id="brand-link" title="Hexley’s Potion Pantry">
+        <svg class="brand-logo-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Victorian Apothecary Vial & Lunar Emblem -->
+          <circle cx="22" cy="22" r="20" stroke="#c86d3b" stroke-width="1" stroke-dasharray="2 2" opacity="0.6"/>
+          <path d="M18 7H26V11L33 24C34.5 26.5 34 30.5 31 32.5C29.5 33.5 27.5 34 25.5 34H18.5C16.5 34 14.5 33.5 13 32.5C10 30.5 9.5 26.5 11 24L18 11V7Z" fill="#181122" stroke="#c86d3b" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M16 7H28" stroke="#f5eedf" stroke-width="2" stroke-linecap="round"/>
+          <path d="M19 4H25V7H19V4Z" fill="#c86d3b" stroke="#7e4c27" stroke-width="1"/>
+          <!-- Fluid level line -->
+          <path d="M12.5 25C16 27 28 27 31.5 25" stroke="#d97736" stroke-width="1.5" stroke-dasharray="3 1.5"/>
+          <!-- Engraved Moon in potion -->
+          <path d="M24 16C22.2 16 20.8 17.2 20.5 19C20.2 20.8 21.4 22.3 23.2 22.6C22.2 23 21 22.8 20.2 22.2C19 21.3 18.7 19.8 19.3 18.5C19.9 17.2 21.2 16.3 22.7 16.1C23.1 16 23.6 16 24 16Z" fill="#f5eedf"/>
+          <circle cx="27" cy="23" r="1.2" fill="#ffcd75"/>
+          <circle cx="17" cy="24" r="1" fill="#ffcd75"/>
+        </svg>
+        <div class="brand-title">
+          <span>Hexley’s Potion Pantry</span>
+          <span class="brand-sub">Victorian Apothecary &bull; Est. 1888</span>
+        </div>
+      </a>
+
+      <!-- 6 Primary App Sections with Victorian Apothecary SVGs -->
+      <nav class="main-nav" aria-label="Main Navigation">
+        <button class="nav-btn active" data-page="dashboard">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" data-page="inventory">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5a4 4 0 0 1-.8 2.4L4.5 17.5A3 3 0 0 0 7 22h10a3 3 0 0 0 2.5-4.5L14.8 10.4A4 4 0 0 1 14 8V3"/></svg>
+          <span>Inventory</span>
+        </button>
+        <button class="nav-btn" data-page="sale">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span>Record Sale</span>
+        </button>
+        <button class="nav-btn" data-page="forecast">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4M21 5h-4"/></svg>
+          <span>Forecast &amp; Restock</span>
+        </button>
+        <button class="nav-btn" data-page="activity">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+          <span>Stock Activity</span>
+        </button>
+        <button class="nav-btn" data-page="suppliers">
+          <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Suppliers &amp; Settings</span>
+        </button>
+      </nav>
+
+      <!-- Database Status Badge (Victorian Apothecary Stamp) -->
+      <div class="header-actions">
+        <button id="db-status-badge" class="db-status-badge status-demo" title="Apothecary Local Storage">
+          <span id="db-status-icon" class="apothecary-seal-pip">&bull;</span>
+          <span id="db-status-text">LOCAL APOTHECARY ARCHIVE</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    
+    <!-- SECTION 1: DASHBOARD -->
+    <section id="section-dashboard" class="page-section active">
+      <div class="page-header">
+        <div>
+          <div class="apothecary-meta-tag">BATCH RECORD NO. 1888-IX &bull; MIDNIGHT VIGIL</div>
+          <h1 class="page-title">Apothecary Vault &amp; Stock Ledger</h1>
+          <p class="page-desc">Real-time pantry status, lunar curse surveillance, and urgent restock thresholds.</p>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center;">
+          <button class="btn btn-secondary" id="dash-btn-sale">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+            <span>Record Sale</span>
+          </button>
+          <button class="btn btn-primary" id="dash-btn-add">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Add Ingredient</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- VISUAL HERO: Full Moon Festival Lunar Curse Plate -->
+      <div id="festival-banner" class="hero-festival-plate">
+        <div class="festival-plate-inner">
+          <!-- Lunar Crest Illustration -->
+          <div class="festival-lunar-crest">
+            <svg class="lunar-medallion-svg" viewBox="0 0 84 84" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Outer celestial etched orbit -->
+              <circle cx="42" cy="42" r="39" stroke="#c86d3b" stroke-width="1" stroke-dasharray="2 3"/>
+              <circle cx="42" cy="42" r="35" stroke="#7e4c27" stroke-width="1"/>
+              <!-- Radiant Moon Sphere -->
+              <circle cx="42" cy="42" r="28" fill="url(#heroMoonGlow)"/>
+              <!-- Engraved Woodcut Crater Markings -->
+              <circle cx="36" cy="34" r="5.5" fill="#f5eedf" fill-opacity="0.35"/>
+              <circle cx="50" cy="46" r="7" fill="#f5eedf" fill-opacity="0.25"/>
+              <circle cx="39" cy="51" r="4.5" fill="#f5eedf" fill-opacity="0.3"/>
+              <circle cx="49" cy="32" r="3" fill="#f5eedf" fill-opacity="0.2"/>
+              <!-- Shadow Overlay (Crescent Etching) -->
+              <path d="M42 14C57.464 14 70 26.536 70 42C70 57.464 57.464 70 42 70C34.5 70 26 61.5 26 42C26 22.5 34.5 14 42 14Z" fill="#241118" fill-opacity="0.45"/>
+              <!-- Starburst points -->
+              <path d="M42 4L43 9L47 10L43 11L42 16L41 11L37 10L41 9Z" fill="#ffcd75"/>
+              <path d="M78 42L74 43L73 47L72 43L68 42L72 41L73 37L74 41Z" fill="#ffcd75"/>
+              <defs>
+                <radialGradient id="heroMoonGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(38 38) rotate(45) scale(32)">
+                  <stop offset="0%" stop-color="#fff5db"/>
+                  <stop offset="55%" stop-color="#e8be74"/>
+                  <stop offset="100%" stop-color="#c86d3b"/>
+                </radialGradient>
+              </defs>
+            </svg>
+            <div class="lunar-phase-badge">LUNAR APEX</div>
+          </div>
+          
+          <!-- Central Directive Content -->
+          <div class="festival-content">
+            <div class="festival-header-row">
+              <span class="apothecary-dispatch-stamp">APOTHECARY DIRECTIVE &bull; VOL. IV</span>
+              <span id="festival-status-indicator" class="festival-pill-active">MANDATE: ACTIVE (3&times; DEMAND SURGE)</span>
+            </div>
+            
+            <h2 class="festival-hero-title">Full Moon Festival Approaching at Midnight</h2>
+            
+            <p class="festival-hero-desc">
+              Celestial lunar tides trigger the Midnight Curse: demand triples across three vital apothecary ingredients. 
+              Review the restock prescription below to prevent vault depletion before midnight.
+            </p>
+
+            <div class="festival-affected-block">
+              <span class="affected-label">CURSED INGREDIENTS (3&times; SURGE):</span>
+              <div id="festival-item-names" class="affected-pills-row">
+                <!-- Dynamically populated in js/app.js -->
+                <span class="apothecary-pill"><span class="pill-moon">☾</span> Loading items...</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Restock CTA Column -->
+          <div class="festival-cta-column">
+            <a href="#forecast" class="btn btn-copper-hero nav-shortcut">
+              <span>View Restock Spell</span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <div class="festival-safety-note">Calculates safety stock &amp; supplier lead days</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unusual Consumption Alerts Container -->
+      <div id="unusual-alerts-container"></div>
+
+      <!-- Stat Cards Grid with Clear Urgency Hierarchy -->
+      <div class="stats-grid">
+        <!-- 1. Out of Stock (CRITICAL URGENCY - OXBLOOD/GARNET) -->
+        <div class="stat-card stat-critical">
+          <div class="stat-top">
+            <div class="stat-meta">
+              <span class="stat-label">Out of Stock</span>
+              <span class="urgency-tag urgency-critical">DEFICIT</span>
+            </div>
+            <div class="stat-icon-wrap icon-critical" title="Depleted vault">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-out-stock">0</div>
+          <div class="stat-sub">Depleted apothecary shelves</div>
+        </div>
+
+        <!-- 2. Low Stock (HIGH URGENCY - AMBER/COPPER) -->
+        <div class="stat-card stat-warning">
+          <div class="stat-top">
+            <div class="stat-meta">
+              <span class="stat-label">Low Stock</span>
+              <span class="urgency-tag urgency-warning">DEPLETING</span>
+            </div>
+            <div class="stat-icon-wrap icon-warning" title="Below minimum safety reserve">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-low-stock">0</div>
+          <div class="stat-sub">Below safety threshold limits</div>
+        </div>
+
+        <!-- 3. Stockout < 7 Days (PROPHETIC FORECAST - PLUM/LUNAR) -->
+        <div class="stat-card stat-prophecy">
+          <div class="stat-top">
+            <div class="stat-meta">
+              <span class="stat-label">Stockout &lt; 7 Days</span>
+              <span class="urgency-tag urgency-prophecy">PROPHECY</span>
+            </div>
+            <div class="stat-icon-wrap icon-prophecy" title="Projected to run dry soon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-runout-soon">0</div>
+          <div class="stat-sub">Predicted dry before week's end</div>
+        </div>
+
+        <!-- 4. Total Items (LEDGER INVENTORY - QUIET CHARCOAL) -->
+        <div class="stat-card stat-quiet">
+          <div class="stat-top">
+            <div class="stat-meta">
+              <span class="stat-label">Catalogued Stock</span>
+              <span class="urgency-tag urgency-quiet">VAULT</span>
+            </div>
+            <div class="stat-icon-wrap icon-quiet" title="Total active items">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v5a4 4 0 0 1-.8 2.4L4.5 17.5A3 3 0 0 0 7 22h10a3 3 0 0 0 2.5-4.5L14.8 10.4A4 4 0 0 1 14 8V3"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-total-items">0</div>
+          <div class="stat-sub">Active registered ingredients</div>
+        </div>
+
+        <!-- 5. Sales Today (TRANSACTIONS - QUIET CHARCOAL) -->
+        <div class="stat-card stat-quiet">
+          <div class="stat-top">
+            <div class="stat-meta">
+              <span class="stat-label">Today's Draughts</span>
+              <span class="urgency-tag urgency-quiet">LEDGER</span>
+            </div>
+            <div class="stat-icon-wrap icon-quiet" title="Sales tally">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 6v12M15 9.5a3 3 0 0 0-3-2.5h-1a2.5 2.5 0 0 0 0 5h2a2.5 2.5 0 0 1 0 5h-1a3 3 0 0 1-3-2.5"/></svg>
+            </div>
+          </div>
+          <div class="stat-value" id="stat-sales-today">0</div>
+          <div class="stat-sub" id="stat-sales-amount">&cent;0 total earned</div>
+        </div>
+      </div>
+
+      <!-- Two-column recent activity preview with Victorian ledger styling -->
+      <div class="sale-layout">
+        <div class="card card-ledger">
+          <div class="card-title">
+            <div class="title-with-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/></svg>
+              <span>Recent Sales Register</span>
+            </div>
+            <a href="#activity" class="nav-shortcut">View All &rarr;</a>
+          </div>
+          <div id="dash-recent-sales">Loading recent sales...</div>
+          <div class="card-footer-note">&bull; Recorded in standard apothecary coin &bull; Signed Hexley &bull;</div>
+        </div>
+
+        <div class="card card-ledger">
+          <div class="card-title">
+            <div class="title-with-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              <span>Stock Movement Register</span>
+            </div>
+            <a href="#activity" class="nav-shortcut">All Logs &rarr;</a>
+          </div>
+          <div id="dash-recent-movements">Loading stock logs...</div>
+          <div class="card-footer-note">&bull; Permanent ledger &bull; No silent alterations permitted &bull;</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: INVENTORY -->
+    <section id="section-inventory" class="page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Potion Pantry Inventory</h1>
+          <p class="page-desc">Manage ingredients, potions, units, and safety stock thresholds.</p>
+        </div>
+        <button class="btn btn-primary" id="inv-btn-add">+ Add New Item</button>
+      </div>
+
+      <!-- Filters & Search -->
+      <div class="filter-bar">
+        <input type="text" id="inv-search" class="search-input" placeholder="Search by ingredient name or supplier...">
+        <select id="inv-filter-category" class="filter-select">
+          <option value="all">All Categories</option>
+          <option value="ingredient">Ingredients</option>
+          <option value="potion">Potions</option>
+          <option value="supply">Shop Supplies</option>
+        </select>
+        <select id="inv-filter-status" class="filter-select">
+          <option value="all">All Stock Statuses</option>
+          <option value="in_stock">In Stock</option>
+          <option value="low_stock">Low Stock</option>
+          <option value="out_of_stock">Out of Stock</option>
+          <option value="festival">Festival Cursed</option>
+          <option value="archived">Archived</option>
+        </select>
+      </div>
+
+      <!-- Table Container -->
+      <div class="table-container">
+        <table class="pantry-table" id="inventory-table">
+          <thead>
+            <tr>
+              <th>Ingredient & Category</th>
+              <th>Current Stock</th>
+              <th>Min Safety Stock</th>
+              <th>Status</th>
+              <th>Supplier (Lead Time)</th>
+              <th>Festival Surge</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="inventory-tbody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 3: RECORD SALE -->
+    <section id="section-sale" class="page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Record Witch Shop Sale</h1>
+          <p class="page-desc">Atomic stock deduction with complete movement history logging.</p>
+        </div>
+      </div>
+
+      <div class="sale-layout">
+        <!-- Item Selection Panel -->
+        <div class="card">
+          <div class="card-title">Select Pantry Items</div>
+          <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+            Click an available item to add it to the parchment sale ticket.
+          </p>
+          <div class="item-selector-grid" id="sale-item-picker">
+            <!-- Items rendered here -->
+          </div>
+        </div>
+
+        <!-- Checkout Ticket -->
+        <div class="card">
+          <div class="card-title">Current Sale Ticket</div>
+          <div id="sale-ticket-list" style="margin-bottom:16px; min-height:120px;">
+            <p style="color:var(--text-dim); font-size:0.9rem;">No ingredients selected yet.</p>
+          </div>
+
+          <div style="border-top:1px solid var(--border-subtle); padding-top:12px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:700;">
+              <span>Total Units:</span>
+              <span id="sale-total-qty">0</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700; color:var(--accent-festival);">
+              <span>Estimated Cost:</span>
+              <span id="sale-total-cost">¢0.00</span>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Customer / Sale Notes (Optional)</label>
+              <input type="text" id="sale-notes" class="form-control" placeholder="e.g., Midnight traveler, healing tonic order">
+            </div>
+          </div>
+
+          <button id="btn-confirm-sale" class="btn btn-festival" style="width:100%;">
+            Confirm & Deduct Stock
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: FORECAST & RESTOCK -->
+    <section id="section-forecast" class="page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Prophecy & Restock Spell</h1>
+          <p class="page-desc">Transparent baseline demand prediction, Full Moon Festival surges, and reorder math.</p>
+        </div>
+      </div>
+
+      <!-- Festival Settings Quick Toggle Bar -->
+      <div class="alert-box alert-festival" style="align-items:center;">
+        <div class="alert-icon">⚡</div>
+        <div class="alert-content">
+          <div class="alert-title">Festival Configuration</div>
+          <div class="alert-text">
+            Midnight Curse Multiplier: <strong id="fc-multiplier-val">3x</strong> | Cursed Items: <span id="fc-cursed-count">3 items</span>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" id="btn-edit-festival">Edit Festival Settings</button>
+      </div>
+
+      <!-- Item Forecast Selector -->
+      <div class="card">
+        <div class="form-group" style="max-width:400px;">
+          <label class="form-label">Select Item for Prophecy & Restock Details:</label>
+          <select id="forecast-item-select" class="form-control"></select>
+        </div>
+
+        <div id="forecast-details-card" style="margin-top:16px;">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- SVG Forecast & History Chart -->
+        <div class="chart-wrapper">
+          <h4 style="font-family:var(--font-serif); margin-bottom:8px; color:var(--text-cream);">
+            Historic Consumption & 7-Day Forecast Curve
+          </h4>
+          <div id="forecast-chart-container"></div>
+        </div>
+      </div>
+
+      <!-- All Items Reorder Table -->
+      <div class="card">
+        <div class="card-title">All Pantry Restock Recommendations</div>
+        <div class="table-container">
+          <table class="pantry-table">
+            <thead>
+              <tr>
+                <th>Ingredient</th>
+                <th>Stock on Hand</th>
+                <th>Safety Stock</th>
+                <th>7-Day Demand</th>
+                <th>Reorder Suggestion</th>
+                <th>Supplier (Lead Time)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="restock-table-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 5: STOCK ACTIVITY -->
+    <section id="section-activity" class="page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Permanent Stock Movement Log</h1>
+          <p class="page-desc">Complete immutable audit trail of sales, deliveries, and stock adjustments.</p>
+        </div>
+        <button class="btn btn-secondary" id="btn-open-adjust-modal">Record Stock Correction</button>
+      </div>
+
+      <div class="table-container">
+        <table class="pantry-table">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Item</th>
+              <th>Action Type</th>
+              <th>Quantity Change</th>
+              <th>Remaining Stock</th>
+              <th>Reason / Reference</th>
+            </tr>
+          </thead>
+          <tbody id="activity-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 6: SUPPLIERS & SETTINGS -->
+    <section id="section-suppliers" class="page-section">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Suppliers &amp; Settings</h1>
+          <p class="page-desc">Manage apothecary vendors, festival rules, and pantry data.</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" id="btn-record-delivery">+ Record Delivery</button>
+          <button class="btn btn-primary" id="btn-add-supplier">+ Add Supplier</button>
+        </div>
+      </div>
+
+      <div class="sale-layout">
+        <!-- Supplier Cards -->
+        <div>
+          <div class="card">
+            <div class="card-title">Registered Suppliers</div>
+            <div id="suppliers-list">Loading suppliers...</div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Sample Data Control</div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:12px;">
+              Reset local storage with authentic sample witch inventory (Bat Wings, Mandrake Root, Newt Eyes) with pre-seeded sales and consumption anomalies.
+            </p>
+            <button class="btn btn-secondary" id="btn-reset-sample-data">Reset to Sample Potion Data</button>
+          </div>
+        </div>
+
+        <!-- Local Storage Info Card -->
+        <div class="card">
+          <div class="card-title">Data Storage</div>
+          <div style="background:rgba(124,58,237,0.15); border:1px solid #7c3aed; border-radius:8px; padding:16px; color:#c4b5fd; font-size:0.9rem; margin-bottom:16px;">
+            <strong>&#x1F9EA; Running in Local Storage Mode</strong><br><br>
+            All pantry data &mdash; inventory, sales, movements, and suppliers &mdash; is saved directly in <strong>this browser</strong>. No server or internet connection required.<br><br>
+            Data persists between visits on this device. Use <em>Reset to Sample Potion Data</em> to restore the original demo inventory.
+          </div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">
+            <strong>Keys stored locally:</strong><br>
+            hexley_inventory &middot; hexley_sales &middot; hexley_movements &middot; hexley_suppliers &middot; hexley_settings
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: ADD / EDIT INVENTORY ITEM -->
+  <div class="modal-backdrop" id="modal-item">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-item-title">Add Pantry Ingredient</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-item">
+        <input type="hidden" id="item-id">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="item-name">Ingredient Name *</label>
+            <input type="text" id="item-name" class="form-control" required placeholder="e.g., Bat Wings, Mandrake Root">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="item-category">Category *</label>
+              <select id="item-category" class="form-control" required>
+                <option value="ingredient">Ingredient</option>
+                <option value="potion">Potion</option>
+                <option value="supply">Shop Supply</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="item-unit">Unit of Measure *</label>
+              <input type="text" id="item-unit" class="form-control" required placeholder="e.g., pairs, jars, grams, vials">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="item-quantity">Quantity on Hand *</label>
+              <input type="number" id="item-quantity" class="form-control" min="0" required placeholder="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="item-min-stock">Minimum Safety Stock *</label>
+              <input type="number" id="item-min-stock" class="form-control" min="0" required placeholder="10">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="item-supplier">Supplier</label>
+              <select id="item-supplier" class="form-control"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="item-cost">Unit Cost (¢)</label>
+              <input type="number" id="item-cost" class="form-control" min="0" step="0.5" placeholder="5.00">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top:12px; background:rgba(255,158,0,0.1); padding:12px; border-radius:8px; border:1px solid rgba(255,158,0,0.3);">
+            <label class="checkbox-label">
+              <input type="checkbox" id="item-festival-affected">
+              <span><strong>Affected by Full Moon Festival (Midnight Curse)</strong></span>
+            </label>
+            <div class="form-row" style="margin-top:10px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label" for="item-festival-mult">Festival Multiplier</label>
+                <input type="number" id="item-festival-mult" class="form-control" min="1" max="10" value="3">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Ingredient</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: RECORD DELIVERY -->
+  <div class="modal-backdrop" id="modal-delivery">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Supplier Delivery</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-delivery">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="del-supplier">Supplier *</label>
+            <select id="del-supplier" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="del-item">Ingredient / Item *</label>
+            <select id="del-item" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="del-qty">Quantity Received *</label>
+            <input type="number" id="del-qty" class="form-control" min="1" required placeholder="e.g., 20">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="del-notes">Delivery Notes / Courier ID</label>
+            <input type="text" id="del-notes" class="form-control" placeholder="e.g., Night Raven delivery, batch #904">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Record Delivery & Restock</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: STOCK CORRECTION -->
+  <div class="modal-backdrop" id="modal-adjust">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="modal-title">Record Stock Correction / Damage</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-adjust">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="adj-item">Ingredient *</label>
+            <select id="adj-item" class="form-control" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adj-delta">Adjustment Quantity (+ or -) *</label>
+            <input type="number" id="adj-delta" class="form-control" required placeholder="e.g., -5 for damaged jars, +10 for recount">
+            <div class="form-hint">Negative numbers reduce stock; positive numbers increase stock.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="adj-reason">Audit Reason *</label>
+            <input type="text" id="adj-reason" class="form-control" required placeholder="e.g., Spilled cauldron, jar shattered, inventory recount">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Stock Movement</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD SUPPLIER -->
+  <div class="modal-backdrop" id="modal-supplier">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Apothecary Supplier</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-supplier">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="sup-name">Supplier Name *</label>
+            <input type="text" id="sup-name" class="form-control" required placeholder="e.g., Grimoire & Grove Apothecary">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="sup-contact">Contact / Owl Dispatch</label>
+              <input type="text" id="sup-contact" class="form-control" placeholder="e.g., Raven Owl #04">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="sup-lead">Delivery Lead Time (Days) *</label>
+              <input type="number" id="sup-lead" class="form-control" min="1" required value="3">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="sup-notes">Specialties / Notes</label>
+            <input type="text" id="sup-notes" class="form-control" placeholder="e.g., Rare herbs, nocturnal fauna">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Supplier</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: FESTIVAL SETTINGS -->
+  <div class="modal-backdrop" id="modal-festival">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="modal-title">Full Moon Festival Configuration</h3>
+        <button class="modal-close" data-close-modal>&times;</button>
+      </div>
+      <form id="form-festival">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="fest-active" checked>
+              <span><strong>Festival Surge Active</strong></span>
+            </label>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fest-name">Festival Title</label>
+            <input type="text" id="fest-name" class="form-control" value="Full Moon Festival">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fest-multiplier">Demand Multiplier</label>
+            <input type="number" id="fest-multiplier" class="form-control" min="1" max="10" value="3">
+            <div class="form-hint">Default is 3x demand multiplier for affected ingredients.</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Select Cursed Ingredients (Up to 3 recommended):</label>
+            <div id="fest-items-checklist" style="max-height:180px; overflow-y:auto; border:1px solid var(--border-subtle); border-radius:6px; padding:10px;"></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+          <button type="submit" class="btn btn-festival">Save Festival Rules</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
+

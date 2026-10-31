@@ -1,40 +1,1302 @@
-:root{--bg:#1c1224;--cream:#f6ecd9;--ink:#2a1d33;--or:#ff8a2b;--vi:#9b6bff;--red:#c83c4e;--grn:#3f9e5a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--cream);font-family:system-ui,Arial,sans-serif;line-height:1.4}
-[hidden]{display:none!important}
-a{color:var(--or)}
-header{padding:16px;background:linear-gradient(90deg,#2b1842,#3a1c2e)}
-.top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px}
-h1{margin:0;font-family:Georgia,serif;color:var(--or);font-size:26px}
-.wrap{max-width:980px;margin:0 auto;padding:14px;min-height:70vh}
-nav{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-nav a,.btn,.btn2,button{font:inherit;border:0;border-radius:12px;padding:10px 14px;cursor:pointer;background:#33244a;color:var(--cream);text-decoration:none;display:inline-block}
-nav a.on,.btn{background:var(--or);color:#2a1408;font-weight:bold}
-.btn2{background:var(--vi);color:#1a0f2e}
-input,select{width:100%;font:inherit;font-size:16px;padding:11px;border-radius:10px;border:1px solid #c9b8a0;margin:4px 0 10px}
-label{font-size:14px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
-.card{background:var(--cream);color:var(--ink);border-radius:14px;padding:14px;margin-bottom:12px;position:relative}
-.card.warn{border-left:6px solid var(--or);cursor:pointer}
-.card.odd{border-left:6px solid var(--vi)}
-.ing{padding-right:70px}
-.big{font-size:28px;font-weight:bold}
-.tag{display:inline-block;padding:3px 10px;border-radius:99px;color:#fff;font-size:13px}
-.ok{background:var(--grn)}.low{background:#c98a14}.out{background:var(--red)}
-.bad{color:var(--red);font-weight:bold}
-.err{color:var(--red);min-height:20px}
-.good{color:var(--grn);font-weight:bold;min-height:20px}
-.bottle{position:absolute;right:14px;top:14px;width:46px;height:64px;border:3px solid var(--ink);border-radius:8px 8px 16px 16px;overflow:hidden;background:#fff8ec}
-.liquid{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(var(--vi),var(--or))}
-.banner{background:linear-gradient(90deg,var(--or),var(--vi));color:#1a0f2e;padding:12px 16px;border-radius:14px;margin:12px 0}
-.hero{padding:24px 0 10px}
-.hero h2{font-family:Georgia,serif;font-size:32px;margin:0 0 10px;color:#fff}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{padding:8px;text-align:left;border-bottom:1px solid #e0d2bb}
-.scroll{overflow-x:auto}
-.chart{display:flex;align-items:flex-end;gap:8px;height:170px;background:#fff8ec;border-radius:12px;padding:12px;color:var(--ink);margin:12px 0}
-.col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;font-size:12px}
-.bar{width:100%;border-radius:6px 6px 0 0;background:#b9a6cf}
-.bar.fest{background:var(--or)}.bar.norm{background:var(--vi)}
-footer{text-align:center;font-size:13px;opacity:.7;padding:20px}
+/* css/style.css - Hexley's Potion Pantry 
+   Art-directed Victorian Apothecary at Midnight (Halloween Aesthetic)
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* Victorian Apothecary Midnight Palette */
+  --bg-primary: #110c18;       /* Deep charcoal-plum midnight void */
+  --bg-surface: #171120;       /* Dark polished cabinet shelf */
+  --bg-card: #1c1527;          /* Solid dark apothecary box */
+  --bg-elevated: #231b31;      /* Elevated velvet drawer */
+  --bg-parchment: #f4ecdc;     /* Authentic aged parchment paper */
+  --bg-parchment-subtle: #21192e; 
+  --bg-parchment-tint: rgba(244, 236, 220, 0.04);
+
+  /* Hairline Antique Borders & Ruled Lines */
+  --border-subtle: #362945;     /* Dark bronze-plum rule */
+  --border-card: #453657;       /* Cabinet edge */
+  --border-focus: #c86d3b;      /* Warm copper focus */
+  --border-copper: #c86d3b;     /* Restrained burnished copper */
+  --border-copper-dim: #6d3a1d; /* Shadowed copper */
+  --border-parchment: #c8b99d;  /* Aged paper rule */
+
+  /* Legible Victorian Typography */
+  --text-main: #f5eedf;        /* Warm cream */
+  --text-cream: #faf2e3;       /* Unblemished ivory parchment */
+  --text-parchment: #e8dec8;   /* Aged parchment text */
+  --text-muted: #ab9eb8;       /* Heather slate-violet */
+  --text-dim: #7a6e88;         /* Subdued apothecary ledger note */
+  --text-copper: #dc7a42;      /* Burnt-orange / copper callout */
+
+  /* Restrained Accents & Urgency Indicators */
+  --accent-copper: #c86d3b;
+  --accent-copper-hover: #dc7a42;
+  --accent-copper-glow: rgba(200, 109, 59, 0.2);
+  --accent-amber: #d97706;      /* Amber glass / depleting caution */
+  --accent-amber-bg: #271407;
+  --accent-urgent-rose: #be123c;/* Crimson sealing wax / out of stock */
+  --accent-urgent-bg: #2b0b14;
+  --accent-sage: #2d6a4f;       /* Dried herbal sage / in stock */
+  --accent-sage-bg: #0f281d;
+  --accent-festival: #d97736;   /* Full moon copper */
+
+  /* Typographic Pairing */
+  --font-serif: "Cinzel", Georgia, "Times New Roman", serif;
+  --font-editorial: "Playfair Display", Georgia, serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Architectural Radii & Restrained Shadows */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 3px 8px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 4px 12px rgba(6, 4, 9, 0.6);
+  --transition-fast: 0.15s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  background-image: radial-gradient(circle at 50% 0%, #1c1328 0%, #110c18 60%);
+  background-attachment: fixed;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* =========================================================
+   1. APP HEADER & NAVIGATION (VICTORIAN CABINET LEDGER)
+   ========================================================= */
+.app-header {
+  background: #150f1e;
+  border-bottom: 2px solid #281d36;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+}
+
+.header-inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.brand-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-decoration: none;
+  color: var(--text-cream);
+  padding: 4px 0;
+}
+
+.brand-logo-svg {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
+}
+
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 1.22rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--text-cream);
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.brand-sub {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--accent-copper);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+/* Top Nav Tabs */
+.main-nav {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.nav-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid transparent;
+  padding: 8px 13px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+}
+
+.nav-icon {
+  width: 15px;
+  height: 15px;
+  opacity: 0.75;
+  stroke: currentColor;
+  flex-shrink: 0;
+}
+
+.nav-btn:hover {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border-color: var(--border-subtle);
+}
+
+.nav-btn.active {
+  background: #20172c;
+  color: var(--text-cream);
+  border: 1px solid var(--border-copper-dim);
+  border-bottom: 2px solid var(--accent-copper);
+}
+
+.nav-btn.active .nav-icon {
+  opacity: 1;
+  stroke: var(--accent-copper);
+}
+
+/* Database Status Badge (Apothecary Stamp) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.db-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  background: #1d1527;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  cursor: default;
+}
+
+.apothecary-seal-pip {
+  color: #10b981;
+  font-size: 1rem;
+  line-height: 0;
+}
+
+/* =========================================================
+   2. MAIN CONTAINER & PAGE HEADERS
+   ========================================================= */
+.main-container {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px 24px 80px 24px;
+}
+
+.page-section {
+  display: none;
+}
+
+.page-section.active {
+  display: block;
+  animation: pageFadeIn 0.2s ease-out;
+}
+
+@keyframes pageFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.apothecary-meta-tag {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-copper);
+  margin-bottom: 4px;
+}
+
+.page-title {
+  font-family: var(--font-serif);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--text-cream);
+  line-height: 1.2;
+}
+
+.page-desc {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin-top: 4px;
+  max-width: 720px;
+}
+
+/* =========================================================
+   3. BUTTONS (RESTRAINED COPPER & ANTIQUE SURFACES)
+   ========================================================= */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+  min-height: 38px;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: #251622;
+  color: var(--text-cream);
+  border: 1px solid var(--accent-copper);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.btn-primary:hover {
+  background: var(--accent-copper);
+  color: #fff;
+  border-color: #e5874c;
+}
+
+.btn-secondary {
+  background: var(--bg-surface);
+  color: var(--text-main);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-secondary:hover {
+  background: var(--bg-elevated);
+  border-color: var(--border-card);
+  color: var(--text-cream);
+}
+
+.btn-danger {
+  background: var(--accent-urgent-bg);
+  color: #fda4af;
+  border: 1px solid var(--accent-urgent-rose);
+}
+
+.btn-danger:hover {
+  background: var(--accent-urgent-rose);
+  color: #fff;
+}
+
+.btn-sm {
+  padding: 5px 11px;
+  font-size: 0.8rem;
+  min-height: 30px;
+}
+
+/* =========================================================
+   4. HERO: FULL MOON FESTIVAL ALERT (ENGRAVED APOTHECARY PLATE)
+   ========================================================= */
+.hero-festival-plate {
+  background: linear-gradient(135deg, #241416 0%, #1c1322 45%, #181120 100%);
+  border: 1px solid var(--border-copper);
+  outline: 1px solid rgba(200, 109, 59, 0.3);
+  outline-offset: -4px;
+  border-radius: var(--radius-sm);
+  padding: 22px 24px;
+  margin-bottom: 26px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6), inset 0 0 40px rgba(200, 109, 59, 0.05);
+}
+
+.festival-plate-inner {
+  display: grid;
+  grid-template-columns: 84px 1fr auto;
+  gap: 22px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .festival-plate-inner {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.festival-lunar-crest {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.lunar-medallion-svg {
+  width: 76px;
+  height: 76px;
+  filter: drop-shadow(0 0 10px rgba(200, 109, 59, 0.3));
+}
+
+.lunar-phase-badge {
+  font-family: var(--font-sans);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent-copper);
+  text-align: center;
+  margin-top: 6px;
+}
+
+.festival-content {
+  min-width: 0;
+}
+
+.festival-header-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.apothecary-dispatch-stamp {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--text-copper);
+  text-transform: uppercase;
+}
+
+.festival-pill-active {
+  background: rgba(200, 109, 59, 0.15);
+  border: 1px solid var(--accent-copper);
+  color: #ffcd75;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.festival-hero-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-cream);
+  line-height: 1.25;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+}
+
+.festival-hero-desc {
+  font-size: 0.88rem;
+  color: var(--text-parchment);
+  line-height: 1.45;
+  max-width: 760px;
+  margin-bottom: 12px;
+}
+
+.festival-affected-block {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.affected-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.affected-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.apothecary-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #19101f;
+  border: 1px solid var(--border-copper);
+  color: #faeed7;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.02em;
+}
+
+.pill-moon {
+  color: var(--accent-copper);
+  font-size: 0.85rem;
+}
+
+.apothecary-pill-empty {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.festival-cta-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+  .festival-cta-column {
+    align-items: flex-start;
+  }
+}
+
+.btn-copper-hero {
+  background: #2e1814;
+  color: #fff;
+  border: 1px solid var(--accent-copper);
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+.btn-copper-hero:hover {
+  background: var(--accent-copper);
+  color: #fff;
+  border-color: #e5874c;
+}
+
+.festival-safety-note {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* =========================================================
+   5. STOCK METRICS HIERARCHY (NOT ALL CARDS LOOK IDENTICAL!)
+   ========================================================= */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+  margin-bottom: 26px;
+}
+
+.stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.stat-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.urgency-tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  width: fit-content;
+}
+
+.stat-icon-wrap {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.stat-value {
+  font-family: var(--font-serif);
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-cream);
+  font-feature-settings: "tnum";
+}
+
+.stat-sub {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 6px;
+  line-height: 1.35;
+}
+
+/* --- HIERARCHY VARIANT 1: OUT OF STOCK (URGENT DEFICIT - OXBLOOD) --- */
+.stat-card.stat-critical {
+  background: linear-gradient(180deg, #280e16 0%, #1d0a11 100%);
+  border: 1px solid #881337;
+  outline: 1px solid rgba(190, 18, 60, 0.35);
+  outline-offset: -3px;
+}
+
+.stat-card.stat-critical .stat-label {
+  color: #fca5a5;
+}
+
+.urgency-critical {
+  background: rgba(190, 18, 60, 0.25);
+  border: 1px solid #be123c;
+  color: #fda4af;
+}
+
+.icon-critical {
+  background: rgba(190, 18, 60, 0.15);
+  color: #f43f5e;
+}
+
+.stat-card.stat-critical .stat-value {
+  color: #fecdd3;
+}
+
+.stat-card.stat-critical .stat-sub {
+  color: #f87171;
+}
+
+/* --- HIERARCHY VARIANT 2: LOW STOCK (URGENT DEPLETION - SMOKY AMBER) --- */
+.stat-card.stat-warning {
+  background: linear-gradient(180deg, #241408 0%, #1a0f06 100%);
+  border: 1px solid #92400e;
+  outline: 1px solid rgba(217, 119, 6, 0.3);
+  outline-offset: -3px;
+}
+
+.stat-card.stat-warning .stat-label {
+  color: #fde68a;
+}
+
+.urgency-warning {
+  background: rgba(217, 119, 6, 0.2);
+  border: 1px solid #d97706;
+  color: #fcd34d;
+}
+
+.icon-warning {
+  background: rgba(217, 119, 6, 0.15);
+  color: #f59e0b;
+}
+
+.stat-card.stat-warning .stat-value {
+  color: #fef08a;
+}
+
+.stat-card.stat-warning .stat-sub {
+  color: #fbbf24;
+}
+
+/* --- HIERARCHY VARIANT 3: STOCKOUT < 7 DAYS (PROPHECY COUNTDOWN) --- */
+.stat-card.stat-prophecy {
+  background: linear-gradient(180deg, #20152b 0%, #180f22 100%);
+  border: 1px solid #583770;
+  border-top: 2px solid var(--accent-copper);
+}
+
+.stat-card.stat-prophecy .stat-label {
+  color: #faedd9;
+}
+
+.urgency-prophecy {
+  background: rgba(200, 109, 59, 0.2);
+  border: 1px solid var(--accent-copper);
+  color: #ffcd75;
+}
+
+.icon-prophecy {
+  background: rgba(200, 109, 59, 0.15);
+  color: var(--accent-copper);
+}
+
+.stat-card.stat-prophecy .stat-value {
+  color: #fcd34d;
+}
+
+.stat-card.stat-prophecy .stat-sub {
+  color: var(--text-copper);
+}
+
+/* --- HIERARCHY VARIANT 4 & 5: QUIET APOTHECARY LEDGER CARDS --- */
+.stat-card.stat-quiet {
+  background: #171120;
+  border: 1px solid var(--border-subtle);
+}
+
+.urgency-quiet {
+  background: #231b31;
+  border: 1px solid var(--border-card);
+  color: var(--text-muted);
+}
+
+.icon-quiet {
+  background: #231b31;
+  color: var(--text-muted);
+}
+
+.stat-card.stat-quiet .stat-value {
+  color: var(--text-main);
+}
+
+/* =========================================================
+   6. ANOMALY ALERTS (UNUSUAL CONSUMPTION)
+   ========================================================= */
+.alert-box {
+  background: var(--bg-surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  padding: 16px 20px;
+  margin-bottom: 22px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.alert-warning {
+  background: #20130a;
+  border: 1px solid #92400e;
+}
+
+.alert-critical {
+  background: #260c15;
+  border: 1px solid #9f1239;
+}
+
+.alert-icon-box {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--text-cream);
+  margin-bottom: 4px;
+}
+
+.alert-text {
+  font-size: 0.88rem;
+  color: var(--text-parchment);
+  line-height: 1.45;
+}
+
+.alert-meta {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* =========================================================
+   7. RECENT ACTIVITY LEDGER CARDS
+   ========================================================= */
+.sale-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .sale-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 20px;
+  min-width: 0;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-ledger {
+  background: #171120;
+  border: 1px solid var(--border-subtle);
+}
+
+.card-title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  color: var(--text-cream);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-with-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.title-with-badge svg {
+  stroke: var(--accent-copper);
+}
+
+.nav-shortcut {
+  color: var(--accent-copper);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.nav-shortcut:hover {
+  text-decoration: underline;
+  color: #ffcd75;
+}
+
+.ledger-entry-row {
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(54, 41, 69, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ledger-entry-row:last-child {
+  border-bottom: none;
+}
+
+.ledger-item-name {
+  font-weight: 600;
+  color: var(--text-cream);
+  font-size: 0.92rem;
+}
+
+.ledger-meta {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 2px;
+}
+
+.ledger-amount-copper {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--accent-copper);
+  font-size: 1.05rem;
+}
+
+.card-footer-note {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-align: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   8. TABLES & APOTHECARY REGISTERS
+   ========================================================= */
+.table-container {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+.pantry-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.pantry-table th {
+  background: #130d1a;
+  padding: 12px 16px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.pantry-table td {
+  padding: 13px 16px;
+  font-size: 0.88rem;
+  border-bottom: 1px solid #231b31;
+  vertical-align: middle;
+}
+
+.pantry-table tr:last-child td {
+  border-bottom: none;
+}
+
+.pantry-table tr:hover td {
+  background: rgba(200, 109, 59, 0.04);
+}
+
+.item-cell-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  color: var(--text-cream);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.item-cell-sub {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 2px;
+}
+
+/* Status Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.badge-dot {
+  font-size: 0.85rem;
+  line-height: 0;
+}
+
+.badge-in-stock {
+  background: var(--accent-sage-bg);
+  color: #6ee7b7;
+  border: 1px solid var(--accent-sage);
+}
+
+.badge-low-stock {
+  background: var(--accent-amber-bg);
+  color: #fcd34d;
+  border: 1px solid var(--accent-amber);
+}
+
+.badge-out-of-stock {
+  background: var(--accent-urgent-bg);
+  color: #fda4af;
+  border: 1px solid var(--accent-urgent-rose);
+}
+
+.badge-festival {
+  background: #33180c;
+  color: #ffcd75;
+  border: 1px solid var(--accent-copper);
+}
+
+.badge-archived {
+  background: #1f1b26;
+  color: #8c8299;
+  border: 1px solid #3d354a;
+}
+
+/* =========================================================
+   9. SEARCH, FILTERS & FORMS
+   ========================================================= */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  min-width: 240px;
+  flex: 1;
+}
+
+.search-input:focus, .filter-select:focus, .form-control:focus {
+  outline: none;
+  border-color: var(--border-copper);
+  box-shadow: 0 0 0 1px var(--border-copper);
+}
+
+.filter-select {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-main);
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.form-group {
+  margin-bottom: 16px;
+  min-width: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-cream);
+  margin-bottom: 6px;
+}
+
+.form-hint {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  background: #140d1c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: var(--text-cream);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-copper);
+}
+
+/* =========================================================
+   10. SALE BUILDER & CART ITEMS
+   ========================================================= */
+.item-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.pantry-item-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pantry-item-card:hover {
+  border-color: var(--border-card);
+  background: var(--bg-elevated);
+}
+
+.pantry-item-card.selected {
+  border-color: var(--accent-copper);
+  background: #251620;
+}
+
+.cart-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(54, 41, 69, 0.6);
+}
+
+.cart-item-row:last-child {
+  border-bottom: none;
+}
+
+.cart-qty-input {
+  width: 65px;
+  background: #140d1c;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 5px 6px;
+  color: #fff;
+  font-size: 0.88rem;
+  text-align: center;
+}
+
+/* =========================================================
+   11. MODALS
+   ========================================================= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 5, 12, 0.88);
+  backdrop-filter: blur(3px);
+  z-index: 100;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal-panel {
+  background: #191222;
+  border: 1px solid var(--border-copper-dim);
+  outline: 1px solid rgba(200, 109, 59, 0.2);
+  outline-offset: -3px;
+  border-radius: var(--radius-sm);
+  max-width: 580px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+}
+
+.modal-header {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-title {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--text-cream);
+  letter-spacing: 0.02em;
+}
+
+.modal-close {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #fff;
+}
+
+.modal-body {
+  padding: 22px;
+}
+
+.modal-footer {
+  padding: 14px 22px;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* =========================================================
+   12. TOAST NOTIFICATIONS
+   ========================================================= */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  background: #1c1527;
+  border-radius: var(--radius-sm);
+  padding: 11px 16px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  border-left: 3px solid var(--accent-copper);
+  border-top: 1px solid var(--border-subtle);
+  border-right: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-subtle);
+  animation: toastFade 0.2s ease-out;
+}
+
+.toast-success {
+  border-left-color: var(--accent-sage);
+  color: #a7f3d0;
+}
+
+.toast-error {
+  border-left-color: var(--accent-urgent-rose);
+  color: #fecdd3;
+}
+
+@keyframes toastFade {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   13. FORECAST VISUALIZER (ANTIQUE CHART SVG)
+   ========================================================= */
+.chart-wrapper {
+  background: #140d1a;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.chart-svg {
+  width: 100%;
+  min-width: 500px;
+  height: 220px;
+}
+
+/* =========================================================
+   14. RESPONSIVE ADJUSTMENTS
+   ========================================================= */
+@media (max-width: 768px) {
+  .header-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .main-nav {
+    width: 100%;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  .card {
+    padding: 16px;
+  }
+}
