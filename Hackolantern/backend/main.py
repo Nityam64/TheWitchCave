@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+from typing import Optional, List, Union
+from datetime import datetime, timedelta
 from ml_engine.ai_core import run_prophecy_and_restock, detect_strange_happenings
 import firebase_db
 import import_sample_data
@@ -31,26 +33,54 @@ class AuditRequest(BaseModel):
 
 class CurseRequest(BaseModel):
     ingredient_ids: list  # Up to 3 ingredients for 3x Full Moon Festival spike
+    start_date: Optional[str] = None
+    duration_days: Optional[int] = 3
+    multiplier: Optional[float] = 3.0
+
+class EventCreate(BaseModel):
+    name: str
+    ingredient_ids: list
+    start_date: str
+    end_date: str
+    multiplier: float = 3.0
 
 @app.get("/api/pantry")
 def get_full_pantry_status():
     items = firebase_db.get_all_ingredients()
     results = []
+    today = datetime.now().date()
+    today_str = today.strftime("%Y-%m-%d")
+
     for item in items:
-        # ai engine uses the daily sales list
+        ing_id = item.get("id")
         sales_history = item.get("sales", [])
+        events = firebase_db.get_events_for_ingredient(ing_id)
+        is_cursed = firebase_db.is_ingredient_cursed(ing_id)
+        current_multiplier = firebase_db.get_event_multiplier_for_date(ing_id, today_str)
+        lead_time = int(item.get("lead_time_days") or 3)
+
         ai_metrics = run_prophecy_and_restock(
-            sales_history,
-            item.get("current_stock", 0),
-            item.get("safety_stock", 0),
-            item.get("is_cursed", False)
+            sales_history=sales_history,
+            current_stock=item.get("current_stock", 0),
+            safety_stock=item.get("safety_stock", 0),
+            is_cursed=is_cursed,
+            events=events,
+            lead_time_days=lead_time,
+            reference_date=today
         )
         anomalies = detect_strange_happenings(
-            sales_history,
-            item.get("expected_stock", 0),
-            item.get("current_stock", 0)
+            sales_history=sales_history,
+            expected_stock=item.get("expected_stock", 0),
+            actual_stock=item.get("current_stock", 0),
+            current_multiplier=current_multiplier
         )
-        results.append({**item, "prophecy": ai_metrics, "anomalies": anomalies})
+        results.append({
+            **item,
+            "is_cursed": is_cursed,
+            "prophecy": ai_metrics,
+            "anomalies": anomalies,
+            "events": events
+        })
     return {"pantry": results}
 
 @app.get("/api/ingredients/{item_id}/history")
@@ -78,7 +108,59 @@ def audit_shelf(item_id: str, payload: AuditRequest):
         raise HTTPException(status_code=404, detail="Ingredient not found")
     return {"status": "audited", "item": updated, "message": f"{payload.missing_amount} units reported missing during shelf audit."}
 
+# =====================================================================
+# Events Endpoints
+# =====================================================================
+
+@app.post("/api/events")
+def create_event(payload: EventCreate):
+    event = firebase_db.add_event({
+        "name": payload.name,
+        "ingredient_ids": payload.ingredient_ids,
+        "start_date": payload.start_date,
+        "end_date": payload.end_date,
+        "multiplier": payload.multiplier,
+    })
+    # Update legacy is_cursed for all affected ingredients
+    firebase_db.set_cursed_ingredients(payload.ingredient_ids)
+    return {"status": "created", "event": event}
+
+@app.get("/api/events")
+def list_events():
+    return {"events": firebase_db.get_all_events()}
+
+@app.delete("/api/events/{event_id}")
+def delete_event(event_id: str):
+    success = firebase_db.delete_event(event_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Event not found")
+    return {"status": "deleted", "id": event_id}
+
 @app.post("/api/midnight-curse")
 def trigger_midnight_curse(payload: CurseRequest):
+    """
+    Shortcut: creates a 'Full Moon Festival' event starting 7 days from today,
+    lasting 3 days, with a 3.0 multiplier (or accepts custom parameters in payload).
+    """
+    start_date = payload.start_date
+    if not start_date:
+        start_date = (datetime.now().date() + timedelta(days=7)).strftime("%Y-%m-%d")
+    duration = payload.duration_days or 3
+    start_dt = datetime.strptime(start_date, "%Y-%m-%d").date()
+    end_date = (start_dt + timedelta(days=duration - 1)).strftime("%Y-%m-%d")
+    multiplier = payload.multiplier if payload.multiplier is not None else 3.0
+
+    event = firebase_db.add_event({
+        "name": "Full Moon Festival",
+        "ingredient_ids": payload.ingredient_ids,
+        "start_date": start_date,
+        "end_date": end_date,
+        "multiplier": multiplier,
+    })
     firebase_db.set_cursed_ingredients(payload.ingredient_ids)
-    return {"status": "Midnight Curse Applied (3x Demand Spike)", "cursed_ids": payload.ingredient_ids}
+
+    return {
+        "status": "Midnight Curse Applied (3x Demand Spike)",
+        "cursed_ids": payload.ingredient_ids,
+        "event": event
+    }

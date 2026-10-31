@@ -1,4 +1,5 @@
 import os
+import uuid
 import logging
 from datetime import datetime, timedelta
 
@@ -11,6 +12,7 @@ CORE_INGREDIENTS = [
         "current_stock": 45,
         "expected_stock": 45,
         "safety_stock": 20,
+        "lead_time_days": 4,
         "is_cursed": False,
         "daily_sales": {}
     },
@@ -20,6 +22,7 @@ CORE_INGREDIENTS = [
         "current_stock": 18,
         "expected_stock": 25,
         "safety_stock": 15,
+        "lead_time_days": 3,
         "is_cursed": False,
         "daily_sales": {}
     },
@@ -29,6 +32,7 @@ CORE_INGREDIENTS = [
         "current_stock": 60,
         "expected_stock": 60,
         "safety_stock": 25,
+        "lead_time_days": 2,
         "is_cursed": False,
         "daily_sales": {}
     },
@@ -38,6 +42,7 @@ CORE_INGREDIENTS = [
         "current_stock": 90,
         "expected_stock": 90,
         "safety_stock": 30,
+        "lead_time_days": 2,
         "is_cursed": False,
         "daily_sales": {}
     },
@@ -61,6 +66,7 @@ for item in CORE_INGREDIENTS:
 # In-memory fallback
 _in_memory_db = {item["id"]: dict(item, daily_sales=dict(item["daily_sales"])) for item in CORE_INGREDIENTS}
 _in_memory_transactions = []
+_in_memory_events = {}
 _firestore_db = None
 
 # Initialize Firebase
@@ -131,6 +137,7 @@ def get_all_ingredients():
                 ds = data.get("daily_sales", {})
                 data["daily_sales"] = ds
                 data["sales"] = get_last_14_days_sales(ds)
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 results.append(data)
             if results:
                 results.sort(key=lambda x: str(x["id"]))
@@ -142,6 +149,7 @@ def get_all_ingredients():
         item_copy = dict(item)
         ds = item_copy.get("daily_sales", {})
         item_copy["sales"] = get_last_14_days_sales(ds)
+        item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
         results.append(item_copy)
 
     results.sort(key=lambda x: str(x["id"]))
@@ -159,6 +167,7 @@ def get_ingredient(item_id):
                 ds = data.get("daily_sales", {})
                 data["daily_sales"] = ds
                 data["sales"] = get_last_14_days_sales(ds)
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 return data
         except Exception as e:
             logger.error(f"Error getting ingredient from Firestore: {e}")
@@ -176,6 +185,7 @@ def get_ingredient(item_id):
         item_copy = dict(item)
         ds = item_copy.get("daily_sales", {})
         item_copy["sales"] = get_last_14_days_sales(ds)
+        item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
         return item_copy
     return None
 
@@ -223,6 +233,7 @@ def update_stock_and_sales(item_id, change_amount: int):
             data["sales"] = get_last_14_days_sales(daily_sales)
             if "id" not in data:
                 data["id"] = item_id
+            data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
             return data
         except Exception as e:
             logger.error(f"Firestore update failed ({e}). Falling back to in-memory.")
@@ -258,6 +269,7 @@ def update_stock_and_sales(item_id, change_amount: int):
 
     item_copy = dict(item)
     item_copy["sales"] = get_last_14_days_sales(item_copy["daily_sales"])
+    item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
     return item_copy
 
 def audit_stock(item_id, missing_amount: int):
@@ -286,6 +298,7 @@ def audit_stock(item_id, missing_amount: int):
             if "id" not in data:
                 data["id"] = item_id
             data["sales"] = get_last_14_days_sales(data.get("daily_sales", {}))
+            data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
             return data
         except Exception as e:
             logger.error(f"Firestore audit failed ({e}). Falling back to in-memory.")
@@ -305,10 +318,11 @@ def audit_stock(item_id, missing_amount: int):
     item["current_stock"] = max(0, item["current_stock"] - missing_amount)
     item_copy = dict(item)
     item_copy["sales"] = get_last_14_days_sales(item_copy.get("daily_sales", {}))
+    item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
     return item_copy
 
 def set_cursed_ingredients(cursed_ids: list):
-    """Updates is_cursed for all ingredients."""
+    """Updates legacy is_cursed for all ingredients."""
     global _firestore_db, _in_memory_db
     c_set = {str(x) for x in cursed_ids}
     if _firestore_db:
@@ -344,3 +358,129 @@ def get_ingredient_sales_history(item_id, days: int = 60) -> list[dict]:
             "units_sold": int(daily_sales.get(d_str, 0))
         })
     return history
+
+
+# =====================================================================
+# Events Management System (Firestore 'events' collection + In-Memory)
+# =====================================================================
+
+def add_event(event_data: dict) -> dict:
+    """Creates a new surge event with name, ingredient_ids, start_date, end_date, and multiplier."""
+    global _firestore_db, _in_memory_events
+    event_id = str(event_data.get("id") or f"event_{uuid.uuid4().hex[:8]}")
+    
+    # Normalize ingredient ids to strings and ints
+    raw_ids = event_data.get("ingredient_ids", [])
+    normalized_ids = []
+    for x in raw_ids:
+        try:
+            normalized_ids.append(int(x))
+        except (ValueError, TypeError):
+            normalized_ids.append(str(x))
+
+    new_event = {
+        "id": event_id,
+        "name": str(event_data.get("name") or "Festival"),
+        "ingredient_ids": normalized_ids,
+        "start_date": str(event_data.get("start_date")),
+        "end_date": str(event_data.get("end_date")),
+        "multiplier": float(event_data.get("multiplier", 3.0)),
+        "created_at": datetime.utcnow().isoformat() + "Z"
+    }
+
+    if _firestore_db:
+        try:
+            _firestore_db.collection("events").document(event_id).set(new_event)
+            logger.info(f"Event {event_id} added to Firestore.")
+            return new_event
+        except Exception as e:
+            logger.error(f"Firestore add_event failed ({e}). Falling back to in-memory store.")
+
+    _in_memory_events[event_id] = new_event
+    return new_event
+
+def get_all_events() -> list[dict]:
+    """Returns all scheduled events sorted by start date."""
+    global _firestore_db, _in_memory_events
+    if _firestore_db:
+        try:
+            docs = _firestore_db.collection("events").stream()
+            events = []
+            for doc in docs:
+                d = doc.to_dict()
+                if "id" not in d:
+                    d["id"] = doc.id
+                events.append(d)
+            events.sort(key=lambda x: str(x.get("start_date", "")))
+            return events
+        except Exception as e:
+            logger.error(f"Firestore get_all_events failed ({e}). Falling back to in-memory store.")
+
+    events = list(_in_memory_events.values())
+    events.sort(key=lambda x: str(x.get("start_date", "")))
+    return events
+
+def get_event(event_id: str) -> dict | None:
+    """Fetches a single event by ID."""
+    global _firestore_db, _in_memory_events
+    s_id = str(event_id)
+    if _firestore_db:
+        try:
+            doc = _firestore_db.collection("events").document(s_id).get()
+            if doc.exists:
+                d = doc.to_dict()
+                d["id"] = s_id
+                return d
+        except Exception as e:
+            logger.error(f"Firestore get_event failed ({e}). Falling back to in-memory store.")
+
+    return _in_memory_events.get(s_id)
+
+def delete_event(event_id: str) -> bool:
+    """Deletes an event by ID."""
+    global _firestore_db, _in_memory_events
+    s_id = str(event_id)
+    deleted = False
+
+    if _firestore_db:
+        try:
+            doc_ref = _firestore_db.collection("events").document(s_id)
+            if doc_ref.get().exists:
+                doc_ref.delete()
+                deleted = True
+        except Exception as e:
+            logger.error(f"Firestore delete_event failed ({e}). Falling back to in-memory store.")
+
+    if s_id in _in_memory_events:
+        del _in_memory_events[s_id]
+        deleted = True
+
+    return deleted
+
+def get_events_for_ingredient(ingredient_id) -> list[dict]:
+    """Returns all events covering a specific ingredient ID."""
+    all_events = get_all_events()
+    str_id = str(ingredient_id)
+    matching = []
+    for evt in all_events:
+        c_set = {str(x) for x in evt.get("ingredient_ids", [])}
+        if str_id in c_set:
+            matching.append(evt)
+    return matching
+
+def is_ingredient_cursed(ingredient_id) -> bool:
+    """True if an active or upcoming event covers this ingredient (end_date >= today)."""
+    today_str = datetime.now().date().strftime("%Y-%m-%d")
+    for evt in get_events_for_ingredient(ingredient_id):
+        if evt.get("end_date", "") >= today_str:
+            return True
+    return False
+
+def get_event_multiplier_for_date(ingredient_id, date_str: str) -> float:
+    """Returns the surge multiplier applicable for an ingredient on a specific YYYY-MM-DD date."""
+    events = get_events_for_ingredient(ingredient_id)
+    multiplier = 1.0
+    for evt in events:
+        if evt.get("start_date", "") <= date_str <= evt.get("end_date", ""):
+            multiplier = max(multiplier, float(evt.get("multiplier", 3.0)))
+    return multiplier
