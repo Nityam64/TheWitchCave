@@ -1,4 +1,5 @@
 import os
+import uuid
 import logging
 from datetime import datetime, timedelta, timezone
 
@@ -7,9 +8,9 @@ logger = logging.getLogger("firebase_db")
 CORE_INGREDIENTS = [
     {
         "id": 1,
-        "slug": "bat_wings",
         "name": "Bat Wings",
-        "category": "Animal Parts",
+        "category": "Raw Ingredients",
+        "unit": "pairs",
         "current_stock": 45,
         "expected_stock": 45,
         "safety_stock": 20,
@@ -20,9 +21,9 @@ CORE_INGREDIENTS = [
     },
     {
         "id": 2,
-        "slug": "mandrake_root",
         "name": "Mandrake Root",
-        "category": "Roots",
+        "category": "Herbs",
+        "unit": "roots",
         "current_stock": 18,
         "expected_stock": 25,
         "safety_stock": 15,
@@ -33,9 +34,9 @@ CORE_INGREDIENTS = [
     },
     {
         "id": 3,
-        "slug": "ghost_pepper",
         "name": "Ghost Pepper",
         "category": "Spices",
+        "unit": "peppers",
         "current_stock": 60,
         "expected_stock": 60,
         "safety_stock": 25,
@@ -46,9 +47,9 @@ CORE_INGREDIENTS = [
     },
     {
         "id": 4,
-        "slug": "newt_eyes",
         "name": "Newt Eyes",
-        "category": "Animal Parts",
+        "category": "Raw Ingredients",
+        "unit": "jars",
         "current_stock": 90,
         "expected_stock": 90,
         "safety_stock": 30,
@@ -59,7 +60,7 @@ CORE_INGREDIENTS = [
     },
 ]
 
-# Populate initial dummy daily_sales pattern for core ingredients
+# Helper to populate default 14-day history for core ingredients
 _default_patterns = {
     1: [8, 9, 7, 10, 8, 9, 28, 8, 9, 7, 10, 8, 9, 28],
     2: [4, 5, 4, 6, 5, 4, 5, 4, 5, 4, 6, 5, 4, 5],
@@ -77,6 +78,7 @@ for item in CORE_INGREDIENTS:
 # In-memory database store
 _in_memory_db = {item["id"]: dict(item, daily_sales=dict(item["daily_sales"])) for item in CORE_INGREDIENTS}
 _in_memory_transactions = []
+_in_memory_events = {}
 _firestore_db = None
 
 # Initialize Firebase Admin if serviceAccountKey is present
@@ -100,7 +102,7 @@ if creds_path and os.path.exists(creds_path):
         logger.warning(f"Failed to initialize Firebase Admin SDK ({e}). Falling back to in-memory store.")
         _firestore_db = None
 else:
-    logger.info("Running with in-memory DB fallback (no Firebase Admin credentials found).")
+    logger.warning("No serviceAccountKey.json or FIREBASE_CREDENTIALS_PATH found. Running with in-memory DB fallback.")
 
 def get_last_14_days_sales(daily_sales: dict) -> list[int]:
     """Returns a list of the last 14 daily totals in chronological date order (fills missing days with 0)."""
@@ -112,7 +114,7 @@ def get_last_14_days_sales(daily_sales: dict) -> list[int]:
     return sales_list
 
 def seed_firestore_if_empty():
-    """Seeds the core ingredients to Firestore if connected and collection is empty."""
+    """Seeds the 4 core ingredients if the collection or memory store is empty."""
     global _firestore_db, _in_memory_db
     if _firestore_db:
         try:
@@ -125,6 +127,9 @@ def seed_firestore_if_empty():
                 logger.info("Firestore pantry_ingredients collection seeded.")
         except Exception as e:
             logger.error(f"Error seeding Firestore: {e}")
+    else:
+        if not _in_memory_db:
+            _in_memory_db = {item["id"]: dict(item, daily_sales=dict(item["daily_sales"])) for item in CORE_INGREDIENTS}
 
 def get_all_ingredients():
     """Fetches all ingredients with backward-compatible 14-day sales list."""
@@ -144,9 +149,10 @@ def get_all_ingredients():
                 ds = data.get("daily_sales", {})
                 data["daily_sales"] = ds
                 data["sales"] = get_last_14_days_sales(ds)
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 results.append(data)
             if results:
-                results.sort(key=lambda x: str(x["id"]))
+                results.sort(key=lambda x: str(x.get("id", "")))
                 return results
         except Exception as e:
             logger.error(f"Error fetching from Firestore ({e}). Using in-memory fallback.")
@@ -155,16 +161,15 @@ def get_all_ingredients():
         item_copy = dict(item)
         ds = item_copy.get("daily_sales", {})
         item_copy["sales"] = get_last_14_days_sales(ds)
+        item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
         results.append(item_copy)
 
-    results.sort(key=lambda x: str(x["id"]))
+    results.sort(key=lambda x: str(x.get("id", "")))
     return results
 
 def get_ingredient(item_id):
-    """Fetches a single ingredient by numeric ID, string ID, slug, or name."""
     global _firestore_db, _in_memory_db
-    s_id = str(item_id).lower().strip()
-
+    s_id = str(item_id).lower()
     if _firestore_db:
         try:
             doc = _firestore_db.collection("pantry_ingredients").document(str(item_id)).get()
@@ -175,6 +180,7 @@ def get_ingredient(item_id):
                 ds = data.get("daily_sales", {})
                 data["daily_sales"] = ds
                 data["sales"] = get_last_14_days_sales(ds)
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 return data
             # Check by slug in collection
             docs = _firestore_db.collection("pantry_ingredients").where("slug", "==", s_id).limit(1).stream()
@@ -183,36 +189,19 @@ def get_ingredient(item_id):
                 ds = data.get("daily_sales", {})
                 data["daily_sales"] = ds
                 data["sales"] = get_last_14_days_sales(ds)
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 return data
         except Exception as e:
             logger.error(f"Error getting ingredient from Firestore: {e}")
 
-    # In-memory lookup: exact key
-    item = _in_memory_db.get(item_id)
-    if not item and isinstance(item_id, str) and item_id.isdigit():
-        item = _in_memory_db.get(int(item_id))
-
-    # In-memory lookup: by id, slug, or normalized name
-    if not item:
-        for k, v in _in_memory_db.items():
-            if str(k).lower() == s_id:
-                item = v
-                break
-            if str(v.get("id")).lower() == s_id:
-                item = v
-                break
-            if str(v.get("slug", "")).lower() == s_id:
-                item = v
-                break
-            if v.get("name", "").lower().replace(" ", "_") == s_id or v.get("name", "").lower() == s_id:
-                item = v
-                break
-
-    if item:
-        item_copy = dict(item)
-        ds = item_copy.get("daily_sales", {})
-        item_copy["sales"] = get_last_14_days_sales(ds)
-        return item_copy
+    # check int or str id or slug
+    for k, v in _in_memory_db.items():
+        if str(k).lower() == s_id or str(v.get("id", "")).lower() == s_id or str(v.get("slug", "")).lower() == s_id:
+            item_copy = dict(v)
+            ds = item_copy.get("daily_sales", {})
+            item_copy["sales"] = get_last_14_days_sales(ds)
+            item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
+            return item_copy
     return None
 
 def update_stock_and_sales(item_id, change_amount: int):
@@ -223,7 +212,7 @@ def update_stock_and_sales(item_id, change_amount: int):
     global _firestore_db, _in_memory_db
     now = datetime.now(timezone.utc)
     iso_timestamp = now.isoformat()
-    today_str = datetime.now().strftime("%Y-%m-%d")
+    today_str = now.strftime("%Y-%m-%d")
 
     target_item = get_ingredient(item_id)
     if not target_item:
@@ -262,23 +251,13 @@ def update_stock_and_sales(item_id, change_amount: int):
                 data["daily_sales"] = daily_sales
                 data["sales"] = get_last_14_days_sales(daily_sales)
                 data["id"] = actual_id
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 return data
         except Exception as e:
             logger.error(f"Firestore update failed ({e}). Falling back to in-memory.")
 
     # In-memory update
-    target_key = None
-    if actual_id in _in_memory_db:
-        target_key = actual_id
-    else:
-        for k, v in _in_memory_db.items():
-            if str(k) == str(actual_id) or str(v.get("id")) == str(actual_id):
-                target_key = k
-                break
-    if target_key is None:
-        target_key = actual_id
-
-    item = _in_memory_db[target_key]
+    item = _in_memory_db[actual_id]
     item["current_stock"] = max(0, item["current_stock"] + change_amount)
     item["expected_stock"] = item["current_stock"]
     if "daily_sales" not in item:
@@ -288,7 +267,7 @@ def update_stock_and_sales(item_id, change_amount: int):
         item["daily_sales"][today_str] = int(item["daily_sales"].get(today_str, 0)) + units
 
     _in_memory_transactions.append({
-        "item_id": target_key,
+        "item_id": actual_id,
         "change_amount": change_amount,
         "timestamp": iso_timestamp,
         "resulting_stock": item["current_stock"],
@@ -297,6 +276,7 @@ def update_stock_and_sales(item_id, change_amount: int):
 
     item_copy = dict(item)
     item_copy["sales"] = get_last_14_days_sales(item_copy["daily_sales"])
+    item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
     return item_copy
 
 def audit_stock(item_id, missing_amount: int):
@@ -329,22 +309,20 @@ def audit_stock(item_id, missing_amount: int):
                 data["current_stock"] = new_stock
                 data["id"] = actual_id
                 data["sales"] = get_last_14_days_sales(data.get("daily_sales", {}))
+                data["is_cursed"] = is_ingredient_cursed(data["id"]) or data.get("is_cursed", False)
                 return data
         except Exception as e:
             logger.error(f"Firestore audit failed ({e}). Falling back to in-memory.")
 
-    target_key = actual_id if actual_id in _in_memory_db else item_id
-    if target_key not in _in_memory_db:
-        return None
-
-    item = _in_memory_db[target_key]
+    item = _in_memory_db[actual_id]
     item["current_stock"] = max(0, item["current_stock"] - missing_amount)
     item_copy = dict(item)
     item_copy["sales"] = get_last_14_days_sales(item_copy.get("daily_sales", {}))
+    item_copy["is_cursed"] = is_ingredient_cursed(item_copy["id"]) or item_copy.get("is_cursed", False)
     return item_copy
 
 def set_cursed_ingredients(cursed_ids: list):
-    """Updates is_cursed for all ingredients."""
+    """Updates legacy is_cursed for all ingredients."""
     global _firestore_db, _in_memory_db
     c_set = {str(x).lower() for x in cursed_ids}
     if _firestore_db:
@@ -363,15 +341,17 @@ def set_cursed_ingredients(cursed_ids: list):
             logger.error(f"Firestore curse update failed ({e}). Falling back to in-memory.")
 
     for k, item in _in_memory_db.items():
-        is_c = (str(k).lower() in c_set) or (str(item.get("id", "")).lower() in c_set) or (str(item.get("slug", "")).lower() in c_set)
-        item["is_cursed"] = is_c
+        k_str = str(k).lower()
+        i_str = str(item.get("id", "")).lower()
+        s_str = str(item.get("slug", "")).lower()
+        item["is_cursed"] = (k_str in c_set) or (i_str in c_set) or (s_str in c_set)
     return True
 
 def get_ingredient_sales_history(item_id, days: int = 60) -> list[dict]:
     """Returns chronological [{date: YYYY-MM-DD, units_sold: int}] for the past N days."""
     item = get_ingredient(item_id)
     if not item:
-        return None
+        return []
     daily_sales = item.get("daily_sales", {})
     today = datetime.now().date()
     history = []
@@ -382,3 +362,62 @@ def get_ingredient_sales_history(item_id, days: int = 60) -> list[dict]:
             "units_sold": int(daily_sales.get(d_str, 0))
         })
     return history
+
+def create_event(payload: dict) -> dict:
+    """Creates a calendar event like Full Moon Festival with multipliers."""
+    global _firestore_db, _in_memory_events
+    event_id = str(uuid.uuid4())
+    event_data = {
+        "id": event_id,
+        "name": payload.get("name", "Festival"),
+        "start_date": payload.get("start_date"),
+        "end_date": payload.get("end_date"),
+        "multiplier": float(payload.get("multiplier", 3.0)),
+        "affected_ingredients": [str(x).lower() for x in payload.get("affected_ingredients", [])],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+
+    if _firestore_db:
+        try:
+            _firestore_db.collection("events").document(event_id).set(event_data)
+        except Exception as e:
+            logger.error(f"Error creating event in Firestore: {e}")
+
+    _in_memory_events[event_id] = event_data
+    return event_data
+
+def get_all_events() -> list[dict]:
+    global _firestore_db, _in_memory_events
+    if _firestore_db:
+        try:
+            docs = _firestore_db.collection("events").stream()
+            events = [doc.to_dict() for doc in docs]
+            if events:
+                return events
+        except Exception as e:
+            logger.error(f"Error fetching events from Firestore: {e}")
+    return list(_in_memory_events.values())
+
+def get_events_for_ingredient(item_id) -> list[dict]:
+    s_id = str(item_id).lower()
+    all_events = get_all_events()
+    matching = []
+    for ev in all_events:
+        affected = [str(x).lower() for x in ev.get("affected_ingredients", [])]
+        if not affected or s_id in affected:
+            matching.append(ev)
+    return matching
+
+def get_event_multiplier_for_date(item_id, target_date_str: str) -> float:
+    events = get_events_for_ingredient(item_id)
+    max_mult = 1.0
+    for ev in events:
+        start = ev.get("start_date")
+        end = ev.get("end_date")
+        if start and end and start <= target_date_str <= end:
+            max_mult = max(max_mult, float(ev.get("multiplier", 1.0)))
+    return max_mult
+
+def is_ingredient_cursed(item_id) -> bool:
+    today_str = datetime.now().date().strftime("%Y-%m-%d")
+    return get_event_multiplier_for_date(item_id, today_str) > 1.0
