@@ -45,18 +45,39 @@ class DatabaseService {
       this.auth = authMod.getAuth(app);
 
       // Sign in anonymously to authenticate the session for Firestore rules
+      let authWarning = "";
       try {
         const userCred = await authMod.signInAnonymously(this.auth);
         this.user = userCred.user;
       } catch (authErr) {
-        console.warn("Anonymous auth warning:", authErr.message);
+        console.warn("Anonymous auth warning:", authErr.code, authErr.message);
+        if (authErr.code === "auth/operation-not-allowed") {
+          authWarning = "Anonymous Sign-In is disabled. Enable it in Firebase Console > Authentication > Sign-in method.";
+        } else {
+          authWarning = authErr.message;
+        }
       }
 
       // Quick connectivity probe on settings collection
-      await firestoreMod.getDocs(firestoreMod.collection(this.firestore, "settings"));
+      try {
+        await firestoreMod.getDocs(firestoreMod.collection(this.firestore, "settings"));
+      } catch (probeErr) {
+        console.warn("Firestore probe warning:", probeErr.code, probeErr.message);
+        if (probeErr.code === "permission-denied") {
+          const detail = authWarning ? ` (${authWarning})` : " Check your Firestore Security Rules.";
+          throw new Error("Firestore permission denied." + detail);
+        } else if (probeErr.code === "not-found" || (probeErr.message && probeErr.message.includes("does not exist"))) {
+          throw new Error("Firestore database does not exist yet. Create it under Firebase Console > Build > Firestore Database.");
+        } else {
+          throw probeErr;
+        }
+      }
 
       this.status = "connected";
-      return { status: "connected", message: `Connected to Cloud Firestore (${config.projectId})` };
+      return { 
+        status: "connected", 
+        message: `Connected to Cloud Firestore (${config.projectId})` + (authWarning ? ` [Auth warning: ${authWarning}]` : "")
+      };
     } catch (err) {
       console.error("Firestore Init Error:", err);
       this.status = "error";
@@ -96,8 +117,18 @@ class DatabaseService {
   // --- INVENTORY API ---
   async getInventory() {
     if (this.status === "connected" && this.firestore) {
-      const { collection, getDocs } = this.firebaseModules;
+      const { collection, getDocs, doc, setDoc } = this.firebaseModules;
       const snap = await getDocs(collection(this.firestore, "inventoryItems"));
+      if (snap.empty) {
+        try {
+          for (const it of SAMPLE_INVENTORY) {
+            await setDoc(doc(this.firestore, "inventoryItems", it.id), it);
+          }
+          return SAMPLE_INVENTORY;
+        } catch (seedErr) {
+          console.warn("Auto-seed inventory warning:", seedErr);
+        }
+      }
       return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
     return JSON.parse(localStorage.getItem("hexley_inventory") || "[]");
@@ -378,8 +409,18 @@ class DatabaseService {
   // --- SUPPLIERS API ---
   async getSuppliers() {
     if (this.status === "connected" && this.firestore) {
-      const { collection, getDocs } = this.firebaseModules;
+      const { collection, getDocs, doc, setDoc } = this.firebaseModules;
       const snap = await getDocs(collection(this.firestore, "suppliers"));
+      if (snap.empty) {
+        try {
+          for (const sup of SAMPLE_SUPPLIERS) {
+            await setDoc(doc(this.firestore, "suppliers", sup.id), sup);
+          }
+          return SAMPLE_SUPPLIERS;
+        } catch (seedErr) {
+          console.warn("Auto-seed suppliers warning:", seedErr);
+        }
+      }
       return snap.docs.map(d => ({ id: d.id, ...d.data() }));
     }
     return JSON.parse(localStorage.getItem("hexley_suppliers") || "[]");
@@ -437,9 +478,15 @@ class DatabaseService {
   // --- SETTINGS API ---
   async getSettings() {
     if (this.status === "connected" && this.firestore) {
-      const { doc, getDoc } = this.firebaseModules;
+      const { doc, getDoc, setDoc } = this.firebaseModules;
       const snap = await getDoc(doc(this.firestore, "settings", "global"));
       if (snap.exists()) return snap.data();
+      try {
+        await setDoc(doc(this.firestore, "settings", "global"), SAMPLE_SETTINGS);
+        return SAMPLE_SETTINGS;
+      } catch (seedErr) {
+        console.warn("Auto-seed settings warning:", seedErr);
+      }
     }
     return JSON.parse(localStorage.getItem("hexley_settings") || JSON.stringify(SAMPLE_SETTINGS));
   }

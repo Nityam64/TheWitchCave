@@ -1,14 +1,14 @@
 // js/firebase-config.js - Firebase connection module
-// When running in Demo/Offline mode, clearly informs the app.
-// If valid config is provided, initializes Firebase App and Firestore.
+// Connected to live project: the-witch-cave
 
 export const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "YOUR_FIREBASE_API_KEY",
-  authDomain: "hexleys-potion-pantry.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "hexleys-potion-pantry.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDnhAZpqEYqdLtOz3ZpmDFtf0y3eNiIPqE",
+  authDomain: "the-witch-cave.firebaseapp.com",
+  projectId: "the-witch-cave",
+  storageBucket: "the-witch-cave.firebasestorage.app",
+  messagingSenderId: "563745056227",
+  appId: "1:563745056227:web:c1853c0fc26db316ecacd6",
+  measurementId: "G-YTWM2M40CY"
 };
 
 // Check if user has stored custom credentials in browser LocalStorage
@@ -17,7 +17,7 @@ export function getActiveFirebaseConfig() {
     const saved = localStorage.getItem("HEXLEY_FIREBASE_CONFIG");
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed && parsed.projectId && parsed.projectId !== "YOUR_PROJECT_ID") {
+      if (parsed && parsed.projectId && !parsed.projectId.includes("YOUR_")) {
         return { config: parsed, isCustom: true };
       }
     }
@@ -44,4 +44,3 @@ export function isConfigPlaceholder(config) {
     config.projectId.includes("YOUR_")
   );
 }
-
