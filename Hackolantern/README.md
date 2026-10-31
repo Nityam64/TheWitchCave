@@ -2,8 +2,9 @@
 
 ## Architecture
 - `backend/`: FastAPI + Firebase Firestore (with in-memory fallback) + AI Engine (Prophecy Forecasting, Restock Spell, Strange Happenings Anomaly Detection, Midnight Curse 3x Festival Spike).
-- `web-dashboard/`: React + Recharts + Vite B2B Dark Store Command Center with Manager Get Started launchpad & Crystal Ball curves.
+- `web-dashboard/`: React + Recharts + Vite B2B Dark Store Command Center with Manager Get Started launchpad & Crystal Ball curves, plus Hexley's Potion Pantry web client connected to Cloud Firestore.
 - `android-app/`: Flutter Android client with Cleartext HTTP permissions, live LAN Wi-Fi / Tunnel IP switcher, and Shelf Audit barcode simulator.
+- `firestore.rules`: Security rules requiring authentication and enforcing non-negative stock counts.
 
 ## Quick Run
 Run all services with a single script:
@@ -21,7 +22,7 @@ Or run services individually:
 2. **Web Dashboard:**
    ```bash
    cd Hackolantern/web-dashboard
-   bun run dev   # or: npm install && npm run dev
+   bun run dev   # or: npm install && npm run dev (or: python3 -m http.server 8000)
    ```
 3. **Android Mobile App:**
    ```bash

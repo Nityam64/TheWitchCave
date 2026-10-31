@@ -2,7 +2,7 @@ import os
 import csv
 import glob
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 import firebase_db
 
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +13,6 @@ def find_sample_file(data_dir=None):
         data_dir = os.path.join(os.path.dirname(__file__), "data")
     if not os.path.exists(data_dir):
         return None
-    # Look for any csv or json in data/
     candidates = glob.glob(os.path.join(data_dir, "*.csv")) + glob.glob(os.path.join(data_dir, "*.json"))
     return candidates[0] if candidates else None
 
@@ -33,6 +32,32 @@ def inspect_file(filepath):
                 print(f"Row {i+1}:", row)
     print("------------------------------------------\n")
 
+def resolve_target_id(name: str, raw_id: str, db: dict, in_progress: dict) -> int:
+    """Matches existing ingredient by slug, id or name; generates next integer ID for new ones."""
+    norm_name = name.strip().lower()
+    norm_id = str(raw_id).strip().lower()
+
+    # Check already registered in this import batch
+    for k, v in in_progress.items():
+        if str(v.get("slug", "")).lower() == norm_id:
+            return k
+        if v.get("name", "").strip().lower() == norm_name:
+            return k
+
+    # Check existing items in database
+    for k, v in db.items():
+        if str(k).lower() == norm_id or str(v.get("id")).lower() == norm_id:
+            return k
+        if str(v.get("slug", "")).lower() == norm_id:
+            return k
+        if v.get("name", "").strip().lower() == norm_name:
+            return k
+
+    # Assign next integer ID considering both db and in_progress
+    all_keys = list(db.keys()) + list(in_progress.keys())
+    int_ids = [int(k) for k in all_keys if str(k).isdigit()]
+    return max(int_ids, default=0) + 1
+
 def import_data(filepath=None):
     if not filepath:
         filepath = find_sample_file()
@@ -43,29 +68,22 @@ def import_data(filepath=None):
     inspect_file(filepath)
 
     imported_count = 0
-    # Group rows by ingredient
     ingredients_map = {}
 
     with open(filepath, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            # Normalize keys to lower case
             clean_row = {k.strip().lower(): v.strip() for k, v in row.items() if k}
-            
-            # Identify ingredient ID
+
             raw_id = clean_row.get("ingredient_id") or clean_row.get("id") or clean_row.get("ingredient")
             name = clean_row.get("ingredient_name") or clean_row.get("name") or str(raw_id)
             if not raw_id:
                 raw_id = name.lower().replace(" ", "_")
-            
-            # Try parsing integer id if possible
-            try:
-                ing_id = int(raw_id)
-            except ValueError:
-                ing_id = raw_id
+
+            # Resolve to persistent ID matching existing database or assigning new
+            ing_id = resolve_target_id(name, raw_id, firebase_db._in_memory_db, ingredients_map)
 
             if ing_id not in ingredients_map:
-                # sensible defaults
                 stock = int(clean_row.get("current_stock") or 50)
                 safety = int(clean_row.get("safety_stock") or 20)
                 is_cursed = clean_row.get("is_cursed", "").lower() in ("true", "1", "yes")
@@ -75,6 +93,7 @@ def import_data(filepath=None):
 
                 ingredients_map[ing_id] = {
                     "id": ing_id,
+                    "slug": str(raw_id).lower(),
                     "name": name,
                     "category": cat,
                     "current_stock": stock,
@@ -86,7 +105,6 @@ def import_data(filepath=None):
                     "daily_sales": {}
                 }
 
-            # Daily sales record
             date_str = clean_row.get("date")
             units_sold = int(clean_row.get("units_sold") or clean_row.get("quantity") or clean_row.get("qty") or 0)
             if date_str:
@@ -128,27 +146,35 @@ def import_data(filepath=None):
         logger.info(f"Imported {imported_count} ingredients into MongoDB Atlas.")
     elif firebase_db._firestore_db:
         coll = firebase_db._firestore_db.collection("pantry_ingredients")
+        now_iso = datetime.now(timezone.utc).isoformat()
         for ing_id, item in ingredients_map.items():
             doc_ref = coll.document(str(ing_id))
             doc = doc_ref.get()
             if doc.exists:
-                # Merge daily sales into existing
                 existing_data = doc.to_dict()
                 merged_daily = dict(existing_data.get("daily_sales", {}))
                 merged_daily.update(item["daily_sales"])
                 doc_ref.update({
                     "daily_sales": merged_daily,
-                    "updated_at": datetime.utcnow().isoformat() + "Z"
+                    "slug": item["slug"],
+                    "category": item["category"],
+                    "supplier": item["supplier"],
+                    "lead_time_days": item["lead_time_days"],
+                    "updated_at": now_iso
                 })
             else:
                 doc_ref.set(item)
             imported_count += 1
         logger.info(f"Imported {imported_count} ingredients into Firestore.")
     else:
-        # In-memory
+        # In-memory store
         for ing_id, item in ingredients_map.items():
             if ing_id in firebase_db._in_memory_db:
                 firebase_db._in_memory_db[ing_id]["daily_sales"].update(item["daily_sales"])
+                firebase_db._in_memory_db[ing_id]["slug"] = item["slug"]
+                firebase_db._in_memory_db[ing_id]["category"] = item["category"]
+                firebase_db._in_memory_db[ing_id]["supplier"] = item["supplier"]
+                firebase_db._in_memory_db[ing_id]["lead_time_days"] = item["lead_time_days"]
             else:
                 firebase_db._in_memory_db[ing_id] = item
 

@@ -576,7 +576,7 @@ def add_event(event_data: dict) -> dict:
     global _mongo_db, _firestore_db, _in_memory_events
     event_id = str(event_data.get("id") or f"event_{uuid.uuid4().hex[:8]}")
     
-    raw_ids = event_data.get("ingredient_ids", [])
+    raw_ids = event_data.get("ingredient_ids") or event_data.get("affected_ingredients") or []
     normalized_ids = []
     for x in raw_ids:
         try:
@@ -588,6 +588,7 @@ def add_event(event_data: dict) -> dict:
         "id": event_id,
         "name": str(event_data.get("name") or "Festival"),
         "ingredient_ids": normalized_ids,
+        "affected_ingredients": normalized_ids,
         "start_date": str(event_data.get("start_date")),
         "end_date": str(event_data.get("end_date")),
         "multiplier": float(event_data.get("multiplier", 3.0)),
@@ -710,13 +711,25 @@ def delete_event(event_id: str) -> bool:
 def get_events_for_ingredient(ingredient_id) -> list[dict]:
     """Returns all events covering a specific ingredient ID."""
     all_events = get_all_events()
-    str_id = str(ingredient_id)
+    str_id = str(ingredient_id).lower()
     matching = []
     for evt in all_events:
-        c_set = {str(x) for x in evt.get("ingredient_ids", [])}
-        if str_id in c_set:
+        raw_list = evt.get("ingredient_ids") or evt.get("affected_ingredients") or []
+        c_set = {str(x).lower() for x in raw_list}
+        if not c_set or str_id in c_set:
             matching.append(evt)
     return matching
+
+def get_event_multiplier_for_date(ingredient_id, date_str: str) -> float:
+    """Returns the surge multiplier applicable for an ingredient on a specific YYYY-MM-DD date."""
+    events = get_events_for_ingredient(ingredient_id)
+    multiplier = 1.0
+    for evt in events:
+        start = evt.get("start_date", "")
+        end = evt.get("end_date", "")
+        if start and end and start <= date_str <= end:
+            multiplier = max(multiplier, float(evt.get("multiplier", 3.0)))
+    return multiplier
 
 def is_ingredient_cursed(ingredient_id) -> bool:
     """True if an active or upcoming event covers this ingredient (end_date >= today)."""
@@ -725,12 +738,3 @@ def is_ingredient_cursed(ingredient_id) -> bool:
         if evt.get("end_date", "") >= today_str:
             return True
     return False
-
-def get_event_multiplier_for_date(ingredient_id, date_str: str) -> float:
-    """Returns the surge multiplier applicable for an ingredient on a specific YYYY-MM-DD date."""
-    events = get_events_for_ingredient(ingredient_id)
-    multiplier = 1.0
-    for evt in events:
-        if evt.get("start_date", "") <= date_str <= evt.get("end_date", ""):
-            multiplier = max(multiplier, float(evt.get("multiplier", 3.0)))
-    return multiplier

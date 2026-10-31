@@ -88,7 +88,6 @@ def get_full_pantry_status():
 
 @app.get("/api/ingredients/{item_id}/history")
 def get_ingredient_history(item_id: str, days: int = Query(60, ge=1, le=365)):
-    # Try parsing integer if numeric
     target_id = int(item_id) if item_id.isdigit() else item_id
     history = firebase_db.get_ingredient_sales_history(target_id, days=days)
     if not history:

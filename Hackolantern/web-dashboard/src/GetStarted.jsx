@@ -1,6 +1,10 @@
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 export default function GetStarted({ onEnterConsole }) {
+  const scrollRef = useRef(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+
   const features = [
     {
       icon: "📦",
@@ -52,6 +56,27 @@ export default function GetStarted({ onEnterConsole }) {
     { num: "03", step: "Execute Restock", desc: "One-click restock recommendations generated with supplier lead buffers." }
   ];
 
+  const updateScrollButtons = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 10);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 10);
+    }
+  };
+
+  useEffect(() => {
+    updateScrollButtons();
+    window.addEventListener("resize", updateScrollButtons);
+    return () => window.removeEventListener("resize", updateScrollButtons);
+  }, []);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const offset = direction === "left" ? -340 : 340;
+      scrollRef.current.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  };
+
   return (
     <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "20px 12px 60px" }}>
       {/* Hero Showcase Section */}
@@ -64,7 +89,7 @@ export default function GetStarted({ onEnterConsole }) {
         textAlign: "center",
         boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5)",
         overflow: "hidden",
-        marginBottom: "36px"
+        marginBottom: "40px"
       }}>
         <div style={{
           display: "inline-flex",
@@ -158,34 +183,102 @@ export default function GetStarted({ onEnterConsole }) {
         </div>
       </div>
 
-      {/* Feature Capabilities Grid */}
-      <div style={{ marginBottom: "40px" }}>
-        <div style={{ textAlign: "center", marginBottom: "28px" }}>
-          <h2 style={{ fontSize: "26px", fontWeight: 800, margin: "0 0 8px", color: "#f8fafc" }}>
-            Engineered for High-Velocity Shelf Operations
-          </h2>
-          <p style={{ fontSize: "15px", color: "#94a3b8", margin: 0 }}>
-            Everything needed to manage potion supply chains during calm hours or Full Moon surges.
-          </p>
+      {/* Feature Capabilities: Horizontal Carousel / Swipe */}
+      <div style={{ marginBottom: "48px" }}>
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
+          marginBottom: "16px",
+          flexWrap: "wrap",
+          gap: "12px"
+        }}>
+          <div>
+            <h2 style={{ fontSize: "24px", fontWeight: 800, margin: "0 0 6px", color: "#f8fafc" }}>
+              Engineered for High-Velocity Shelf Operations
+            </h2>
+            <p style={{ fontSize: "14px", color: "#94a3b8", margin: 0 }}>
+              Swipe through the core telemetry and operational capabilities.
+            </p>
+          </div>
+
+          {/* Navigation Controls */}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <button
+              onClick={() => scroll("left")}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+              style={{
+                background: canScrollLeft ? "#24113d" : "#140a22",
+                color: canScrollLeft ? "#f8fafc" : "#475569",
+                border: "1px solid #3b1d64",
+                borderRadius: "10px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: canScrollLeft ? "pointer" : "default",
+                fontSize: "16px",
+                transition: "all 0.15s ease"
+              }}
+            >
+              ←
+            </button>
+            <button
+              onClick={() => scroll("right")}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+              style={{
+                background: canScrollRight ? "#24113d" : "#140a22",
+                color: canScrollRight ? "#f8fafc" : "#475569",
+                border: "1px solid #3b1d64",
+                borderRadius: "10px",
+                width: "36px",
+                height: "36px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: canScrollRight ? "pointer" : "default",
+                fontSize: "16px",
+                transition: "all 0.15s ease"
+              }}
+            >
+              →
+            </button>
+          </div>
         </div>
 
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: "18px"
-        }}>
+        {/* Horizontal Scroll Track */}
+        <div
+          ref={scrollRef}
+          onScroll={updateScrollButtons}
+          style={{
+            display: "flex",
+            gap: "18px",
+            overflowX: "auto",
+            scrollSnapType: "x mandatory",
+            padding: "8px 4px 18px",
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
+            WebkitOverflowScrolling: "touch"
+          }}
+        >
           {features.map((feat, i) => (
             <div
               key={i}
               style={{
+                flex: "0 0 320px",
+                scrollSnapAlign: "start",
                 background: "linear-gradient(180deg, #180e28 0%, #130922 100%)",
                 border: "1px solid #2e1a4d",
-                borderRadius: "16px",
+                borderRadius: "18px",
                 padding: "24px",
-                boxShadow: "0 6px 18px rgba(0, 0, 0, 0.25)",
+                boxShadow: "0 6px 20px rgba(0, 0, 0, 0.3)",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between"
+                justifyContent: "space-between",
+                userSelect: "none"
               }}
             >
               <div>
@@ -207,7 +300,7 @@ export default function GetStarted({ onEnterConsole }) {
                 <h3 style={{ fontSize: "17px", fontWeight: 700, margin: "0 0 8px", color: "#f8fafc" }}>
                   {feat.title}
                 </h3>
-                <p style={{ fontSize: "14px", lineHeight: 1.5, color: "#94a3b8", margin: "0 0 16px" }}>
+                <p style={{ fontSize: "14px", lineHeight: 1.5, color: "#94a3b8", margin: "0 0 18px" }}>
                   {feat.desc}
                 </p>
               </div>
@@ -220,7 +313,7 @@ export default function GetStarted({ onEnterConsole }) {
                 alignItems: "center",
                 gap: "6px",
                 borderTop: "1px solid rgba(255, 255, 255, 0.05)",
-                paddingTop: "12px"
+                paddingTop: "14px"
               }}>
                 <span>✓</span>
                 <span>{feat.highlight}</span>
