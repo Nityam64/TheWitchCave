@@ -58,7 +58,7 @@ export function detectUnusualConsumption(inventory, salesHistory) {
         measuredUsage: `${todayQuantity} ${item.unit}`,
         normalAverage: `${baselineDailyAvg} ${item.unit}/day`,
         ratio,
-        suggestion: "Inspect recent sales and stock movements for unexpected shrinkage, ritual batch demands, or goblin shoplifting.",
+        suggestion: "Inspect recent sales and stock movements for unexpected shrinkage, sudden retail spikes, or unrecorded shrinkage.",
         timestamp: new Date().toISOString()
       });
     }
