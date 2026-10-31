@@ -18,6 +18,74 @@
       --violet: #8a4fd1;     /* hover glow */
     }
 
+    /* Antigravity Global Motion & Cursor */
+    * {
+      cursor: none; /* Antigravity custom cursor */
+    }
+
+    /* Fine paper texture */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 95;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    #antigravityCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Custom Antigravity Magnetic Cursor */
+    .cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 14px var(--pumpkin), 0 0 28px var(--gold);
+      transition: width 0.2s, height 0.2s, background-color 0.2s;
+    }
+    .cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid rgba(242, 178, 92, 0.45);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+                  height 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+                  border-color 0.3s,
+                  background-color 0.3s;
+    }
+    body.cursor-hover .cursor-dot {
+      width: 16px;
+      height: 16px;
+      background: var(--slime);
+      box-shadow: 0 0 20px var(--slime);
+    }
+    body.cursor-hover .cursor-ring {
+      width: 68px;
+      height: 68px;
+      border-color: rgba(127, 255, 90, 0.75);
+      background-color: rgba(127, 255, 90, 0.06);
+    }
+
     /* Page */
     body {
       margin: 0;
@@ -33,7 +101,7 @@
       inset: 0;
       background: radial-gradient(circle at 50% 25%, rgba(255, 117, 24, 0.08) 0%, rgba(138, 79, 209, 0.05) 55%, transparent 80%);
       pointer-events: none;
-      z-index: -1;
+      z-index: -2;
       animation: candleFlicker 7s ease-in-out infinite alternate;
     }
     @keyframes candleFlicker {
@@ -42,7 +110,7 @@
       70% { opacity: 0.6; transform: scale(0.98); }
       100% { opacity: 1; transform: scale(1.04) translate(6px, -4px); }
     }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 60px; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 60px; position: relative; z-index: 10; }
 
     /* Keyboard focus outline */
     a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
@@ -927,6 +995,16 @@
   </style>
 </head>
 <body>
+  <!-- Fine paper noise texture overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Antigravity floating runes & motes canvas -->
+  <canvas id="antigravityCanvas"></canvas>
+
+  <!-- Interactive Magnetic Celestial Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
   <!-- Night scene behind the page (decoration only) -->
   <div class="fx" aria-hidden="true" id="fxScene">
     <div class="moon" id="lunarMoon" onclick="toggleBloodMoon()" title="Click to summon Blood Moon Eclipse 🌕 ➔ 🌑"></div>
@@ -1263,6 +1341,9 @@
 
       window.location.hash = pageId;
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (window.updateCardTilts) setTimeout(window.updateCardTilts, 50);
+      if (window.bindHoverTargets) setTimeout(window.bindHoverTargets, 50);
     }
 
     // ==================== DASHBOARD ====================
@@ -1984,6 +2065,164 @@
       }
     });
 
+    // ==================== ANTIGRAVITY ENGINE ====================
+    // 1. Antigravity Floating Runes & Particle Physics Canvas
+    (function initAntigravityPhysics() {
+      var canvas = document.getElementById("antigravityCanvas");
+      if (!canvas) return;
+      var ctx = canvas.getContext("2d");
+      var w = canvas.width = window.innerWidth;
+      var h = canvas.height = window.innerHeight;
+
+      window.addEventListener("resize", function() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      var mousePos = { x: w / 2, y: h / 2, radius: 170 };
+      window.addEventListener("mousemove", function(e) {
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+      });
+
+      var runes = ["✧", "✦", "✶", "☾", "⚝", "☿", "🜂", "🜄"];
+      var particleList = [];
+      var count = Math.min(65, Math.floor(w / 22));
+
+      for (var i = 0; i < count; i++) {
+        particleList.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: Math.random() * 2.2 + 1,
+          rune: Math.random() > 0.65 ? runes[Math.floor(Math.random() * runes.length)] : null,
+          runeSize: Math.floor(Math.random() * 11 + 9),
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: -(Math.random() * 0.55 + 0.15), // upward antigravity drift
+          baseAlpha: Math.random() * 0.4 + 0.12,
+          color: Math.random() > 0.6 ? "#ff7518" : (Math.random() > 0.5 ? "#f2b25c" : "#8a4fd1")
+        });
+      }
+
+      function loopAntigravity() {
+        ctx.clearRect(0, 0, w, h);
+
+        for (var idx = 0; idx < particleList.length; idx++) {
+          var p = particleList[idx];
+
+          // Mouse Antigravity Repulsion
+          var dx = mousePos.x - p.x;
+          var dy = mousePos.y - p.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mousePos.radius) {
+            var force = (1 - dist / mousePos.radius) * 2.5;
+            p.x -= (dx / dist) * force;
+            p.y -= (dy / dist) * force;
+          }
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.y < -20) {
+            p.y = h + 10;
+            p.x = Math.random() * w;
+          }
+          if (p.x < -20) p.x = w + 10;
+          if (p.x > w + 20) p.x = -10;
+
+          ctx.save();
+          if (p.rune) {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.baseAlpha;
+            ctx.font = p.runeSize + "px serif";
+            ctx.fillText(p.rune, p.x, p.y);
+          } else {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.baseAlpha;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        requestAnimationFrame(loopAntigravity);
+      }
+      loopAntigravity();
+    })();
+
+    // 2. Custom Magnetic Dual-Ring Celestial Cursor
+    (function initCustomCursor() {
+      var dot = document.getElementById("cursorDot");
+      var ring = document.getElementById("cursorRing");
+      if (!dot || !ring) return;
+
+      var curX = window.innerWidth / 2, curY = window.innerHeight / 2;
+      var ringX = curX, ringY = curY;
+
+      window.addEventListener("mousemove", function(e) {
+        curX = e.clientX;
+        curY = e.clientY;
+      });
+
+      function loopCursor() {
+        dot.style.left = curX + "px";
+        dot.style.top = curY + "px";
+
+        ringX += (curX - ringX) * 0.18;
+        ringY += (curY - ringY) * 0.18;
+        ring.style.left = ringX + "px";
+        ring.style.top = ringY + "px";
+
+        requestAnimationFrame(loopCursor);
+      }
+      loopCursor();
+
+      function bindHoverTargets() {
+        var targets = document.querySelectorAll("a, button, input, select, .item, .stat-card, .ticket, .filter-btn, .moon");
+        targets.forEach(function(el) {
+          el.addEventListener("mouseenter", function() { document.body.classList.add("cursor-hover"); });
+          el.addEventListener("mouseleave", function() { document.body.classList.remove("cursor-hover"); });
+        });
+      }
+      bindHoverTargets();
+      window.bindHoverTargets = bindHoverTargets;
+    })();
+
+    // 3. 3D Gyroscopic Tilt & Dynamic Spotlight Reflector
+    (function init3DTiltAndSpotlights() {
+      function attachTilt(card) {
+        if (card.dataset.tiltAttached) return;
+        card.dataset.tiltAttached = "true";
+
+        card.addEventListener("mousemove", function(e) {
+          var rect = card.getBoundingClientRect();
+          var x = e.clientX - rect.left;
+          var y = e.clientY - rect.top;
+          var centerX = rect.width / 2;
+          var centerY = rect.height / 2;
+
+          var rotX = ((y - centerY) / centerY) * -6;
+          var rotY = ((x - centerX) / centerX) * 6;
+
+          card.style.transform = "perspective(900px) rotateX(" + rotX.toFixed(2) + "deg) rotateY(" + rotY.toFixed(2) + "deg) translateY(-2px)";
+          card.style.setProperty("--spotlight-x", x + "px");
+          card.style.setProperty("--spotlight-y", y + "px");
+        });
+
+        card.addEventListener("mouseleave", function() {
+          card.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)";
+        });
+      }
+
+      function updateCardTilts() {
+        var cards = document.querySelectorAll(".item, .stat-card, .ticket, .fc-card, .panel");
+        cards.forEach(attachTilt);
+      }
+      setInterval(updateCardTilts, 1000);
+      window.updateCardTilts = updateCardTilts;
+    })();
+
     // Boot
     loadState();
     buildSaleItems();
@@ -1995,6 +2234,8 @@
     } else {
       navigateTo("dashboard");
     }
+    if (window.bindHoverTargets) window.bindHoverTargets();
+    if (window.updateCardTilts) window.updateCardTilts();
   </script>
 </body>
 </html>
