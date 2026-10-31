@@ -245,12 +245,11 @@ export default function App() {
             {/* Inventory Grid */}
             <div style={{
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))",
-              gap: "18px"
+              gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+              gap: "20px"
             }}>
               {filteredPantry.map((item) => {
                 const isUnderSafety = item.current_stock < (item.safety_stock || 0);
-                const isDiscrepant = item.current_stock < item.expected_stock;
 
                 return (
                   <div
@@ -368,23 +367,23 @@ export default function App() {
                           background: "#0e0618",
                           border: "1px solid #24113d",
                           borderRadius: "10px",
-                          padding: "10px",
+                          padding: "12px 12px 6px 6px",
                           marginBottom: "14px"
                         }}>
-                          <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px" }}>
+                          <div style={{ fontSize: "10px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em", textTransform: "uppercase", marginBottom: "6px", paddingLeft: "8px" }}>
                             🔮 Crystal Ball 7-Day Forecast Curve
                           </div>
-                          <div style={{ width: "100%", height: 75 }}>
+                          <div style={{ width: "100%", height: 85 }}>
                             <ResponsiveContainer width="100%" height="100%">
-                              <AreaChart data={item.prophecy?.crystal_ball_forecast || []} margin={{ top: 2, right: 6, left: -25, bottom: 0 }}>
+                              <AreaChart data={item.prophecy?.crystal_ball_forecast || []} margin={{ top: 4, right: 12, left: -14, bottom: 0 }}>
                                 <defs>
                                   <linearGradient id={`grad-${item.id}`} x1="0" y1="0" x2="0" y2="1">
                                     <stop offset="5%" stopColor={item.is_cursed ? "#f59e0b" : "#a855f7"} stopOpacity={0.4}/>
                                     <stop offset="95%" stopColor={item.is_cursed ? "#f59e0b" : "#a855f7"} stopOpacity={0}/>
                                   </linearGradient>
                                 </defs>
-                                <XAxis dataKey="day" stroke="#475569" tick={{ fontSize: 9 }} />
-                                <YAxis stroke="#475569" tick={{ fontSize: 9 }} domain={['dataMin - 1', 'dataMax + 2']} />
+                                <XAxis dataKey="day" stroke="#475569" tick={{ fontSize: 9 }} tickLine={false} />
+                                <YAxis stroke="#475569" tick={{ fontSize: 9 }} tickLine={false} width={36} domain={['dataMin - 1', 'dataMax + 2']} />
                                 <Tooltip
                                   contentStyle={{ background: "#1c0d32", borderColor: "#7e22ce", borderRadius: "6px", fontSize: "11px" }}
                                   itemStyle={{ color: "#e9d5ff" }}
@@ -404,25 +403,26 @@ export default function App() {
                       )}
                     </div>
 
-                    {/* Operational Action Controls */}
+                    {/* Operational Action Controls: Clean 2-column or uniform responsive grid */}
                     <div style={{
-                      display: "flex",
-                      flexWrap: "wrap",
-                      gap: "6px",
+                      display: "grid",
+                      gridTemplateColumns: "repeat(2, 1fr)",
+                      gap: "8px",
                       borderTop: "1px solid #22103a",
-                      paddingTop: "12px"
+                      paddingTop: "14px"
                     }}>
                       <button
                         onClick={() => recordSale(item.id, 5)}
                         style={{
                           background: "#2e154d",
                           color: "#e9d5ff",
-                          border: "none",
-                          borderRadius: "6px",
-                          padding: "6px 10px",
+                          border: "1px solid #43216d",
+                          borderRadius: "8px",
+                          padding: "8px 10px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          cursor: "pointer"
+                          cursor: "pointer",
+                          textAlign: "center"
                         }}
                       >
                         Sell 5
@@ -430,14 +430,15 @@ export default function App() {
                       <button
                         onClick={() => recordSale(item.id, -20)}
                         style={{
-                          background: "rgba(16, 185, 129, 0.15)",
+                          background: "rgba(16, 185, 129, 0.12)",
                           color: "#34d399",
                           border: "1px solid #059669",
-                          borderRadius: "6px",
-                          padding: "6px 10px",
+                          borderRadius: "8px",
+                          padding: "8px 10px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          cursor: "pointer"
+                          cursor: "pointer",
+                          textAlign: "center"
                         }}
                       >
                         Restock +20
@@ -445,14 +446,15 @@ export default function App() {
                       <button
                         onClick={() => toggleCurse(item.id)}
                         style={{
-                          background: item.is_cursed ? "#d97706" : "rgba(245, 158, 11, 0.12)",
+                          background: item.is_cursed ? "#d97706" : "rgba(245, 158, 11, 0.1)",
                           color: item.is_cursed ? "#ffffff" : "#fbbf24",
                           border: "1px solid #d97706",
-                          borderRadius: "6px",
-                          padding: "6px 10px",
+                          borderRadius: "8px",
+                          padding: "8px 10px",
                           fontSize: "12px",
                           fontWeight: 600,
-                          cursor: "pointer"
+                          cursor: "pointer",
+                          textAlign: "center"
                         }}
                       >
                         {item.is_cursed ? "Uncurse" : "Curse (3x)"}
@@ -461,15 +463,15 @@ export default function App() {
                         onClick={() => auditShelf(item.id, 5)}
                         title="Simulate shelf inventory loss / shrinkage"
                         style={{
-                          background: "rgba(239, 68, 68, 0.15)",
+                          background: "rgba(239, 68, 68, 0.12)",
                           color: "#f87171",
                           border: "1px solid #991b1b",
-                          borderRadius: "6px",
-                          padding: "6px 10px",
+                          borderRadius: "8px",
+                          padding: "8px 10px",
                           fontSize: "12px",
                           fontWeight: 600,
                           cursor: "pointer",
-                          marginLeft: "auto"
+                          textAlign: "center"
                         }}
                       >
                         Audit Discrepancy
