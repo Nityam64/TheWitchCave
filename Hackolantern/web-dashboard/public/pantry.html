@@ -24,6 +24,23 @@
       background: var(--night);
       color: var(--parchment);
       font: 18px/1.5 "Crimson Text", Georgia, serif;
+      position: relative;
+    }
+    /* Ambient candlelight glow in background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 25%, rgba(255, 117, 24, 0.08) 0%, rgba(138, 79, 209, 0.05) 55%, transparent 80%);
+      pointer-events: none;
+      z-index: -1;
+      animation: candleFlicker 7s ease-in-out infinite alternate;
+    }
+    @keyframes candleFlicker {
+      0% { opacity: 0.65; transform: scale(1); }
+      35% { opacity: 0.95; transform: scale(1.02) translate(-8px, 4px); }
+      70% { opacity: 0.6; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.04) translate(6px, -4px); }
     }
     .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 60px; }
 
@@ -52,6 +69,13 @@
       border-radius: 50%;
       background: #f6e7c1;
       box-shadow: 0 0 60px rgba(246, 231, 193, 0.35);
+      cursor: pointer;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.5s ease;
+      pointer-events: auto;
+    }
+    .moon:hover {
+      transform: scale(1.12) rotate(-8deg);
+      box-shadow: 0 0 95px rgba(255, 117, 24, 0.75), 0 0 40px rgba(246, 231, 193, 0.6);
     }
     .moon::after {
       content: "";
@@ -62,6 +86,47 @@
       height: 84px;
       border-radius: 50%;
       background: var(--night);
+      transition: background 0.5s ease;
+    }
+
+    /* Blood Moon Mode */
+    body.blood-moon .moon {
+      background: #e63946;
+      box-shadow: 0 0 95px rgba(230, 57, 70, 0.9);
+      animation: bloodPulse 3.5s infinite alternate;
+    }
+    body.blood-moon .moon::after {
+      background: #18050e;
+    }
+    body.blood-moon {
+      --night: #18050e;
+      --panel: #2e0f1e;
+      --pumpkin: #ff3344;
+      --gold: #ff9955;
+      --slime: #ff0055;
+      --violet: #b5179e;
+    }
+    body.blood-moon .fog {
+      background: radial-gradient(ellipse at 50% 100%, rgba(230, 57, 70, 0.4), transparent 70%);
+    }
+    @keyframes bloodPulse {
+      0% { box-shadow: 0 0 60px rgba(230, 57, 70, 0.6); transform: scale(1); }
+      100% { box-shadow: 0 0 120px rgba(255, 51, 68, 0.95); transform: scale(1.04); }
+    }
+
+    /* Glowing Embers / Witch Sparks rising */
+    .ember {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      animation: riseEmber linear infinite;
+    }
+    @keyframes riseEmber {
+      0% { transform: translateY(105vh) translateX(0) scale(0.6); opacity: 0; }
+      15% { opacity: 0.85; filter: drop-shadow(0 0 6px currentColor); }
+      80% { opacity: 0.6; }
+      100% { transform: translateY(-10vh) translateX(50px) scale(1.3); opacity: 0; }
     }
 
     /* Fog drifting at the bottom */
@@ -85,12 +150,22 @@
       top: 14%;
       left: -60px;
       font-size: 26px;
-      opacity: 0.6;
-      animation: fly 16s linear infinite;
+      opacity: 0.65;
+      animation: flyBat 16s linear infinite;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.2s ease;
+    }
+    .bat:hover {
+      transform: scale(1.4) rotate(15deg);
     }
     .bat.b2 { top: 32%; font-size: 20px; animation-duration: 22s; animation-delay: 7s; }
-    @keyframes fly {
-      to { transform: translateX(calc(100vw + 120px)); }
+    @keyframes flyBat {
+      0% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(25vw) translateY(-14px) rotate(4deg); }
+      50% { transform: translateX(50vw) translateY(10px) rotate(-4deg); }
+      75% { transform: translateX(75vw) translateY(-8px) rotate(2deg); }
+      100% { transform: translateX(calc(100vw + 120px)) translateY(0); }
     }
 
     /* Ghosts bobbing up and down */
@@ -99,13 +174,20 @@
       right: 8%;
       bottom: 18%;
       font-size: 40px;
-      opacity: 0.5;
-      animation: bob 4s ease-in-out infinite;
+      opacity: 0.55;
+      animation: spectralBob 4.5s ease-in-out infinite;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.3s ease, opacity 0.3s ease;
     }
-    .ghost.g2 { right: auto; left: 5%; bottom: 35%; font-size: 30px; animation-delay: 2s; }
-    @keyframes bob {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-18px); }
+    .ghost:hover {
+      transform: scale(1.25) translateY(-10px);
+      opacity: 0.9;
+    }
+    .ghost.g2 { right: auto; left: 5%; bottom: 35%; font-size: 30px; animation-delay: 2.2s; }
+    @keyframes spectralBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.55; }
+      50% { transform: translateY(-22px) rotate(4deg); opacity: 0.75; filter: drop-shadow(0 0 12px rgba(138, 79, 209, 0.4)); }
     }
 
     /* Cobweb in the top-left corner */
@@ -115,7 +197,9 @@
       left: 0;
       width: 150px;
       opacity: 0.4;
+      transition: opacity 0.3s ease;
     }
+    .web:hover { opacity: 0.75; }
 
     /* Spider on a thread that stretches up and down */
     .spider {
@@ -125,6 +209,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .spider:hover {
+      transform: translateY(110px);
     }
     .thread {
       width: 1px;
@@ -132,7 +222,8 @@
       background: #b9a9c9;
       animation: lower 4s ease-in-out infinite;
     }
-    .spider span { font-size: 24px; }
+    .spider span { font-size: 24px; transition: transform 0.2s ease; }
+    .spider:hover span { transform: scale(1.3) rotate(20deg); }
     @keyframes lower {
       0%, 100% { height: 30px; }
       50% { height: 120px; }
@@ -199,9 +290,37 @@
     }
     .lead, .hint { color: #bfae95; margin: 0 0 20px; }
 
-    /* Section Visibility */
+    /* Section Visibility with Smooth Entry */
     .view-section { display: none; }
-    .view-section.active { display: block; }
+    .view-section.active {
+      display: block;
+      animation: viewEnter 0.35s ease-out;
+    }
+    @keyframes viewEnter {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Floating Click & Magic Sparkle Particle */
+    .float-particle {
+      position: fixed;
+      pointer-events: none;
+      font-family: "IM Fell English", serif;
+      font-weight: bold;
+      font-size: 20px;
+      z-index: 9999;
+      animation: floatUpFade 0.85s forwards ease-out;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+    @keyframes floatUpFade {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8) translateY(0); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) translateY(-25px); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1) translateY(-50px); }
+    }
+    @keyframes sparkleFade {
+      0% { opacity: 0.9; transform: translate(-50%, -50%) scale(0.6) translateY(0); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3) translateY(-22px) rotate(25deg); }
+    }
 
     /* Layout Grids */
     .grid {
@@ -286,6 +405,11 @@
       padding: 26px 24px 24px;
       border: 1px solid var(--pumpkin);
       transform: rotate(-0.4deg);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    .ticket:hover {
+      transform: rotate(0deg) scale(1.015);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(255, 117, 24, 0.25);
     }
     .ticket h2 { color: var(--ink); }
     .seal {
@@ -298,16 +422,16 @@
       background: radial-gradient(circle at 35% 35%, #9bff7a, #2f7a25);
       box-shadow: 0 0 0 3px var(--night);
       animation: sealPulse 3.5s ease-in-out infinite;
-      transition: transform 0.2s ease;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
       cursor: pointer;
     }
     .seal:hover {
-      transform: scale(1.15) rotate(15deg);
-      box-shadow: 0 0 16px var(--slime), 0 0 0 3px var(--night);
+      transform: scale(1.22) rotate(18deg);
+      box-shadow: 0 0 20px var(--slime), 0 0 0 3px var(--night);
     }
     @keyframes sealPulse {
       0%, 100% { transform: scale(1); box-shadow: 0 0 0 3px var(--night); }
-      50% { transform: scale(1.06); box-shadow: 0 0 12px rgba(127, 255, 90, 0.5), 0 0 0 3px var(--night); }
+      50% { transform: scale(1.07); box-shadow: 0 0 14px rgba(127, 255, 90, 0.6), 0 0 0 3px var(--night); }
     }
     .line {
       display: flex;
@@ -343,12 +467,34 @@
       color: var(--gold);
       border: 2px solid var(--pumpkin);
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
     }
-    .btn:not(:disabled) { animation: bubble 2.4s ease-in-out infinite; }
+    .btn:not(:disabled) {
+      animation: bubble 2.4s ease-in-out infinite;
+    }
     .btn:hover:not(:disabled) {
       background: var(--pumpkin);
       color: var(--ink);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 117, 24, 0.4);
+    }
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: -60%;
+      left: -60%;
+      width: 220%;
+      height: 220%;
+      background: linear-gradient(45deg, transparent, rgba(255, 117, 24, 0.15), rgba(127, 255, 90, 0.2), transparent);
+      transform: rotate(35deg);
+      animation: shimmerSteam 3.2s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes shimmerSteam {
+      0% { transform: translate(-100%, -100%) rotate(35deg); }
+      100% { transform: translate(100%, 100%) rotate(35deg); }
     }
     .btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-secondary {
@@ -1590,6 +1736,28 @@
       }
       originalAddItemToSale(i);
     };
+
+    // Ambient Magic Sparkle Trail on Mousemove (artisan Victorian touch)
+    var lastSparkle = 0;
+    window.addEventListener("mousemove", function(e) {
+      var now = Date.now();
+      if (now - lastSparkle > 160) {
+        lastSparkle = now;
+        var s = document.createElement("span");
+        s.className = "float-particle";
+        var runes = ["✦", "✧", "⋆", "✨", "🦇", "🧪", "🎃"];
+        s.textContent = runes[Math.floor(Math.random() * runes.length)];
+        var colors = ["#ff7518", "#f2b25c", "#8a4fd1", "#7fff5a", "#ecdcbc"];
+        s.style.color = colors[Math.floor(Math.random() * colors.length)];
+        s.style.fontSize = (Math.random() * 8 + 12) + "px";
+        s.style.left = (e.clientX + (Math.random() * 14 - 7)) + "px";
+        s.style.top = (e.clientY + (Math.random() * 14 - 7)) + "px";
+        s.style.zIndex = "999";
+        s.style.animation = "sparkleFade 0.75s forwards ease-out";
+        document.body.appendChild(s);
+        setTimeout(function() { s.remove(); }, 750);
+      }
+    });
 
     // Boot
     loadState();
