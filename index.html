@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hexley's Potion Pantry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* Colors */
+    :root {
+      --night: #140a1d;      /* page background */
+      --panel: #2a1a36;      /* dark panel */
+      --parchment: #ecdcbc;  /* paper */
+      --ink: #2b1d14;        /* text on paper */
+      --pumpkin: #ff7518;    /* title and borders */
+      --gold: #f2b25c;       /* headings */
+      --slime: #7fff5a;      /* poison glow */
+      --violet: #8a4fd1;     /* hover glow */
+    }
+
+    /* Page */
+    body {
+      margin: 0;
+      background: var(--night);
+      color: var(--parchment);
+      font: 18px/1.5 "Crimson Text", Georgia, serif;
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 60px; }
+
+    /* Keyboard focus outline */
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    /* Night scene: sits behind the page */
+    .fx {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* Moon: a circle with a dark circle on top makes a crescent */
+    .moon {
+      position: absolute;
+      top: 40px;
+      right: 6%;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: #f6e7c1;
+      box-shadow: 0 0 60px rgba(246, 231, 193, 0.35);
+    }
+    .moon::after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 22px;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: var(--night);
+    }
+
+    /* Fog drifting at the bottom */
+    .fog {
+      position: absolute;
+      bottom: 0;
+      left: -50%;
+      width: 200%;
+      height: 180px;
+      background: radial-gradient(ellipse at 50% 100%, rgba(138, 79, 209, 0.35), transparent 70%);
+      animation: drift 25s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(12%); }
+    }
+
+    /* Bats flying across */
+    .bat {
+      position: absolute;
+      top: 14%;
+      left: -60px;
+      font-size: 26px;
+      opacity: 0.6;
+      animation: fly 16s linear infinite;
+    }
+    .bat.b2 { top: 32%; font-size: 20px; animation-duration: 22s; animation-delay: 7s; }
+    @keyframes fly {
+      to { transform: translateX(calc(100vw + 120px)); }
+    }
+
+    /* Ghosts bobbing up and down */
+    .ghost {
+      position: absolute;
+      right: 8%;
+      bottom: 18%;
+      font-size: 40px;
+      opacity: 0.5;
+      animation: bob 4s ease-in-out infinite;
+    }
+    .ghost.g2 { right: auto; left: 5%; bottom: 35%; font-size: 30px; animation-delay: 2s; }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-18px); }
+    }
+
+    /* Cobweb in the top-left corner */
+    .web {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      opacity: 0.4;
+    }
+
+    /* Spider on a thread that stretches up and down */
+    .spider {
+      position: absolute;
+      top: 0;
+      left: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .thread {
+      width: 1px;
+      height: 60px;
+      background: #b9a9c9;
+      animation: lower 4s ease-in-out infinite;
+    }
+    .spider span { font-size: 24px; }
+    @keyframes lower {
+      0%, 100% { height: 30px; }
+      50% { height: 120px; }
+    }
+
+    /* Header */
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      border-bottom: 1px solid var(--pumpkin);
+      padding-bottom: 14px;
+    }
+    .brand {
+      font-family: "Creepster", cursive;
+      font-size: 34px;
+      color: var(--pumpkin);
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .sub { color: var(--gold); font-style: italic; }
+    .tabs a {
+      color: var(--parchment);
+      opacity: 0.7;
+      text-decoration: none;
+      margin-left: 18px;
+      padding-bottom: 4px;
+      cursor: pointer;
+      display: inline-block;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .tabs a:hover { opacity: 1; color: var(--gold); }
+    .tabs a.on { opacity: 1; color: var(--gold); border-bottom: 2px solid var(--gold); }
+
+    /* Bouncing pumpkin */
+    .bounce { display: inline-block; animation: bob 2s ease-in-out infinite; }
+
+    /* Title: big spooky font with a flicker */
+    h1 {
+      font-family: "Creepster", cursive;
+      font-weight: normal;
+      font-size: 58px;
+      color: var(--pumpkin);
+      text-shadow: 0 0 10px rgba(255, 117, 24, 0.6), 0 0 30px rgba(255, 117, 24, 0.3);
+      margin: 36px 0 4px;
+      animation: flicker 4s infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      20% { opacity: 0.85; }
+      40% { opacity: 1; }
+      70% { opacity: 0.9; }
+    }
+    h2 {
+      font-family: "IM Fell English", serif;
+      font-weight: normal;
+      font-size: 26px;
+      color: var(--gold);
+      margin: 0 0 6px;
+    }
+    .lead, .hint { color: #bfae95; margin: 0 0 20px; }
+
+    /* Section Visibility */
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* Layout Grids */
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .grid-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 840px) {
+      .grid, .grid-equal { grid-template-columns: 1fr; }
+      .tabs a { margin-left: 10px; margin-top: 6px; }
+      h1 { font-size: 44px; }
+    }
+
+    /* Panels & Parchments */
+    .panel { background: var(--panel); border: 1px solid #4a2d52; padding: 24px; position: relative; margin-bottom: 24px; }
+    .items { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) {
+      .items { grid-template-columns: 1fr; }
+    }
+
+    /* Item labels: paper cards with a double border */
+    .item {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin);
+      padding: 16px;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .item strong { display: block; font-family: "IM Fell English", serif; font-weight: normal; font-size: 22px; }
+    .item .stock { display: block; color: #2f5e2a; font-weight: 600; }
+    .item .price { display: block; color: #8a4a1c; }
+    .item:hover:not(:disabled) {
+      transform: translateY(-3px);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin), 0 0 22px var(--violet);
+    }
+    .item:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Red "Sold out" stamp */
+    .stamp {
+      display: none;
+      position: absolute;
+      top: 12px;
+      right: 10px;
+      transform: rotate(10deg);
+      border: 2px solid #9b1c1c;
+      color: #9b1c1c;
+      padding: 0 8px;
+      font-family: "IM Fell English", serif;
+      font-size: 17px;
+    }
+    .item:disabled .stamp { display: block; }
+    .stamp-badge {
+      display: inline-block;
+      border: 1px solid #9b1c1c;
+      color: #9b1c1c;
+      padding: 1px 6px;
+      font-family: "IM Fell English", serif;
+      font-size: 14px;
+      transform: rotate(-3deg);
+      margin-left: 6px;
+    }
+
+    /* Right: sale ticket / parchment card */
+    .ticket {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      padding: 26px 24px 24px;
+      border: 1px solid var(--pumpkin);
+      transform: rotate(-0.4deg);
+    }
+    .ticket h2 { color: var(--ink); }
+    .seal {
+      position: absolute;
+      top: -14px;
+      right: 24px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #9bff7a, #2f7a25);
+      box-shadow: 0 0 0 3px var(--night);
+    }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--pumpkin);
+      padding: 6px 0;
+    }
+    .line.new { animation: drop 0.35s ease; }
+    .note { font-style: italic; color: #6b5440; margin: 8px 0; }
+    .total { display: flex; justify-content: space-between; margin-top: 12px; font-size: 20px; }
+    .cost { color: #8a4a1c; font-weight: 600; }
+    .ticket label, .panel label { display: block; margin-top: 14px; font-size: 16px; color: var(--ink); }
+    .panel label { color: var(--gold); }
+    .ticket input, .ticket select, .panel input, .panel select, .panel textarea {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 6px;
+      padding: 10px;
+      font: inherit;
+      background: #fbf5e6;
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      font: inherit;
+      font-size: 19px;
+      background: var(--ink);
+      color: var(--gold);
+      border: 2px solid var(--pumpkin);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn:not(:disabled) { animation: bubble 2.4s ease-in-out infinite; }
+    .btn:hover:not(:disabled) {
+      background: var(--pumpkin);
+      color: var(--ink);
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: #2a1a36;
+      color: var(--gold);
+      border: 1px solid var(--pumpkin);
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 16px;
+      cursor: pointer;
+      animation: none;
+      width: auto;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--pumpkin); color: var(--ink); }
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 14px;
+      background: var(--ink);
+      color: var(--parchment);
+      border: 1px solid var(--pumpkin);
+      cursor: pointer;
+    }
+    .btn-sm:hover { background: var(--pumpkin); color: var(--ink); }
+
+    .msg { min-height: 1.5em; margin: 12px 0 0; color: #2f5e2a; font-weight: 600; text-align: center; }
+
+    /* Dashboard Cards Grid */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) {
+      .stat-cards { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .stat-cards { grid-template-columns: 1fr; }
+    }
+    .stat-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      padding: 18px 16px;
+      position: relative;
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin);
+    }
+    .stat-card .label { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b5440; }
+    .stat-card .val { font-family: "IM Fell English", serif; font-size: 32px; color: var(--ink); line-height: 1.2; margin: 4px 0; }
+    .stat-card .subtext { font-size: 14px; color: #2f5e2a; font-style: italic; }
+
+    /* Festival Banner */
+    .festival-plate {
+      background: #20132b;
+      border: 1px solid var(--pumpkin);
+      padding: 18px 22px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 0 25px rgba(255, 117, 24, 0.2);
+    }
+    .festival-icon { font-size: 36px; animation: bob 3s ease-in-out infinite; }
+    .festival-text h3 { margin: 0 0 4px; font-family: "IM Fell English", serif; font-size: 22px; color: var(--gold); font-weight: normal; }
+    .festival-text p { margin: 0; color: #bfae95; font-size: 16px; }
+
+    /* Tables */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--ink);
+      background: var(--parchment);
+      font-size: 16px;
+      border: 1px solid var(--pumpkin);
+    }
+    .ledger-table th {
+      background: #ddcbb0;
+      color: var(--ink);
+      font-family: "IM Fell English", serif;
+      font-weight: normal;
+      font-size: 18px;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--pumpkin);
+    }
+    .ledger-table td {
+      padding: 10px 14px;
+      border-bottom: 1px dashed #d1bda2;
+      vertical-align: middle;
+    }
+    .ledger-table tr:last-child td { border-bottom: none; }
+    .ledger-table tr:hover { background: #fbf5e6; }
+    .tag-sale { color: #8a4a1c; font-weight: 600; }
+    .tag-restock { color: #2f5e2a; font-weight: 600; }
+    .tag-alert { color: #9b1c1c; font-weight: 600; }
+
+    /* Filter Pill Row */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .filter-btn {
+      background: #2a1a36;
+      border: 1px solid #4a2d52;
+      color: var(--parchment);
+      padding: 6px 14px;
+      font: inherit;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active {
+      background: var(--pumpkin);
+      color: var(--night);
+      border-color: var(--pumpkin);
+      font-weight: 600;
+    }
+
+    /* Search input inside panel */
+    .search-box {
+      background: #fbf5e6;
+      border: 1px solid var(--pumpkin);
+      color: var(--ink);
+      font: inherit;
+      padding: 8px 12px;
+      width: 240px;
+    }
+
+    /* Supplier Card */
+    .supplier-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
+      padding: 18px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .supplier-card h3 {
+      font-family: "IM Fell English", serif;
+      font-size: 22px;
+      color: var(--ink);
+      margin: 0 0 4px;
+      font-weight: normal;
+    }
+    .supplier-dispatch { color: #6b5440; font-size: 15px; margin-bottom: 8px; }
+    .supplier-meta { display: flex; justify-content: space-between; font-size: 14px; color: #2f5e2a; font-weight: 600; }
+
+    /* Forecast & Restock Page 3 Art-Directed Theme (matching Reference) */
+    .fc-card {
+      background: #140d1e;
+      border: 1px solid #2e1c40;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+    .fc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .fc-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f5eedf;
+      margin: 0;
+      letter-spacing: -0.01em;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-select {
+      background: #1c112b;
+      color: #f5eedf;
+      border: 1px solid #4a3363;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .fc-select:focus {
+      outline: 2px solid var(--gold);
+    }
+    .fc-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .fc-table th {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #8e7a9e;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      border-bottom: 1px solid #2d1c3e;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-table td {
+      padding: 16px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #f5eedf;
+      font-size: 15px;
+      vertical-align: middle;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-table tr:last-child td {
+      border-bottom: none;
+    }
+    .fc-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .fc-item-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .fc-item-sub {
+      font-size: 12.5px;
+      color: #9d8ba8;
+      margin-top: 3px;
+    }
+    .fc-reorder-val {
+      font-size: 16px;
+      font-weight: 700;
+      color: #dc7a42;
+    }
+    .fc-reorder-sufficient {
+      font-size: 15px;
+      font-weight: 600;
+      color: #6ee7b7;
+    }
+    .fc-btn-restock {
+      background: #1c112b;
+      color: #f5eedf;
+      border: 1px solid #4a3363;
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-btn-restock:hover {
+      background: #ff7518;
+      color: #140a1d;
+      border-color: #ff7518;
+    }
+
+    /* Animations */
+    @keyframes bubble {
+      0%, 100% { box-shadow: 0 0 6px rgba(127, 255, 90, 0.3); }
+      50% { box-shadow: 0 0 22px rgba(127, 255, 90, 0.7); }
+    }
+    @keyframes drop {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: none; }
+    }
+    /* Green flash when a sale or restock is confirmed */
+    .flash { animation: flash 0.9s ease; }
+    @keyframes flash {
+      0%, 100% { box-shadow: none; }
+      30% { box-shadow: 0 0 30px var(--slime); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Night scene behind the page (decoration only) -->
+  <div class="fx" aria-hidden="true">
+    <div class="moon"></div>
+    <div class="fog"></div>
+    <svg class="web" viewBox="0 0 150 150">
+      <g fill="none" stroke="#c9b8dc" stroke-width="1.2">
+        <path d="M0 0 L140 18 M0 0 L110 110 M0 0 L18 140"/>
+        <path d="M40 0 Q40 40 0 40 M75 0 Q75 75 0 75 M110 0 Q110 110 0 110"/>
+      </g>
+    </svg>
+    <div class="spider"><div class="thread"></div><span>🕷️</span></div>
+    <span class="bat">🦇</span>
+    <span class="bat b2">🦇</span>
+    <span class="ghost">👻</span>
+    <span class="ghost g2">👻</span>
+  </div>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header class="head">
+      <div>
+        <a class="brand" onclick="navigateTo('dashboard')"><span class="bounce">🎃</span> Hexley's Potion Pantry</a>
+        <div class="sub">Victorian apothecary, est. 1888</div>
+      </div>
+      <nav class="tabs" id="mainTabs">
+        <a onclick="navigateTo('dashboard')" id="tab-dashboard" class="on">Dashboard</a>
+        <a onclick="navigateTo('inventory')" id="tab-inventory">Inventory</a>
+        <a onclick="navigateTo('forecast')" id="tab-forecast">Forecast &amp; Restock</a>
+        <a onclick="navigateTo('sale')" id="tab-sale">Record Sale</a>
+        <a onclick="navigateTo('activity')" id="tab-activity">Stock Activity</a>
+        <a onclick="navigateTo('settings')" id="tab-settings">Suppliers &amp; Settings</a>
+      </nav>
+    </header>
+
+    <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+    <section class="view-section active" id="view-dashboard">
+      <h1>Apothecary Vault &amp; Stock Ledger</h1>
+      <p class="lead">Real-time pantry status, lunar curse surveillance, and urgent restock thresholds.</p>
+
+      <!-- Stat Cards -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="label">Total Reagents</div>
+          <div class="val" id="dashTotalReagents">6 Items</div>
+          <div class="subtext" id="dashTotalUnits">160 units tracked</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Urgent Shortages</div>
+          <div class="val" style="color:#9b1c1c;" id="dashShortageCount">2 Reagents</div>
+          <div class="subtext" style="color:#9b1c1c;">Below min threshold</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Full Moon Multiplier</div>
+          <div class="val" style="color:#ff7518;">3.0x Surge</div>
+          <div class="subtext">Lunar peak in 2 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Vault Value</div>
+          <div class="val" style="color:#8a4a1c;" id="dashVaultValue">¢1,245.50</div>
+          <div class="subtext">Current inventory worth</div>
+        </div>
+      </div>
+
+      <!-- Festival Banner -->
+      <div class="festival-plate">
+        <div class="festival-icon">🌕</div>
+        <div class="festival-text">
+          <h3>Blood Moon Festival Peak Approaching</h3>
+          <p>Demand for Bat Wings and Mandrake Root surges up to 300%. Check Scrying Forecast to prevent pantry stockouts before midnight deliveries.</p>
+        </div>
+        <div style="margin-left: auto;">
+          <button class="btn-secondary" onclick="navigateTo('forecast')">Scry Restock &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Quick Grids -->
+      <div class="grid">
+        <div class="panel">
+          <h2>Depleted &amp; Low Stock Ledger</h2>
+          <p class="hint">Reagents requiring immediate raven dispatch restock.</p>
+          <div id="dashAlertList"></div>
+        </div>
+        <div class="ticket">
+          <span class="seal"></span>
+          <h2>Quick Apothecary Actions</h2>
+          <p class="note">Perform rapid ledger transactions or restock ingredients.</p>
+          <button class="btn" style="margin-top:14px;" onclick="navigateTo('forecast')">Scrying Forecast &amp; Restock &rarr;</button>
+          <button class="btn" style="margin-top:14px; background:#2a1a36; color:var(--parchment);" onclick="navigateTo('sale')">Record Customer Sale &rarr;</button>
+          <button class="btn" style="margin-top:14px; background:#1c1328; color:var(--gold);" onclick="navigateTo('inventory')">Browse Full Vault Catalog &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. INVENTORY VIEW ==================== -->
+    <section class="view-section" id="view-inventory">
+      <h1>Pantry Botanical &amp; Reagent Vault</h1>
+      <p class="lead">Complete catalog of dried flora, pickled fauna, essences, and enchanted glass.</p>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+        <div class="filter-bar" style="margin-bottom:0;">
+          <button class="filter-btn active" onclick="filterInventory('all', this)">All Reagents</button>
+          <button class="filter-btn" onclick="filterInventory('low', this)">Low / Depleted</button>
+          <button class="filter-btn" onclick="filterInventory('festival', this)">Festival Critical</button>
+        </div>
+        <div>
+          <input type="text" id="invSearch" class="search-box" placeholder="Search reagents..." oninput="renderInventoryGrid()">
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="items" id="inventoryGrid"></div>
+      </div>
+    </section>
+
+    <!-- ==================== 3. FORECAST & RESTOCK VIEW (PAGE 3) ==================== -->
+    <section class="view-section" id="view-forecast">
+      <!-- Card 1: Historic Consumption & 7-Day Forecast Curve -->
+      <div class="fc-card">
+        <div class="fc-card-header">
+          <h2 class="fc-card-title">Historic Consumption &amp; 7-Day Forecast Curve</h2>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <select id="forecastReagentSelect" class="fc-select" onchange="renderSelectedForecast()"></select>
+          </div>
+        </div>
+
+        <div id="chartSvgWrapper" style="overflow-x:auto;"></div>
+      </div>
+
+      <!-- Card 2: All Pantry Restock Recommendations Table -->
+      <div class="fc-card" style="padding: 24px 28px;">
+        <div class="fc-card-header" style="margin-bottom: 12px;">
+          <h2 class="fc-card-title">All Pantry Restock Recommendations</h2>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="fc-table" id="allRestockTable">
+            <thead>
+              <tr>
+                <th>Ingredient</th>
+                <th>Stock on Hand</th>
+                <th>Safety Stock</th>
+                <th>7-Day Demand</th>
+                <th>Reorder Suggestion</th>
+                <th>Supplier (Lead Time)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="allRestockTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. RECORD SALE VIEW ==================== -->
+    <section class="view-section" id="view-sale">
+      <h1>Record witch shop sale</h1>
+      <p class="lead">Atomic stock deduction with complete movement history logging.</p>
+
+      <main class="grid">
+        <section class="panel">
+          <h2>Select pantry items</h2>
+          <p class="hint">Click an ingredient to add it to the sale ticket.</p>
+          <div class="items" id="saleItems"></div>
+        </section>
+
+        <section class="ticket" id="saleTicket">
+          <span class="seal"></span>
+          <h2>Current sale ticket</h2>
+          <div id="lines"></div>
+          <div class="total"><span>Total units</span><span id="units">0</span></div>
+          <div class="total cost"><span>Estimated cost</span><span id="cost">¢0.00</span></div>
+          <label for="note">Customer or sale notes (optional)</label>
+          <input id="note" placeholder="e.g., Midnight traveler, healing tonic order">
+          <button class="btn" id="confirm" onclick="confirmSale()" disabled>Confirm &amp; Deduct Stock</button>
+          <p class="msg" id="msg"></p>
+        </section>
+      </main>
+    </section>
+
+    <!-- ==================== 5. STOCK ACTIVITY VIEW ==================== -->
+    <section class="view-section" id="view-activity">
+      <h1>Apothecary Movement History</h1>
+      <p class="lead">Immutable chronological trail of customer sales, owl dispatches, and vault adjustments.</p>
+
+      <div class="panel" style="overflow-x: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="margin:0;">Chronological Ledger</h2>
+          <button class="btn-secondary" onclick="clearActivityLogs()">Clear History</button>
+        </div>
+        <table class="ledger-table" id="activityTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Reagent &amp; Movement</th>
+              <th>Ledger Notes</th>
+            </tr>
+          </thead>
+          <tbody id="activityTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== 6. SUPPLIERS & SETTINGS VIEW ==================== -->
+    <section class="view-section" id="view-settings">
+      <h1>Suppliers &amp; Apothecary Configuration</h1>
+      <p class="lead">Merchant coven dispatch contracts, lunar threshold parameters, and vault rules.</p>
+
+      <div class="grid-equal">
+        <!-- Merchant Coven Directory -->
+        <div class="panel">
+          <h2>Merchant Coven Directory</h2>
+          <p class="hint">Affiliated suppliers and raven delivery speeds.</p>
+
+          <div class="supplier-card">
+            <h3>Grimoire &amp; Grove Apothecary</h3>
+            <div class="supplier-dispatch">Raven Owl Dispatch #04 &bull; Preserved fauna, nocturnal wings, moorland herbs</div>
+            <div class="supplier-meta"><span>Lead Time: 3 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Obsidian Peak Foragers Guild</h3>
+            <div class="supplier-dispatch">Broomstick Express Couriers #12 &bull; Volcanic peppers, sulfur crystals, cliff roots</div>
+            <div class="supplier-meta"><span>Lead Time: 5 days</span><span>Rating: ★★★★☆</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Moonlit Caverns Cooperative</h3>
+            <div class="supplier-dispatch">Subterranean Bat Post B-7 &bull; Fungal spores, cave honey, hand-blown glassware</div>
+            <div class="supplier-meta"><span>Lead Time: 2 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Blackwood Herbalists &amp; Vintners</h3>
+            <div class="supplier-dispatch">Whispering Crow Post #09 &bull; Mandrake roots, venom extractions, rare distillates</div>
+            <div class="supplier-meta"><span>Lead Time: 4 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+        </div>
+
+        <!-- Apothecary Settings -->
+        <div class="ticket">
+          <span class="seal"></span>
+          <h2>Apothecary Vault Settings</h2>
+          <p class="note">Adjust global coven thresholds and ledger preferences.</p>
+
+          <label for="cfgStoreName">Apothecary Shop Title</label>
+          <input id="cfgStoreName" value="Hexley's Potion Pantry">
+
+          <label for="cfgFestivalMul">Festival Surge Demand Multiplier</label>
+          <input type="number" id="cfgFestivalMul" value="3.0" step="0.5" min="1.0" max="10.0">
+
+          <label for="cfgDefaultMin">Default Minimum Safety Stock</label>
+          <input type="number" id="cfgDefaultMin" value="15" min="1">
+
+          <label for="cfgCurrency">Coinage Symbol</label>
+          <input id="cfgCurrency" value="¢">
+
+          <button class="btn" onclick="saveSettings()">Save Configuration</button>
+          <button class="btn" style="background:#2a1a36; color:var(--parchment); margin-top:10px; animation:none;" onclick="resetDemoVault()">Reset to Default Sample Vault</button>
+          <p class="msg" id="settingsMsg"></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Canonical Apothecary Reagents Database with supplier metadata
+    var defaultItems = [
+      { id: "item-1", icon: "🦇", name: "Bat Wings", unit: "pairs", stock: 45, minStock: 20, price: 4.5, festival: true, festivalMul: 3, supplier: "Grimoire & Grove Apothecary", leadDays: 3, dailyAvg: 4.3 },
+      { id: "item-2", icon: "🌿", name: "Mandrake Root", unit: "roots", stock: 12, minStock: 15, price: 12.0, festival: true, festivalMul: 3, supplier: "Blackwood Herbalists & Vintners", leadDays: 4, dailyAvg: 2.0 },
+      { id: "item-3", icon: "🌶️", name: "Ghost Pepper Essence", unit: "vials", stock: 60, minStock: 25, price: 6.0, festival: false, festivalMul: 1, supplier: "Obsidian Peak Foragers Guild", leadDays: 5, dailyAvg: 3.0 },
+      { id: "item-4", icon: "👁️", name: "Newt Eyes", unit: "jars", stock: 0, minStock: 30, price: 8.5, festival: false, festivalMul: 1, supplier: "Grimoire & Grove Apothecary", leadDays: 3, dailyAvg: 4.0 },
+      { id: "item-5", icon: "🔮", name: "Elixir of Shadow Sight", unit: "bottles", stock: 8, minStock: 10, price: 25.0, festival: true, festivalMul: 3, supplier: "Moonlit Caverns Cooperative", leadDays: 2, dailyAvg: 1.0 },
+      { id: "item-6", icon: "🧪", name: "Cauldron Glass Flasks", unit: "flasks", stock: 35, minStock: 20, price: 3.0, festival: false, festivalMul: 1, supplier: "Moonlit Caverns Cooperative", leadDays: 2, dailyAvg: 2.0 },
+      { id: "item-7", icon: "🐉", name: "Dried Dragon Scales", unit: "ounces", stock: 18, minStock: 10, price: 45.0, festival: false, festivalMul: 1, supplier: "Obsidian Peak Foragers Guild", leadDays: 5, dailyAvg: 1.2 },
+      { id: "item-8", icon: "🐺", name: "Distilled Wolfsbane", unit: "vials", stock: 14, minStock: 15, price: 18.5, festival: true, festivalMul: 2.5, supplier: "Blackwood Herbalists & Vintners", leadDays: 4, dailyAvg: 1.8 }
+    ];
+
+    // State
+    var items = [];
+    var movements = [];
+    var currentFilter = "all";
+    var selectedForecastIndex = 0;
+
+    function loadState() {
+      try {
+        var savedItems = localStorage.getItem("hexley_items_v2");
+        var savedMovements = localStorage.getItem("hexley_movements_v2");
+        items = savedItems ? JSON.parse(savedItems) : JSON.parse(JSON.stringify(defaultItems));
+        movements = savedMovements ? JSON.parse(savedMovements) : [
+          { time: "Oct 31, 11:30 PM", type: "Sale", text: "Bat Wings x 3", note: "Customer: Midnight traveler, healing tonic order" },
+          { time: "Oct 31, 09:15 PM", type: "Restock", text: "Ghost Pepper Essence +20", note: "Delivery: Obsidian Peak Foragers Guild" },
+          { time: "Oct 31, 06:00 PM", type: "Sale", text: "Elixir of Shadow Sight x 2", note: "Customer: High Priestess Coven gathering" }
+        ];
+      } catch (e) {
+        items = JSON.parse(JSON.stringify(defaultItems));
+        movements = [];
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("hexley_items_v2", JSON.stringify(items));
+        localStorage.setItem("hexley_movements_v2", JSON.stringify(movements));
+      } catch (e) {}
+    }
+
+    // Sale Ticket State
+    var sale = [];
+    var lastAdded = -1;
+
+    // Navigation Router
+    function navigateTo(pageId) {
+      var views = document.querySelectorAll(".view-section");
+      views.forEach(function(v) { v.classList.remove("active"); });
+
+      var tabs = document.querySelectorAll(".tabs a");
+      tabs.forEach(function(t) { t.classList.remove("on"); });
+
+      var activeView = document.getElementById("view-" + pageId);
+      var activeTab = document.getElementById("tab-" + pageId);
+
+      if (activeView) activeView.classList.add("active");
+      if (activeTab) activeTab.classList.add("on");
+
+      if (pageId === "dashboard") renderDashboard();
+      if (pageId === "inventory") renderInventoryGrid();
+      if (pageId === "forecast") renderForecastPage();
+      if (pageId === "sale") { updateSaleItems(); showTicket(); }
+      if (pageId === "activity") renderActivityTable();
+
+      window.location.hash = pageId;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // ==================== DASHBOARD ====================
+    function renderDashboard() {
+      var totalUnits = 0;
+      var totalWorth = 0;
+      var shortageCount = 0;
+      var alertBox = document.getElementById("dashAlertList");
+      alertBox.innerHTML = "";
+
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        totalUnits += it.stock;
+        totalWorth += (it.stock * it.price);
+        if (it.stock <= it.minStock) {
+          shortageCount++;
+          var isSoldOut = it.stock <= 0;
+          var statusStamp = isSoldOut ? '<span class="stamp-badge">SOLD OUT</span>' : '<span class="stamp-badge" style="color:#d97706; border-color:#d97706;">LOW STOCK</span>';
+          alertBox.innerHTML +=
+            '<div style="background:var(--parchment); color:var(--ink); border:1px solid var(--pumpkin); padding:12px 16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">' +
+            '<div>' +
+            '<strong>' + it.icon + ' ' + it.name + '</strong> ' + statusStamp +
+            '<div style="font-size:15px; color:#6b5440;">In stock: <strong>' + it.stock + ' ' + it.unit + '</strong> (Safety target: ' + it.minStock + ')</div>' +
+            '</div>' +
+            '<button class="btn-sm" onclick="quickRestockItem(' + i + ', 20)">+ Restock 20</button>' +
+            '</div>';
+        }
+      }
+
+      if (shortageCount === 0) {
+        alertBox.innerHTML = '<p class="note" style="color:#7fff5a;">All pantry reagents are sufficiently stocked above minimum thresholds.</p>';
+      }
+
+      document.getElementById("dashTotalReagents").textContent = items.length + " Items";
+      document.getElementById("dashTotalUnits").textContent = totalUnits + " units in pantry";
+      document.getElementById("dashShortageCount").textContent = shortageCount + " Reagents";
+      document.getElementById("dashVaultValue").textContent = "¢" + totalWorth.toFixed(2);
+    }
+
+    function quickRestockItem(index, amount) {
+      var qty = amount || 20;
+      items[index].stock += qty;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Restock",
+        text: items[index].name + " +" + qty + " " + items[index].unit,
+        note: "Quick restock order to " + items[index].supplier
+      });
+      saveState();
+      renderDashboard();
+      if (document.getElementById("view-forecast").classList.contains("active")) {
+        renderForecastPage();
+      }
+    }
+
+    // ==================== INVENTORY ====================
+    function filterInventory(category, btn) {
+      currentFilter = category;
+      var btns = document.querySelectorAll(".filter-btn");
+      btns.forEach(function(b) { b.classList.remove("active"); });
+      if (btn) btn.classList.add("active");
+      renderInventoryGrid();
+    }
+
+    function renderInventoryGrid() {
+      var grid = document.getElementById("inventoryGrid");
+      var search = (document.getElementById("invSearch").value || "").toLowerCase();
+      grid.innerHTML = "";
+
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        if (search && it.name.toLowerCase().indexOf(search) === -1) continue;
+        if (currentFilter === "low" && it.stock > it.minStock) continue;
+        if (currentFilter === "festival" && !it.festival) continue;
+
+        var isOut = it.stock <= 0;
+        var festivalTag = it.festival ? ' <span style="font-size:13px; color:#ff7518;">[🌕 ' + it.festivalMul + 'x Festival]</span>' : '';
+        grid.innerHTML +=
+          '<div class="item" style="cursor:default;">' +
+          '<strong>' + it.icon + ' ' + it.name + festivalTag + '</strong>' +
+          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : '') +
+          '<span class="stock">Vault Stock: ' + it.stock + ' ' + it.unit + ' (Min: ' + it.minStock + ')</span>' +
+          '<span class="price">¢' + it.price.toFixed(2) + ' / ' + it.unit + ' &bull; ' + it.supplier + '</span>' +
+          '<div style="margin-top:10px; display:flex; gap:8px;">' +
+          '<button class="btn-sm" onclick="adjustInventory(' + i + ', 5)">+5</button>' +
+          '<button class="btn-sm" onclick="adjustInventory(' + i + ', 20)">+20</button>' +
+          (it.stock > 0 ? '<button class="btn-sm" style="background:#4a2d52;" onclick="adjustInventory(' + i + ', -1)">-1</button>' : '') +
+          '</div>' +
+          '</div>';
+      }
+    }
+
+    function adjustInventory(index, delta) {
+      if (items[index].stock + delta < 0) return;
+      items[index].stock += delta;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: delta > 0 ? "Restock" : "Sale",
+        text: items[index].name + " " + (delta > 0 ? "+" : "") + delta + " " + items[index].unit,
+        note: "Manual ledger adjustment in inventory vault"
+      });
+      saveState();
+      renderInventoryGrid();
+      updateSaleItems();
+    }
+
+    // ==================== FORECAST & RESTOCK (PAGE 3) ====================
+    // Historical sales data matching the reference screenshot
+    var historicSalesSeries = {
+      "item-1": [
+        { label: "Mon, 10/26", actual: 8 },
+        { label: "Tue, 10/27", actual: 9 },
+        { label: "Wed, 10/28", actual: 7 },
+        { label: "Thu, 10/29", actual: 10 },
+        { label: "Fri, 10/30", actual: 8 },
+        { label: "Sat, 10/31", actual: 9 },
+        { label: "Sun, 11/1", actual: 28 }
+      ],
+      "item-2": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 2 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 3 },
+        { label: "Fri, 10/30", actual: 2 },
+        { label: "Sat, 10/31", actual: 3 },
+        { label: "Sun, 11/1", actual: 7 }
+      ],
+      "item-3": [
+        { label: "Mon, 10/26", actual: 3 },
+        { label: "Tue, 10/27", actual: 3 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 4 },
+        { label: "Fri, 10/30", actual: 3 },
+        { label: "Sat, 10/31", actual: 3 },
+        { label: "Sun, 11/1", actual: 3 }
+      ],
+      "item-4": [
+        { label: "Mon, 10/26", actual: 4 },
+        { label: "Tue, 10/27", actual: 4 },
+        { label: "Wed, 10/28", actual: 4 },
+        { label: "Thu, 10/29", actual: 4 },
+        { label: "Fri, 10/30", actual: 4 },
+        { label: "Sat, 10/31", actual: 4 },
+        { label: "Sun, 11/1", actual: 4 }
+      ],
+      "item-5": [
+        { label: "Mon, 10/26", actual: 1 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 1 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 1 },
+        { label: "Sun, 11/1", actual: 4 }
+      ],
+      "item-6": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 2 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 2 },
+        { label: "Fri, 10/30", actual: 2 },
+        { label: "Sat, 10/31", actual: 2 },
+        { label: "Sun, 11/1", actual: 2 }
+      ],
+      "item-7": [
+        { label: "Mon, 10/26", actual: 1 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 1 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 1 },
+        { label: "Sun, 11/1", actual: 2 }
+      ],
+      "item-8": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 2 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 2 },
+        { label: "Sun, 11/1", actual: 5 }
+      ]
+    };
+
+    function calculateForecast(item) {
+      var series = historicSalesSeries[item.id] || historicSalesSeries["item-1"];
+      var totalHistoric = series.reduce(function(acc, s) { return acc + s.actual; }, 0);
+      var avgDaily = totalHistoric / series.length;
+      var multiplier = item.festival ? (item.festivalMul || 3) : 1;
+      var dailyForecast = Math.round(avgDaily * multiplier * 10) / 10;
+      var forecast7d = Math.round(dailyForecast * 7);
+      var safetyStock = item.minStock;
+      var currentStock = item.stock;
+      var reorderQty = Math.max(0, forecast7d + safetyStock - currentStock);
+
+      return {
+        series: series,
+        avgDaily: avgDaily,
+        dailyForecast: dailyForecast,
+        forecast7d: forecast7d,
+        safetyStock: safetyStock,
+        currentStock: currentStock,
+        reorderQty: reorderQty
+      };
+    }
+
+    function renderForecastPage() {
+      var sel = document.getElementById("forecastReagentSelect");
+      var prevVal = sel.value;
+      sel.innerHTML = "";
+      for (var i = 0; i < items.length; i++) {
+        sel.innerHTML += '<option value="' + i + '">' + items[i].name + ' (' + items[i].stock + ' ' + items[i].unit + ' in stock)</option>';
+      }
+      if (prevVal !== "" && parseInt(prevVal, 10) < items.length) {
+        sel.value = prevVal;
+        selectedForecastIndex = parseInt(prevVal, 10);
+      } else {
+        sel.value = "0";
+        selectedForecastIndex = 0;
+      }
+
+      renderSelectedForecast();
+      renderAllRestockTable();
+    }
+
+    function renderSelectedForecast() {
+      var sel = document.getElementById("forecastReagentSelect");
+      selectedForecastIndex = parseInt(sel.value, 10);
+      var item = items[selectedForecastIndex];
+      var fc = calculateForecast(item);
+      renderForecastSvgChart(item, fc);
+    }
+
+    function renderForecastSvgChart(item, fc) {
+      var container = document.getElementById("chartSvgWrapper");
+      var svgW = 860;
+      var svgH = 200;
+      var padLeft = 40;
+      var padRight = 36;
+      var padTop = 32;
+      var padBottom = 32;
+      var plotW = svgW - padLeft - padRight;
+      var plotH = svgH - padTop - padBottom;
+
+      // 7 historical points
+      var points = [];
+      for (var s = 0; s < fc.series.length; s++) {
+        points.push({
+          label: fc.series[s].label,
+          actual: fc.series[s].actual,
+          forecast: null,
+          isFuture: false
+        });
+      }
+
+      // 7 future points matching +1d (Mon) to +7d (Sun)
+      var futureDays = ["+1d (Mon)", "+2d (Tue)", "+3d (Wed)", "+4d (Thu)", "+5d (Fri)", "+6d (Sat)", "+7d (Sun)"];
+      for (var f = 0; f < futureDays.length; f++) {
+        points.push({
+          label: futureDays[f],
+          actual: null,
+          forecast: fc.dailyForecast,
+          isFuture: true
+        });
+      }
+
+      // Max value for scaling
+      var maxVal = Math.max(15, fc.dailyForecast * 1.35, 38);
+      var stepX = plotW / (points.length - 1);
+      var barsHtml = "";
+      var pathD = "";
+
+      for (var idx = 0; idx < points.length; idx++) {
+        var pt = points[idx];
+        var x = padLeft + idx * stepX;
+        var val = pt.actual !== null ? pt.actual : pt.forecast;
+        var y = padTop + plotH - (val / maxVal) * plotH;
+
+        if (!pt.isFuture) {
+          // Historical Bar (purple with peach outline)
+          var barH = Math.max(6, (pt.actual / maxVal) * plotH);
+          var barY = padTop + plotH - barH;
+          barsHtml +=
+            '<rect x="' + (x - 12) + '" y="' + barY + '" width="24" height="' + barH + '" fill="#241432" stroke="#c86d3b" stroke-width="1.1" rx="2">' +
+            '<title>' + pt.label + ': ' + pt.actual + ' actual sales</title>' +
+            '</rect>' +
+            '<text x="' + x + '" y="' + (barY - 6) + '" font-size="11" fill="#ecdcbc" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.actual + '</text>';
+        } else {
+          // Forecast Curve connection
+          if (!pathD) {
+            var prevPt = points[idx - 1];
+            var prevX = padLeft + (idx - 1) * stepX;
+            var prevVal = prevPt.actual !== null ? prevPt.actual : prevPt.forecast;
+            var prevY = padTop + plotH - (prevVal / maxVal) * plotH;
+            pathD = "M " + prevX + " " + prevY + " L " + x + " " + y;
+          } else {
+            pathD += " L " + x + " " + y;
+          }
+          barsHtml +=
+            '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="#f8b072" stroke="#ffffff" stroke-width="1">' +
+            '<title>' + pt.label + ': ' + pt.forecast + ' projected</title>' +
+            '</circle>' +
+            '<text x="' + x + '" y="' + (y - 8) + '" font-size="11" fill="#f8b072" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.forecast + '</text>';
+        }
+
+        // X-axis label
+        barsHtml += '<text x="' + x + '" y="' + (svgH - 10) + '" font-size="9.5" fill="#756284" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.label + '</text>';
+      }
+
+      container.innerHTML =
+        '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%; height:auto; display:block;">' +
+        '<line x1="' + padLeft + '" y1="' + (padTop + plotH) + '" x2="' + (svgW - padRight) + '" y2="' + (padTop + plotH) + '" stroke="#2d1c3e" stroke-width="1"/>' +
+        (pathD ? '<path d="' + pathD + '" fill="none" stroke="#f8b072" stroke-width="2" stroke-dasharray="4,4"/>' : '') +
+        barsHtml +
+        '</svg>' +
+        '<div style="display:flex; justify-content:center; align-items:center; gap:22px; font-size:12px; margin-top:14px; color:#9d8ba8; font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">' +
+        '<span style="display:flex; align-items:center; gap:7px;"><span style="display:inline-block; width:12px; height:12px; background:#8a3ab9; border-radius:2px;"></span> Actual Sales</span>' +
+        '<span style="display:flex; align-items:center; gap:7px;"><span style="display:inline-block; width:16px; height:2px; background:#f8b072; border-bottom:2px dashed #f8b072;"></span> 7-Day Forecast Curve</span>' +
+        '</div>';
+    }
+
+    // Render All Pantry Restock Recommendations Table matching Reference Screenshot
+    function renderAllRestockTable() {
+      var tbody = document.getElementById("allRestockTbody");
+      tbody.innerHTML = "";
+
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var fc = calculateForecast(item);
+        var subText = item.unit + (item.festival ? ' &bull; 🌕 ' + item.festivalMul + 'x Cursed' : ' &bull; Normal');
+        if (item.stock <= 0) subText = item.unit + ' &bull; Depleted';
+
+        var reorderHtml = fc.reorderQty > 0
+          ? '<span class="fc-reorder-val">+' + fc.reorderQty + ' ' + item.unit + '</span>'
+          : '<span class="fc-reorder-sufficient">Sufficient</span>';
+
+        tbody.innerHTML +=
+          '<tr>' +
+          '<td>' +
+          '<div class="fc-item-title">' + item.name + '</div>' +
+          '<div class="fc-item-sub">' + subText + '</div>' +
+          '</td>' +
+          '<td><strong style="color:#ffffff;">' + item.stock + '</strong></td>' +
+          '<td>' + item.minStock + '</td>' +
+          '<td>' + fc.forecast7d + '</td>' +
+          '<td>' + reorderHtml + '</td>' +
+          '<td>' + item.supplier + ' (' + item.leadDays + 'd)</td>' +
+          '<td>' +
+          '<button class="fc-btn-restock" onclick="quickRestockItem(' + i + ', ' + (fc.reorderQty > 0 ? fc.reorderQty : 20) + ')">Order Restock</button>' +
+          '</td>' +
+          '</tr>';
+      }
+    }
+
+    function orderAllShortages() {
+      var count = 0;
+      for (var i = 0; i < items.length; i++) {
+        var fc = calculateForecast(items[i]);
+        if (fc.reorderQty > 0) {
+          items[i].stock += fc.reorderQty;
+          count++;
+          movements.unshift({
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+            type: "Restock",
+            text: items[i].name + " +" + fc.reorderQty + " " + items[i].unit,
+            note: "Algorithmic bulk reorder dispatch to " + items[i].supplier
+          });
+        }
+      }
+      saveState();
+      renderForecastPage();
+      alert("Dispatched raven restock orders for " + count + " shortage reagents!");
+    }
+
+    function confirmRestock() {
+      var idx = parseInt(document.getElementById("restockItem").value, 10);
+      var qty = parseInt(document.getElementById("restockQty").value, 10);
+      var supplier = document.getElementById("restockSupplier").value;
+      var note = document.getElementById("restockNotes").value.trim() || ("Shipment delivered via " + supplier);
+
+      if (isNaN(qty) || qty <= 0) return;
+
+      items[idx].stock += qty;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Restock",
+        text: items[idx].name + " +" + qty + " " + items[idx].unit,
+        note: note
+      });
+
+      saveState();
+      document.getElementById("restockNotes").value = "";
+      document.getElementById("restockMsg").textContent = "Deposited " + qty + " units of " + items[idx].name + " into vault.";
+
+      var rBox = document.getElementById("restockBox");
+      rBox.classList.add("flash");
+      setTimeout(function() { rBox.classList.remove("flash"); }, 900);
+
+      renderForecastPage();
+    }
+
+    // ==================== RECORD SALE ====================
+    function buildSaleItems() {
+      var box = document.getElementById("saleItems");
+      box.innerHTML = "";
+      sale = [];
+      for (var i = 0; i < items.length; i++) {
+        sale.push(0);
+        box.innerHTML +=
+          '<button class="item" id="saleItem' + i + '" onclick="addItemToSale(' + i + ')">' +
+          '<strong>' + items[i].icon + ' ' + items[i].name + '</strong>' +
+          '<span class="stamp">Sold out</span>' +
+          '<span class="stock" id="saleStock' + i + '"></span>' +
+          '<span class="price">¢' + items[i].price.toFixed(2) + ' / ' + items[i].unit + '</span>' +
+          '</button>';
+      }
+      updateSaleItems();
+    }
+
+    function updateSaleItems() {
+      for (var i = 0; i < items.length; i++) {
+        var elStock = document.getElementById("saleStock" + i);
+        var elBtn = document.getElementById("saleItem" + i);
+        if (!elStock || !elBtn) continue;
+        var left = items[i].stock - (sale[i] || 0);
+        elStock.textContent = "Available: " + left + " " + items[i].unit;
+        elBtn.disabled = left <= 0;
+      }
+    }
+
+    function addItemToSale(i) {
+      if (items[i].stock - (sale[i] || 0) <= 0) return;
+      sale[i] = (sale[i] || 0) + 1;
+      lastAdded = i;
+      document.getElementById("msg").textContent = "";
+      updateSaleItems();
+      showTicket();
+    }
+
+    function showTicket() {
+      var lines = document.getElementById("lines");
+      var units = 0;
+      var cost = 0;
+      lines.innerHTML = "";
+      for (var i = 0; i < items.length; i++) {
+        if (sale[i] > 0) {
+          var cls = (i === lastAdded) ? "line new" : "line";
+          lines.innerHTML +=
+            '<div class="' + cls + '"><span>' + items[i].name + ' x ' + sale[i] + '</span>' +
+            '<span>¢' + (sale[i] * items[i].price).toFixed(2) + '</span></div>';
+          units += sale[i];
+          cost += (sale[i] * items[i].price);
+        }
+      }
+      if (units === 0) {
+        lines.innerHTML = '<p class="note">No items yet. Click an ingredient on the left.</p>';
+      }
+      document.getElementById("units").textContent = units;
+      document.getElementById("cost").textContent = "¢" + cost.toFixed(2);
+      document.getElementById("confirm").disabled = (units === 0);
+    }
+
+    function confirmSale() {
+      var count = 0;
+      var soldDescriptions = [];
+      for (var i = 0; i < items.length; i++) {
+        if (sale[i] > 0) {
+          items[i].stock -= sale[i];
+          count += sale[i];
+          soldDescriptions.push(items[i].name + " x " + sale[i]);
+          sale[i] = 0;
+        }
+      }
+
+      var customerNote = document.getElementById("note").value.trim() || "Midnight traveler walk-in";
+      document.getElementById("note").value = "";
+      document.getElementById("msg").textContent = "Sale recorded. " + count + " items taken from stock.";
+
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Sale",
+        text: soldDescriptions.join(", "),
+        note: customerNote
+      });
+
+      var ticket = document.getElementById("saleTicket");
+      ticket.classList.add("flash");
+      setTimeout(function () { ticket.classList.remove("flash"); }, 900);
+
+      lastAdded = -1;
+      saveState();
+      updateSaleItems();
+      showTicket();
+    }
+
+    // ==================== ACTIVITY TABLE ====================
+    function renderActivityTable() {
+      var tbody = document.getElementById("activityTbody");
+      tbody.innerHTML = "";
+      if (movements.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b5440; padding:20px;">No apothecary movements recorded yet.</td></tr>';
+        return;
+      }
+      for (var i = 0; i < movements.length; i++) {
+        var m = movements[i];
+        var tagClass = m.type === "Sale" ? "tag-sale" : (m.type === "Restock" ? "tag-restock" : "tag-alert");
+        tbody.innerHTML +=
+          '<tr>' +
+          '<td>' + m.time + '</td>' +
+          '<td><span class="' + tagClass + '">' + m.type + '</span></td>' +
+          '<td><strong>' + m.text + '</strong></td>' +
+          '<td>' + m.note + '</td>' +
+          '</tr>';
+      }
+    }
+
+    function clearActivityLogs() {
+      if (confirm("Clear all archived movement ledger records?")) {
+        movements = [];
+        saveState();
+        renderActivityTable();
+      }
+    }
+
+    // ==================== SETTINGS ====================
+    function saveSettings() {
+      document.getElementById("settingsMsg").textContent = "Configuration saved to local apothecary parchment.";
+      setTimeout(function() { document.getElementById("settingsMsg").textContent = ""; }, 3000);
+    }
+
+    function resetDemoVault() {
+      if (confirm("Reset apothecary vault to default sample catalog?")) {
+        localStorage.removeItem("hexley_items_v2");
+        localStorage.removeItem("hexley_movements_v2");
+        loadState();
+        buildSaleItems();
+        navigateTo("dashboard");
+      }
+    }
+
+    // Boot
+    loadState();
+    buildSaleItems();
+
+    var hash = (window.location.hash || "").replace("#", "");
+    if (hash && document.getElementById("view-" + hash)) {
+      navigateTo(hash);
+    } else {
+      navigateTo("dashboard");
+    }
+  </script>
+</body>
+</html>
