@@ -1,242 +1,317 @@
 import React from "react";
 
-export default function GetStarted({ onEnterConsole, onQuickCurse }) {
-  const capabilities = [
+export default function GetStarted({ onEnterConsole }) {
+  const features = [
     {
       icon: "📦",
-      title: "Instant Shelf & POS Ledger",
-      desc: "Deduct sales, log supplier deliveries, and track real-time stock across all potion shelves in one click."
+      tag: "INVENTORY OPS",
+      title: "Dark Store POS Ledger",
+      desc: "Instant stock audits, delivery syncs, and real-time jar count tracking across every shelf.",
+      highlight: "Sub-second ledger updates"
     },
     {
       icon: "🔮",
-      title: "AI Prophecy (Stockout Predictor)",
-      desc: "Exponential Moving Average burn-rate engine calculates exact days and dates before any ingredient hits zero."
+      tag: "AI PREDICTIVE ENGINE",
+      title: "Prophecy Burn Forecasting",
+      desc: "Exponential moving average engine pinpoints exact depletion dates before items run dry.",
+      highlight: "Stockout date predictor"
     },
     {
       icon: "✨",
-      title: "Automated Restock Spell",
-      desc: "Calculates optimal reorder quantities factoring in 7-day supplier lead times and safety stock buffers."
+      tag: "AUTONOMOUS REORDER",
+      title: "Restock Spells & Buffers",
+      desc: "Calculates reorder quantities factoring in 7-day supplier lead times and safety thresholds.",
+      highlight: "Automated replenishment"
     },
     {
       icon: "🚨",
-      title: "Strange Happenings (Shrinkage & Spike Radar)",
-      desc: "Z-score anomaly detection flags sudden consumption surges and catches missing shelf inventory (theft/spillage)."
+      tag: "ANOMALY RADAR",
+      title: "Strange Happenings Radar",
+      desc: "Z-score spike detection flags unusual volume bursts and identifies missing inventory.",
+      highlight: "Shrinkage & theft alerts"
     },
     {
       icon: "📈",
-      title: "Crystal Ball Demand Telemetry",
-      desc: "Interactive 7-day historical + forecasted demand curves to visualize burn trajectories before bottlenecks happen."
+      tag: "DEMAND TELEMETRY",
+      title: "Crystal Ball 7-Day Curves",
+      desc: "Visual demand trajectories to anticipate volume bottlenecks and festival rushes.",
+      highlight: "Trend extrapolation"
     },
     {
       icon: "🌕",
-      title: "Midnight Curse (3x Festival Surge Simulator)",
-      desc: "One-click stress test that triples demand on up to 3 core ingredients for next week's Full Moon Festival and recalculates reorders instantly."
+      tag: "STRESS TESTING",
+      title: "Midnight Curse Simulator",
+      desc: "Instant 3x demand multiplier test for the Full Moon Festival on peak potion ingredients.",
+      highlight: "3x surge simulation"
     }
   ];
 
+  const workflow = [
+    { num: "01", step: "Shelf Audit", desc: "Staff scan or spot-check jars via Android/Web to identify shrinkage." },
+    { num: "02", step: "AI Anomaly Flagging", desc: "Prophecy engine evaluates burn rate and alerts on sudden consumption." },
+    { num: "03", step: "Execute Restock", desc: "One-click restock recommendations generated with supplier lead buffers." }
+  ];
+
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "16px 8px" }}>
-      {/* Top Executive Banner */}
+    <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "20px 12px 60px" }}>
+      {/* Hero Showcase Section */}
       <div style={{
-        background: "linear-gradient(135deg, #1b112c 0%, #24143a 100%)",
-        border: "1px solid #3b2061",
-        borderRadius: "16px",
-        padding: "36px 32px",
-        boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
-        marginBottom: "24px"
+        position: "relative",
+        background: "radial-gradient(ellipse at 50% -20%, #3b1d6e 0%, #170d28 65%, #0f0817 100%)",
+        border: "1px solid #381e61",
+        borderRadius: "24px",
+        padding: "54px 36px 44px",
+        textAlign: "center",
+        boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5)",
+        overflow: "hidden",
+        marginBottom: "36px"
       }}>
         <div style={{
-          display: "inline-block",
-          fontSize: "11px",
+          display: "inline-flex",
+          alignItems: "center",
+          gap: "8px",
+          background: "rgba(168, 85, 247, 0.12)",
+          border: "1px solid rgba(168, 85, 247, 0.35)",
+          color: "#d8b4fe",
+          padding: "6px 14px",
+          borderRadius: "999px",
+          fontSize: "12px",
           fontWeight: 700,
           letterSpacing: "0.08em",
-          padding: "4px 10px",
-          borderRadius: "999px",
-          background: "rgba(168, 85, 247, 0.2)",
-          color: "#d8b4fe",
-          border: "1px solid #7e22ce",
-          marginBottom: "16px"
+          marginBottom: "20px"
         }}>
-          INTERNAL STORE OPS • TRACK 01
+          <span>⚡</span>
+          <span>INTERNAL OPS PLATFORM • TRACK 01</span>
         </div>
+
         <h1 style={{
-          fontSize: "34px",
-          fontWeight: 800,
-          letterSpacing: "-0.02em",
-          margin: "0 0 10px 0",
-          color: "#f8fafc"
+          fontSize: "44px",
+          fontWeight: 900,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.15,
+          margin: "0 auto 16px",
+          maxWidth: "760px",
+          background: "linear-gradient(180deg, #ffffff 30%, #c084fc 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent"
         }}>
-          Madam Hexley’s Dark Store Command Center
+          Madam Hexley’s Smart Dark Store Command Center
         </h1>
+
         <p style={{
-          fontSize: "16px",
-          lineHeight: 1.5,
+          fontSize: "17px",
+          lineHeight: 1.6,
           color: "#cbd5e1",
-          margin: "0 0 24px 0",
-          maxWidth: "780px"
+          maxWidth: "680px",
+          margin: "0 auto 32px"
         }}>
-          Zero stockouts. Automated restock spells. Real-time shelf shrinkage & festival surge protection.
+          Next-generation pantry telemetry powered by FastAPI AI and real-time shelf sync. Eliminate stockouts, predict festival surges, and automate replenishment spells.
         </p>
 
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
           <button
             onClick={onEnterConsole}
             style={{
-              background: "#9333ea",
+              background: "linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)",
               color: "#ffffff",
               border: "none",
-              borderRadius: "10px",
-              padding: "12px 22px",
-              fontSize: "15px",
-              fontWeight: 700,
+              borderRadius: "12px",
+              padding: "14px 32px",
+              fontSize: "16px",
+              fontWeight: 800,
+              letterSpacing: "0.02em",
               cursor: "pointer",
-              boxShadow: "0 4px 14px rgba(147, 51, 234, 0.4)",
+              boxShadow: "0 10px 25px rgba(147, 51, 234, 0.45)",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
               transition: "transform 0.15s ease"
             }}
           >
-            Launch Live Pantry Console →
-          </button>
-          <button
-            onClick={onQuickCurse}
-            style={{
-              background: "rgba(245, 158, 11, 0.15)",
-              color: "#fbbf24",
-              border: "1px solid #d97706",
-              borderRadius: "10px",
-              padding: "12px 20px",
-              fontSize: "15px",
-              fontWeight: 600,
-              cursor: "pointer"
-            }}
-          >
-            Simulate Full Moon 3x Surge 🌕
+            <span>Enter Live Pantry Console</span>
+            <span style={{ fontSize: "18px" }}>→</span>
           </button>
         </div>
-      </div>
 
-      {/* Live System Readiness Strip */}
-      <div style={{
-        display: "flex",
-        flexWrap: "wrap",
-        gap: "12px",
-        marginBottom: "28px"
-      }}>
+        {/* Live Subsystem Indicators */}
         <div style={{
-          flex: "1 1 240px",
-          background: "#1b112c",
-          border: "1px solid #2e1a4d",
-          borderRadius: "10px",
-          padding: "10px 16px",
           display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          fontSize: "13px",
-          color: "#e2e8f0"
+          justifyContent: "center",
+          gap: "24px",
+          flexWrap: "wrap",
+          marginTop: "36px",
+          paddingTop: "24px",
+          borderTop: "1px solid rgba(255, 255, 255, 0.08)"
         }}>
-          <span style={{ fontSize: "14px" }}>🟢</span>
-          <span>FastAPI + AI Engine: <strong style={{ color: "#34d399" }}>Online</strong></span>
-        </div>
-        <div style={{
-          flex: "1 1 240px",
-          background: "#1b112c",
-          border: "1px solid #2e1a4d",
-          borderRadius: "10px",
-          padding: "10px 16px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          fontSize: "13px",
-          color: "#e2e8f0"
-        }}>
-          <span style={{ fontSize: "14px" }}>🔥</span>
-          <span>Firebase Firestore Sync: <strong style={{ color: "#38bdf8" }}>Active</strong></span>
-        </div>
-        <div style={{
-          flex: "1 1 240px",
-          background: "#1b112c",
-          border: "1px solid #2e1a4d",
-          borderRadius: "10px",
-          padding: "10px 16px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          fontSize: "13px",
-          color: "#e2e8f0"
-        }}>
-          <span style={{ fontSize: "14px" }}>📱</span>
-          <span>Android Scanner Companion: <strong style={{ color: "#a78bfa" }}>Connected</strong></span>
-        </div>
-      </div>
-
-      {/* Core Store Manager Capabilities Grid */}
-      <h2 style={{ fontSize: "20px", fontWeight: 700, margin: "0 0 16px 0", color: "#f1f5f9" }}>
-        Core Dark Store Operations Architecture
-      </h2>
-      <div style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-        gap: "16px",
-        marginBottom: "32px"
-      }}>
-        {capabilities.map((cap, i) => (
-          <div key={i} style={{
-            background: "#1b112c",
-            border: "1px solid #2e1a4d",
-            borderRadius: "14px",
-            padding: "20px",
-            boxShadow: "0 4px 16px rgba(0, 0, 0, 0.2)"
-          }}>
-            <div style={{ fontSize: "26px", marginBottom: "10px" }}>{cap.icon}</div>
-            <h3 style={{ fontSize: "16px", fontWeight: 700, margin: "0 0 8px 0", color: "#e2e8f0" }}>
-              {cap.title}
-            </h3>
-            <p style={{ fontSize: "14px", lineHeight: 1.5, color: "#94a3b8", margin: 0 }}>
-              {cap.desc}
-            </p>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#94a3b8" }}>
+            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#10b981", display: "inline-block" }}></span>
+            <span>FastAPI AI Engine: <strong style={{ color: "#f8fafc" }}>Online</strong></span>
           </div>
-        ))}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#94a3b8" }}>
+            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#38bdf8", display: "inline-block" }}></span>
+            <span>Firestore Sync: <strong style={{ color: "#f8fafc" }}>Persistent</strong></span>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#94a3b8" }}>
+            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#a855f7", display: "inline-block" }}></span>
+            <span>Android Scanner: <strong style={{ color: "#f8fafc" }}>Ready</strong></span>
+          </div>
+        </div>
       </div>
 
-      {/* 3-Step Manager Shift Workflow */}
-      <div style={{
-        background: "#140c22",
-        border: "1px solid #2a1645",
-        borderRadius: "14px",
-        padding: "22px 24px"
-      }}>
-        <div style={{ fontSize: "12px", fontWeight: 700, color: "#a855f7", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "14px" }}>
-          Daily Shift Operational Protocol
+      {/* Feature Capabilities Grid */}
+      <div style={{ marginBottom: "40px" }}>
+        <div style={{ textAlign: "center", marginBottom: "28px" }}>
+          <h2 style={{ fontSize: "26px", fontWeight: 800, margin: "0 0 8px", color: "#f8fafc" }}>
+            Engineered for High-Velocity Shelf Operations
+          </h2>
+          <p style={{ fontSize: "15px", color: "#94a3b8", margin: 0 }}>
+            Everything needed to manage potion supply chains during calm hours or Full Moon surges.
+          </p>
         </div>
+
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+          gap: "18px"
+        }}>
+          {features.map((feat, i) => (
+            <div
+              key={i}
+              style={{
+                background: "linear-gradient(180deg, #180e28 0%, #130922 100%)",
+                border: "1px solid #2e1a4d",
+                borderRadius: "16px",
+                padding: "24px",
+                boxShadow: "0 6px 18px rgba(0, 0, 0, 0.25)",
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "space-between"
+              }}
+            >
+              <div>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "14px" }}>
+                  <span style={{ fontSize: "28px" }}>{feat.icon}</span>
+                  <span style={{
+                    fontSize: "10px",
+                    fontWeight: 700,
+                    letterSpacing: "0.06em",
+                    padding: "3px 8px",
+                    borderRadius: "6px",
+                    background: "rgba(168, 85, 247, 0.15)",
+                    color: "#c084fc",
+                    border: "1px solid rgba(168, 85, 247, 0.25)"
+                  }}>
+                    {feat.tag}
+                  </span>
+                </div>
+                <h3 style={{ fontSize: "17px", fontWeight: 700, margin: "0 0 8px", color: "#f8fafc" }}>
+                  {feat.title}
+                </h3>
+                <p style={{ fontSize: "14px", lineHeight: 1.5, color: "#94a3b8", margin: "0 0 16px" }}>
+                  {feat.desc}
+                </p>
+              </div>
+
+              <div style={{
+                fontSize: "12px",
+                color: "#10b981",
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+                paddingTop: "12px"
+              }}>
+                <span>✓</span>
+                <span>{feat.highlight}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Standard Shift Protocol Workflow */}
+      <div style={{
+        background: "#160c26",
+        border: "1px solid #2a1548",
+        borderRadius: "20px",
+        padding: "32px 28px",
+        marginBottom: "36px"
+      }}>
+        <h3 style={{ fontSize: "18px", fontWeight: 800, margin: "0 0 6px", color: "#f8fafc" }}>
+          Manager Shift Protocol
+        </h3>
+        <p style={{ fontSize: "14px", color: "#94a3b8", margin: "0 0 24px" }}>
+          Standardized routine for incoming store supervisors.
+        </p>
+
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-          gap: "14px"
+          gap: "16px"
         }}>
-          <div style={{ background: "#1b112c", padding: "14px 16px", borderRadius: "10px", borderLeft: "4px solid #a855f7" }}>
-            <strong style={{ display: "block", color: "#f8fafc", fontSize: "14px", marginBottom: "4px" }}>
-              Step 1: Shelf Audit
-            </strong>
-            <span style={{ fontSize: "13px", color: "#94a3b8" }}>
-              Perform barcode / shelf spot-check via Android or Web to catch discrepancies instantly.
-            </span>
-          </div>
-          <div style={{ background: "#1b112c", padding: "14px 16px", borderRadius: "10px", borderLeft: "4px solid #f59e0b" }}>
-            <strong style={{ display: "block", color: "#f8fafc", fontSize: "14px", marginBottom: "4px" }}>
-              Step 2: AI Anomaly Review
-            </strong>
-            <span style={{ fontSize: "13px", color: "#94a3b8" }}>
-              Review Z-Score consumption spikes and Strange Happenings flags computed by FastAPI.
-            </span>
-          </div>
-          <div style={{ background: "#1b112c", padding: "14px 16px", borderRadius: "10px", borderLeft: "4px solid #10b981" }}>
-            <strong style={{ display: "block", color: "#f8fafc", fontSize: "14px", marginBottom: "4px" }}>
-              Step 3: Restock & Buffer
-            </strong>
-            <span style={{ fontSize: "13px", color: "#94a3b8" }}>
-              Trigger automated restock spells with 7-day supplier lead time and Full Moon festival buffers.
-            </span>
-          </div>
+          {workflow.map((w, idx) => (
+            <div
+              key={idx}
+              style={{
+                background: "#1c1032",
+                border: "1px solid #341c5a",
+                borderRadius: "14px",
+                padding: "20px",
+                position: "relative"
+              }}
+            >
+              <span style={{
+                position: "absolute",
+                top: "14px",
+                right: "16px",
+                fontSize: "24px",
+                fontWeight: 900,
+                color: "rgba(168, 85, 247, 0.25)"
+              }}>
+                {w.num}
+              </span>
+              <h4 style={{ fontSize: "15px", fontWeight: 700, margin: "0 0 6px", color: "#f8fafc" }}>
+                {w.step}
+              </h4>
+              <p style={{ fontSize: "13px", color: "#94a3b8", lineHeight: 1.5, margin: 0 }}>
+                {w.desc}
+              </p>
+            </div>
+          ))}
         </div>
+      </div>
+
+      {/* Bottom Launch Banner */}
+      <div style={{
+        textAlign: "center",
+        padding: "28px 20px",
+        background: "linear-gradient(90deg, rgba(147, 51, 234, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%)",
+        border: "1px dashed #4c2882",
+        borderRadius: "16px"
+      }}>
+        <h4 style={{ fontSize: "18px", fontWeight: 700, margin: "0 0 8px", color: "#f8fafc" }}>
+          Ready to review real-time stock and anomalies?
+        </h4>
+        <p style={{ fontSize: "14px", color: "#94a3b8", margin: "0 0 16px" }}>
+          Access shelf ledgers, test festival demand multipliers, and run automated reorders.
+        </p>
+        <button
+          onClick={onEnterConsole}
+          style={{
+            background: "#9333ea",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "10px",
+            padding: "12px 28px",
+            fontSize: "15px",
+            fontWeight: 700,
+            cursor: "pointer",
+            boxShadow: "0 4px 14px rgba(147, 51, 234, 0.4)"
+          }}
+        >
+          Open Live Console →
+        </button>
       </div>
     </div>
   );
