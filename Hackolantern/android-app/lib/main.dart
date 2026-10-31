@@ -370,15 +370,31 @@ class _PantryMobileScreenState extends State<PantryMobileScreen> {
               children: [
                 Icon(
                   isConnected ? Icons.check_circle : Icons.error,
-                  size: 16,
+                  size: 15,
                   color: isConnected ? Colors.greenAccent : Colors.redAccent,
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    "$serverBaseUrl • $connectionMessage",
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
-                    overflow: TextOverflow.ellipsis,
+                  child: Row(
+                    children: [
+                      Text(
+                        isConnected ? "Connected" : "Disconnected",
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: Colors.black38,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          serverBaseUrl.replaceFirst(RegExp(r'^https?:\/\/'), ''),
+                          style: const TextStyle(fontSize: 10, fontFamily: 'monospace', color: Colors.white70),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 GestureDetector(
@@ -519,55 +535,111 @@ class _PantryMobileScreenState extends State<PantryMobileScreen> {
                                     ),
                                     if (anomalies.isNotEmpty) ...[
                                       const SizedBox(height: 8),
-                                      for (var alert in anomalies)
-                                        Container(
-                                          margin: const EdgeInsets.only(top: 4),
-                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF7F1D1D),
-                                            borderRadius: BorderRadius.circular(6),
-                                            border: Border.all(color: const Color(0xFFDC2626).withOpacity(0.4)),
-                                          ),
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                      Builder(
+                                        builder: (context) {
+                                          final missingAlerts = anomalies
+                                              .where((a) => a is Map && a['type'] == 'MISSING_STOCK')
+                                              .toList();
+                                          final spikeAlerts = anomalies
+                                              .where((a) => a is Map && a['type'] != 'MISSING_STOCK')
+                                              .toList();
+
+                                          return Column(
                                             children: [
-                                              const Text("⚠️ ", style: TextStyle(fontSize: 12)),
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    if (alert is Map && alert['date'] != null)
-                                                      Container(
-                                                        margin: const EdgeInsets.only(bottom: 2),
-                                                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                                                        decoration: BoxDecoration(
-                                                          color: Colors.black45,
-                                                          borderRadius: BorderRadius.circular(3),
-                                                        ),
+                                              if (missingAlerts.isNotEmpty)
+                                                Container(
+                                                  margin: const EdgeInsets.only(top: 6),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFF7F1D1D),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    border: Border.all(color: const Color(0xFFEF4444)),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Text("🚨 ", style: TextStyle(fontSize: 14)),
+                                                      Expanded(
                                                         child: Text(
-                                                          "${alert['date']} • Z-Score: ${alert['z_score'] ?? 'N/A'}σ",
-                                                          style: const TextStyle(
-                                                            fontSize: 10,
-                                                            fontWeight: FontWeight.bold,
-                                                            color: Color(0xFFFCA5A5),
-                                                            fontFamily: 'monospace',
-                                                          ),
+                                                          missingAlerts.first['message'] ?? "Missing stock detected on shelf audit",
+                                                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
                                                         ),
                                                       ),
-                                                    Text(
-                                                      alert is Map
-                                                          ? (alert['message'] ?? "Anomaly detected")
-                                                          : alert.toString(),
-                                                      style: const TextStyle(fontSize: 11, color: Colors.white),
-                                                    ),
-                                                  ],
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
+                                              if (spikeAlerts.length == 1)
+                                                Container(
+                                                  margin: const EdgeInsets.only(top: 6),
+                                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFF281024),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    border: Border.all(color: const Color(0xFF991B1B)),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      const Text("⚡ ", style: TextStyle(fontSize: 14)),
+                                                      Expanded(
+                                                        child: Text(
+                                                          "Spike on " + spikeAlerts.first['date'].toString() + ": " + spikeAlerts.first['qty'].toString() + " units (+" + spikeAlerts.first['z_score'].toString() + "σ)",
+                                                          style: const TextStyle(fontSize: 11, color: Color(0xFFFCA5A5)),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              if (spikeAlerts.length > 1)
+                                                Container(
+                                                  margin: const EdgeInsets.only(top: 6),
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFF281024),
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    border: Border.all(color: const Color(0xFF7F1D1D)),
+                                                  ),
+                                                  child: Theme(
+                                                    data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                                                    child: ExpansionTile(
+                                                      dense: true,
+                                                      visualDensity: VisualDensity.compact,
+                                                      tilePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                                                      childrenPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                                      leading: const Text("⚡", style: TextStyle(fontSize: 14)),
+                                                      title: Text(
+                                                        spikeAlerts.length.toString() + " Historical Spikes Detected",
+                                                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFFECACA)),
+                                                      ),
+                                                      subtitle: Text(
+                                                        "Peak: +" + spikeAlerts.map((s) => (s['z_score'] as num?)?.toDouble() ?? 0.0).reduce((a, b) => a > b ? a : b).toString() + "σ (" + spikeAlerts.first['date'].toString() + ")",
+                                                        style: const TextStyle(fontSize: 10, color: Color(0xFFFCA5A5)),
+                                                      ),
+                                                      children: [
+                                                        for (var s in spikeAlerts)
+                                                          Padding(
+                                                            padding: const EdgeInsets.symmetric(vertical: 2),
+                                                            child: Row(
+                                                              mainAxisAlignment: MainAxisAlignment.between,
+                                                              children: [
+                                                                Text(
+                                                                  s['date'].toString(),
+                                                                  style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Colors.white70),
+                                                                ),
+                                                                Text(
+                                                                  s['qty'].toString() + " units (+" + s['z_score'].toString() + "σ)",
+                                                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFFCA5A5)),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
                                             ],
-                                          ),
-                                        ),
-                                    ],
-                                    const SizedBox(height: 10),
+                                          );
+                                        },
+                                      ),
+                                    ]
+const SizedBox(height: 10),
                                     SizedBox(
                                       width: double.infinity,
                                       child: ElevatedButton.icon(

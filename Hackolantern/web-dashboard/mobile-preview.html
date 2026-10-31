@@ -241,13 +241,15 @@
     .conn-strip {
       background: #064e3b;
       border-bottom: 1px solid #10b981;
-      padding: 7px 14px;
+      padding: 6px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.72rem;
+      gap: 10px;
+      font-size: 0.74rem;
       color: #a7f3d0;
-      font-weight: 500;
+      font-weight: 600;
+      min-height: 40px;
     }
     .conn-strip.error {
       background: #7f1d1d;
@@ -257,20 +259,39 @@
     .conn-info {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 7px;
+      overflow: hidden;
+      white-space: nowrap;
+      min-width: 0;
+    }
+    .pulse-dot {
+      color: #34d399;
+      font-size: 0.95rem;
+      line-height: 1;
+    }
+    .conn-host-badge {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #6ee7b7;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
+      max-width: 140px;
     }
     .switch-btn {
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.22);
       color: #fff;
-      font-size: 0.65rem;
+      font-size: 0.68rem;
       font-weight: 700;
-      padding: 2px 7px;
-      border-radius: 4px;
+      padding: 4px 9px;
+      border-radius: 6px;
       cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
 
     /* Scrollable Body */
@@ -278,7 +299,7 @@
       flex: 1;
       background: #0f0817;
       overflow-y: auto;
-      padding: 10px;
+      padding: 10px 10px 95px 10px;
       position: relative;
     }
     .app-body::-webkit-scrollbar {
@@ -346,37 +367,131 @@
       margin-bottom: 8px;
     }
 
-    /* Anomaly Banner */
-    .anomaly-banner {
-      background: #7f1d1d;
-      border: 1px solid rgba(220, 38, 38, 0.4);
-      border-radius: 6px;
-      padding: 6px 8px;
-      margin-top: 6px;
+    /* Missing Stock Alert */
+    .anomaly-missing-banner {
+      background: rgba(153, 27, 27, 0.35);
+      border: 1px solid #ef4444;
+      border-radius: 8px;
+      padding: 8px 10px;
+      margin-top: 8px;
       display: flex;
-      gap: 6px;
-      align-items: flex-start;
-      font-size: 0.72rem;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+      color: #fee2e2;
+    }
+    .missing-icon {
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* Consumption Spike Summary & Toggle */
+    .anomaly-summary-banner {
+      background: rgba(185, 28, 28, 0.18);
+      border: 1px solid rgba(248, 113, 113, 0.35);
+      border-radius: 8px;
+      padding: 7px 10px;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.73rem;
+      color: #fecaca;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .anomaly-summary-banner:hover {
+      background: rgba(185, 28, 28, 0.28);
+    }
+    .spike-summary-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 0;
+    }
+    .spike-icon {
+      color: #f87171;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .spike-summary-text {
+      line-height: 1.3;
+    }
+    .spike-headline {
+      font-weight: 700;
       color: #fef2f2;
     }
-    .anomaly-date-tag {
-      background: rgba(0,0,0,0.45);
+    .spike-subline {
+      font-size: 0.68rem;
       color: #fca5a5;
-      font-family: 'JetBrains Mono', monospace;
+    }
+    .expand-pill {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      color: #fca5a5;
       font-size: 0.65rem;
       font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    /* Collapsible Spike Drawer */
+    .spike-drawer {
+      background: #12091d;
+      border: 1px solid #3b2064;
+      border-radius: 8px;
+      padding: 8px;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 170px;
+      overflow-y: auto;
+    }
+    .spike-drawer-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1e112e;
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+    }
+    .drawer-date {
+      font-family: 'JetBrains Mono', monospace;
+      color: #e2e8f0;
+      font-weight: 600;
+    }
+    .drawer-metric {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .drawer-qty {
+      color: #fca5a5;
+      font-weight: 700;
+    }
+    .drawer-z {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #f87171;
       padding: 1px 5px;
       border-radius: 3px;
-      margin-bottom: 2px;
-      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
     }
 
     /* Audit Button */
     .btn-audit {
       width: 100%;
-      background: #991b1b;
-      border: none;
-      color: #fff;
+      background: rgba(153, 27, 27, 0.22);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
       font-size: 0.74rem;
       font-weight: 600;
       padding: 8px 10px;
@@ -387,10 +502,11 @@
       justify-content: center;
       gap: 6px;
       margin-top: 8px;
-      transition: background 0.2s;
+      transition: all 0.2s;
     }
     .btn-audit:hover {
-      background: #b91c1c;
+      background: rgba(153, 27, 27, 0.45);
+      color: #fff;
     }
 
     /* Floating Action Button */
@@ -580,8 +696,9 @@
       <!-- Connection Status Strip -->
       <div id="conn-strip" class="conn-strip">
         <div class="conn-info">
-          <span id="conn-dot">●</span>
-          <span id="conn-text">Connecting...</span>
+          <span id="conn-dot" class="pulse-dot">●</span>
+          <span id="conn-text" style="font-weight:700;">Connected</span>
+          <span class="conn-host-badge" id="conn-host">:8000</span>
         </div>
         <button class="switch-btn" onclick="openSettingsModal()">Switch IP</button>
       </div>
@@ -721,8 +838,11 @@
         const items = data.pantry || [];
 
         strip.className = "conn-strip";
+        connDot.className = "pulse-dot";
         connDot.textContent = "●";
-        connText.textContent = `${sanitized} • Connected (HTTP 200)`;
+        connText.textContent = "Connected";
+        const hostBadge = document.getElementById("conn-host");
+        if (hostBadge) hostBadge.textContent = ":" + (sanitized.split(":").pop() || "8000");
 
         if (items.length === 0) {
           body.innerHTML = `
@@ -745,18 +865,70 @@
           const reorder = prophecy.recommended_reorder != null ? prophecy.recommended_reorder : 0;
           const anomalies = item.anomalies || [];
 
-          const anomaliesHtml = anomalies.map(a => {
-            const dateBadge = (a && a.date) ? `<div class="anomaly-date-tag">${a.date} • Z-Score: ${a.z_score || 'N/A'}σ</div>` : "";
-            const msg = (a && a.message) ? a.message : (typeof a === 'string' ? a : 'Unusual consumption anomaly');
-            return `
-              <div class="anomaly-banner">
-                <span style="font-size:0.8rem;">⚠️</span>
+          // Separate anomalies into Missing Stock (critical) vs Consumption Spikes (historical timeline)
+          const missingAlerts = anomalies.filter(a => a && a.type === 'MISSING_STOCK');
+          const spikeAlerts = anomalies.filter(a => a && (a.type === 'CONSUMPTION_SPIKE' || a.type === 'WEEKDAY_SPIKE'));
+
+          let missingHtml = "";
+          if (missingAlerts.length > 0) {
+            const m = missingAlerts[0];
+            const units = m.missing_units || Math.max(1, expectedStock - currentStock);
+            missingHtml = `
+              <div class="anomaly-missing-banner">
+                <span class="missing-icon">🚨</span>
                 <div>
-                  ${dateBadge}
-                  <div>${msg}</div>
+                  <div style="font-weight:700; color:#fca5a5; font-size:0.75rem;">PHYSICAL SHRINKAGE DETECTED</div>
+                  <div>${units} units vanished from vault without a recorded sale!</div>
                 </div>
-              </div>`;
-          }).join("");
+              </div>
+            `;
+          }
+
+          let spikesHtml = "";
+          if (spikeAlerts.length === 1) {
+            const s = spikeAlerts[0];
+            spikesHtml = `
+              <div class="anomaly-summary-banner">
+                <div class="spike-summary-left">
+                  <span class="spike-icon">⚡</span>
+                  <div class="spike-summary-text">
+                    <span class="spike-headline">Demand Spike on ${s.date}</span>
+                    <span class="spike-subline">&bull; ${s.qty} units (+${s.z_score || 'N/A'}σ above baseline)</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else if (spikeAlerts.length > 1) {
+            // Find peak Z-score
+            let peak = spikeAlerts[0];
+            for (const sp of spikeAlerts) {
+              if ((Number(sp.z_score) || 0) > (Number(peak.z_score) || 0)) peak = sp;
+            }
+
+            spikesHtml = `
+              <div class="anomaly-summary-banner" onclick="toggleSpikes('${item.id}')">
+                <div class="spike-summary-left">
+                  <span class="spike-icon">⚡</span>
+                  <div class="spike-summary-text">
+                    <div class="spike-headline">${spikeAlerts.length} Historical Spikes Detected</div>
+                    <div class="spike-subline">Peak: ${peak.qty} units (+${peak.z_score}σ on ${peak.date})</div>
+                  </div>
+                </div>
+                <button class="expand-pill" id="expand-pill-${item.id}">View All (${spikeAlerts.length}) ▾</button>
+              </div>
+              <div class="spike-drawer" id="spike-drawer-${item.id}" style="display:none;">
+                ${spikeAlerts.map(s => `
+                  <div class="spike-drawer-row">
+                    <span class="drawer-date">${s.date}</span>
+                    <div class="drawer-metric">
+                      <span class="drawer-qty">${s.qty} units</span>
+                      <span class="drawer-z">+${s.z_score}σ</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            `;
+          }
 
           return `
             <div class="pantry-card ${isCursed ? 'cursed' : ''}">
@@ -774,10 +946,11 @@
               </div>
 
               <div class="card-meta-row">
-                Run out: ${runOut}d • Reorder: ${reorder} units
+                Run out: ${runOut}d &bull; Reorder: ${reorder} units
               </div>
 
-              ${anomaliesHtml}
+              ${missingHtml}
+              ${spikesHtml}
 
               <button class="btn-audit" onclick="reportMissing(${item.id})">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -789,13 +962,19 @@
 
       } catch (err) {
         strip.className = "conn-strip error";
+        connDot.className = "";
         connDot.textContent = "✕";
-        connText.textContent = `${serverBase} • Unreachable (${err.message})`;
+        connText.textContent = "Offline";
+        const hostBadge = document.getElementById("conn-host");
+        if (hostBadge) hostBadge.textContent = "Unreachable";
         body.innerHTML = `
           <div style="text-align:center; padding:50px 20px; color:#fca5a5;">
             <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
             <div style="font-weight:700;">Cannot connect to backend</div>
-            <div style="font-size:0.75rem; color:#8a789c; margin-top:4px;">Make sure FastAPI is running on port 8000</div>
+            <div style="font-size:0.75rem; color:#8a789c; margin-top:4px;">Check backend on port 8000</div>
+            <button class="switch-btn" style="margin-top:14px; padding:6px 12px;" onclick="openSettingsModal()">Change Host IP</button>
+          </div>`;
+      }
             <button class="switch-btn" style="margin-top:14px; padding:6px 12px;" onclick="openSettingsModal()">Change Host IP</button>
           </div>`;
       }
@@ -866,6 +1045,19 @@
       closeSettingsModal();
       fetchPantry();
     }
+
+    window.toggleSpikes = function(id) {
+      const drawer = document.getElementById(`spike-drawer-${id}`);
+      const pill = document.getElementById(`expand-pill-${id}`);
+      if (!drawer) return;
+      if (drawer.style.display === "none" || !drawer.style.display) {
+        drawer.style.display = "flex";
+        if (pill) pill.textContent = "Collapse ▴";
+      } else {
+        drawer.style.display = "none";
+        if (pill) pill.textContent = `View All ▾`;
+      }
+    };
 
     // Initial load
     fetchPantry();
