@@ -1036,8 +1036,12 @@ function renderSuppliersPage() {
   // Firebase Config text area prefill
   const { config, isCustom } = getActiveFirebaseConfig();
   const textarea = document.getElementById("firebase-config-input");
-  if (textarea && !textarea.value) {
-    textarea.value = JSON.stringify(config, null, 2);
+  if (textarea) {
+    if (!textarea.value) {
+      textarea.value = JSON.stringify(config, null, 2);
+    }
+    textarea.scrollTop = 0;
+    textarea.scrollLeft = 0;
   }
 }
 

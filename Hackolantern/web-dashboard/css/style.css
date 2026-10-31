@@ -647,12 +647,26 @@ textarea.form-control {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   font-size: 0.85rem;
   line-height: 1.55;
-  white-space: pre;
+  white-space: pre-wrap;
+  word-break: break-word;
   overflow-x: auto;
   overflow-y: auto;
   resize: vertical;
   tab-size: 2;
   -webkit-overflow-scrolling: touch;
+}
+
+#firebase-config-input {
+  min-height: 260px;
+  height: 260px;
+  padding: 14px 16px;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .form-row {
@@ -833,6 +847,13 @@ textarea.form-control {
     min-height: 160px;
     padding: 12px;
     font-size: 0.82rem;
+  }
+  #firebase-config-input {
+    min-height: 270px;
+    height: 270px;
+    padding: 14px;
+    font-size: 0.8rem;
+    line-height: 1.55;
   }
 }
 
