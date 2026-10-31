@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hexley's Potion Pantry</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <h1>🧪 Hexley's Potion Pantry</h1>
+    <button id="festBtn" class="btn2" onclick="toggleFest()">Festival</button>
+  </div>
+  <nav>
+    <a id="l-home" href="#home">Home</a>
+    <a id="l-dash" href="#dash">Dashboard</a>
+    <a id="l-ing" href="#ing">Ingredients</a>
+    <a id="l-sale" href="#sale">Record Sale</a>
+    <a id="l-fc" href="#fc">Forecast</a>
+    <a id="l-act" href="#act">Activity</a>
+    <a id="l-set" href="#set">Settings</a>
+    <a id="l-help" href="#help">Help</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div id="banner" class="banner" hidden></div>
+
+  <!-- HOME -->
+  <div id="pg-home">
+    <section class="hero">
+      <h2>Every jar counted. Every festival planned.</h2>
+      <p>Hexley's Potion Pantry tracks ingredients, records sales, forecasts festival demand, and tells you what to reorder before the rush.</p>
+      <a class="btn" href="#dash">Open dashboard</a> <a class="btn2" href="#sale">Record a sale</a>
+    </section>
+    <div class="grid">
+      <div class="card"><h3>📦 Stock tracking</h3><p>See every ingredient, its quantity, and whether it is in stock, running low, or out.</p></div>
+      <div class="card"><h3>🧾 Sales records</h3><p>Record a potion sale and the ingredients it uses are updated automatically.</p></div>
+      <div class="card"><h3>🌕 Festival forecast</h3><p>When the Midnight Curse hits, demand jumps for three ingredients and the forecast shows it.</p></div>
+      <div class="card"><h3>⚠️ Restock alerts</h3><p>Get suggested order amounts and warnings for unusual stock drops.</p></div>
+    </div>
+    <h2>How it works</h2>
+    <div class="grid">
+      <div class="card"><b>1.</b> Add your ingredients with quantity, minimum stock, and supplier.</div>
+      <div class="card"><b>2.</b> Record each potion sale as it happens.</div>
+      <div class="card"><b>3.</b> Follow the restock suggestions before the festival rush.</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="pg-dash" hidden>
+    <p><a class="btn" href="#sale">Record a sale</a> <a class="btn2" href="#ing">Add ingredient</a></p>
+    <div id="stats" class="grid"></div>
+    <h2>Alerts</h2>
+    <div id="alerts"></div>
+  </div>
+
+  <!-- INGREDIENTS -->
+  <div id="pg-ing" hidden>
+    <div class="card">
+      <h2 id="formTitle">Add an ingredient</h2>
+      <input type="hidden" id="fId">
+      <label>Name</label><input id="fName">
+      <label>Category</label><input id="fCat">
+      <label>Quantity</label><input id="fQty" type="number" min="0">
+      <label>Unit (for example: jars)</label><input id="fUnit">
+      <label>Minimum stock</label><input id="fMin" type="number" min="0">
+      <label>Supplier</label><input id="fSup">
+      <label>Delivery time (days)</label><input id="fDays" type="number" min="0">
+      <label><input id="fFest" type="checkbox" style="width:auto"> Festival ingredient</label>
+      <label>Reason (needed when the quantity changes)</label><input id="fReason" placeholder="for example: 2 jars spilled">
+      <div id="ingErr" class="err"></div>
+      <button class="btn" onclick="saveIng()">Save</button>
+      <button class="btn2" onclick="clearForm()">Clear</button>
+    </div>
+    <input id="search" placeholder="Search ingredients" oninput="renderIng()">
+    <div id="ingList" class="grid"></div>
+  </div>
+
+  <!-- RECORD SALE -->
+  <div id="pg-sale" hidden>
+    <div class="card">
+      <h2>Record a sale</h2>
+      <label>Potion sold</label>
+      <select id="potion" onchange="previewSale()"></select>
+      <label>How many?</label>
+      <input id="sQty" type="number" min="1" value="1" oninput="previewSale()">
+      <div id="preview"></div>
+      <div id="saleErr" class="err"></div>
+      <button class="btn" onclick="confirmSale()">Confirm sale</button>
+      <p id="saleOk"></p>
+    </div>
+  </div>
+
+  <!-- FORECAST -->
+  <div id="pg-fc" hidden>
+    <div class="card scroll">
+      <h2>Restock forecast</h2>
+      <table id="fcTable"></table>
+      <p id="fcNote" style="font-size:13px"></p>
+    </div>
+    <div class="card">
+      <label>Show chart for</label>
+      <select id="chartIng" onchange="renderChart()"></select>
+      <div id="chart" class="chart"></div>
+      <div id="math"></div>
+    </div>
+  </div>
+
+  <!-- ACTIVITY -->
+  <div id="pg-act" hidden>
+    <div class="card">
+      <h2>Stock activity</h2>
+      <label>Show</label>
+      <select id="actFilter" onchange="renderActivity()">
+        <option value="">All changes</option>
+        <option>Sale</option>
+        <option>New delivery</option>
+        <option>Manual correction</option>
+      </select>
+      <div id="moves"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="pg-set" hidden>
+    <div class="card">
+      <h2>Settings</h2>
+      <label><input id="setFest" type="checkbox" style="width:auto"> Full Moon Festival is on</label>
+      <label>Safety buffer (added to every order)</label>
+      <input id="setBuf" type="number" min="0">
+      <label>Festival multiplier</label>
+      <input id="setMult" type="number" min="1">
+      <div id="setErr" class="err"></div>
+      <button class="btn" onclick="saveSettings()">Save settings</button>
+    </div>
+    <div class="card">
+      <h2>Demo data</h2>
+      <p>Reset the pantry to the sample ingredients, potions, and history.</p>
+      <button class="btn2" onclick="resetDemo()">Reset demo data</button>
+    </div>
+  </div>
+
+  <!-- HELP -->
+  <div id="pg-help" hidden>
+    <div class="card"><h3>How is the suggested order worked out?</h3><p>Average daily use over the last 7 days, times 7, gives the normal week. Festival ingredients are multiplied while the festival is on. Then the safety buffer is added and what is in stock is subtracted.</p></div>
+    <div class="card"><h3>Why can't a sale go through?</h3><p>Each sale is checked against stock first. If any ingredient is short, nothing changes and the form tells you which one.</p></div>
+    <div class="card"><h3>What is an unusual stock drop?</h3><p>Today's use is more than twice the average of the six days before it.</p></div>
+    <div class="card"><h3>Where is my data saved?</h3><p>In this browser only, for this prototype. Syncing across web and Android is the next step.</p></div>
+  </div>
+</div>
+
+<footer>Hexley's Potion Pantry · prototype with sample data · <a href="#help">Help</a></footer>
+
+<script src="js/app.js"></script>
+</body>
+</html>
