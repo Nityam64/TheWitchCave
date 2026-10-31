@@ -25,12 +25,29 @@ class PantryMobileScreen extends StatefulWidget {
 class _PantryMobileScreenState extends State<PantryMobileScreen> {
   List pantry = [];
   // 10.0.2.2 points Android Emulator to host localhost:8000
-  final String apiUrl = "http://10.0.2.2:8000/api/pantry";
+  final String baseUrl = "http://10.0.2.2:8000/api";
 
   Future<void> fetchPantry() async {
-    final res = await http.get(Uri.parse(apiUrl));
-    if (res.statusCode == 200) {
-      setState(() => pantry = jsonDecode(res.body)['pantry']);
+    try {
+      final res = await http.get(Uri.parse("$baseUrl/pantry"));
+      if (res.statusCode == 200) {
+        setState(() => pantry = jsonDecode(res.body)['pantry']);
+      }
+    } catch (e) {
+      debugPrint("Error fetching pantry: $e");
+    }
+  }
+
+  Future<void> reportMissingStock(int itemId) async {
+    try {
+      await http.post(
+        Uri.parse("$baseUrl/pantry/$itemId/audit"),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"missing_amount": 5}),
+      );
+      await fetchPantry();
+    } catch (e) {
+      debugPrint("Error reporting missing stock: $e");
     }
   }
 
@@ -50,12 +67,46 @@ class _PantryMobileScreenState extends State<PantryMobileScreen> {
           itemCount: pantry.length,
           itemBuilder: (context, i) {
             final item = pantry[i];
+            final anomalies = (item['anomalies'] as List?) ?? [];
             return Card(
               margin: const EdgeInsets.all(8),
-              child: ListTile(
-                title: Text("${item['name']} (Stock: ${item['current_stock']})"),
-                subtitle: Text(
-                  "Run out: ${item['prophecy']['days_until_run_out']}d | Reorder: ${item['prophecy']['recommended_reorder']}",
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "${item['name']} (Stock: ${item['current_stock']})",
+                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Run out: ${item['prophecy']['days_until_run_out']}d | Reorder: ${item['prophecy']['recommended_reorder']}",
+                    ),
+                    if (anomalies.isNotEmpty) ...[
+                      const SizedBox(height: 6),
+                      for (var alert in anomalies)
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          margin: const EdgeInsets.only(top: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.red[900],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            "⚠️ $alert",
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                    ],
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+                      onPressed: () => reportMissingStock(item['id']),
+                      icon: const Icon(Icons.warning, size: 16),
+                      label: const Text("Audit Shelf (Report Missing Stock)"),
+                    ),
+                  ],
                 ),
               ),
             );
