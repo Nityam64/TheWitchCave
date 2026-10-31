@@ -3,9 +3,8 @@ import GetStarted from "./GetStarted";
 
 export default function App() {
   const navigateToPantry = () => {
-    // Navigate to the full Madam Hexley Potion Pantry app
-    // If the port 8080 prototype is running, navigate there; otherwise navigate to /pantry.html
-    window.location.href = "http://localhost:8080/#home";
+    // Navigate to the art-directed Hexley's Potion Pantry dashboard
+    window.location.href = "/pantry.html";
   };
 
   return (
