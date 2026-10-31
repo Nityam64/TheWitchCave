@@ -297,6 +297,17 @@
       border-radius: 50%;
       background: radial-gradient(circle at 35% 35%, #9bff7a, #2f7a25);
       box-shadow: 0 0 0 3px var(--night);
+      animation: sealPulse 3.5s ease-in-out infinite;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+    .seal:hover {
+      transform: scale(1.15) rotate(15deg);
+      box-shadow: 0 0 16px var(--slime), 0 0 0 3px var(--night);
+    }
+    @keyframes sealPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 3px var(--night); }
+      50% { transform: scale(1.06); box-shadow: 0 0 12px rgba(127, 255, 90, 0.5), 0 0 0 3px var(--night); }
     }
     .line {
       display: flex;
@@ -491,36 +502,110 @@
     .supplier-dispatch { color: #6b5440; font-size: 15px; margin-bottom: 8px; }
     .supplier-meta { display: flex; justify-content: space-between; font-size: 14px; color: #2f5e2a; font-weight: 600; }
 
-    /* Forecast Chart Container */
-    .chart-box {
-      background: #1c1026;
-      border: 2px solid var(--pumpkin);
-      padding: 20px 16px 16px;
-      margin-top: 16px;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.6);
-      position: relative;
+    /* Forecast & Restock Page 3 Art-Directed Theme (matching Reference) */
+    .fc-card {
+      background: #140d1e;
+      border: 1px solid #2e1c40;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
     }
-    .chart-svg {
-      width: 100%;
-      height: 220px;
-      display: block;
-      overflow: visible;
-    }
-
-    /* Math Breakdown Grid */
-    .math-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    .fc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
       gap: 12px;
-      margin-top: 16px;
+      margin-bottom: 20px;
     }
-    .math-card {
-      background: #fbf5e6;
-      border: 1px solid var(--pumpkin);
-      padding: 10px 12px;
+    .fc-card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #f5eedf;
+      margin: 0;
+      letter-spacing: -0.01em;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    .math-card .m-lbl { font-size: 12px; text-transform: uppercase; color: #6b5440; }
-    .math-card .m-val { font-family: "IM Fell English", serif; font-size: 20px; color: var(--ink); font-weight: 600; margin-top: 2px; }
+    .fc-select {
+      background: #1c112b;
+      color: #f5eedf;
+      border: 1px solid #4a3363;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .fc-select:focus {
+      outline: 2px solid var(--gold);
+    }
+    .fc-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .fc-table th {
+      font-size: 11.5px;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      color: #8e7a9e;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      border-bottom: 1px solid #2d1c3e;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-table td {
+      padding: 16px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #f5eedf;
+      font-size: 15px;
+      vertical-align: middle;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-table tr:last-child td {
+      border-bottom: none;
+    }
+    .fc-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .fc-item-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .fc-item-sub {
+      font-size: 12.5px;
+      color: #9d8ba8;
+      margin-top: 3px;
+    }
+    .fc-reorder-val {
+      font-size: 16px;
+      font-weight: 700;
+      color: #dc7a42;
+    }
+    .fc-reorder-sufficient {
+      font-size: 15px;
+      font-weight: 600;
+      color: #6ee7b7;
+    }
+    .fc-btn-restock {
+      background: #1c112b;
+      color: #f5eedf;
+      border: 1px solid #4a3363;
+      border-radius: 6px;
+      padding: 7px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .fc-btn-restock:hover {
+      background: #ff7518;
+      color: #140a1d;
+      border-color: #ff7518;
+    }
 
     /* Animations */
     @keyframes bubble {
@@ -545,8 +630,8 @@
 </head>
 <body>
   <!-- Night scene behind the page (decoration only) -->
-  <div class="fx" aria-hidden="true">
-    <div class="moon"></div>
+  <div class="fx" aria-hidden="true" id="fxScene">
+    <div class="moon" id="lunarMoon" onclick="toggleBloodMoon()" title="Click to summon Blood Moon Eclipse 🌕 ➔ 🌑"></div>
     <div class="fog"></div>
     <svg class="web" viewBox="0 0 150 150">
       <g fill="none" stroke="#c9b8dc" stroke-width="1.2">
@@ -660,139 +745,39 @@
 
     <!-- ==================== 3. FORECAST & RESTOCK VIEW (PAGE 3) ==================== -->
     <section class="view-section" id="view-forecast">
-      <h1>Predictive Scrying &amp; Restock</h1>
-      <p class="lead">Algorithmic consumption trajectory, historical sales vs 7-day lunar surge projection, and full pantry restock recommendations.</p>
-
-      <!-- Top Scrying Controls & Chart Section -->
-      <div class="panel">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:12px;">
-          <div>
-            <h2 style="margin:0;">Lunar Trajectory Scrying Glass</h2>
-            <div style="color:#bfae95; font-size:16px;">Select an apothecary reagent to scry 7-day future demand curves against historical sales.</div>
-          </div>
-          <div style="display:flex; align-items:center; gap:10px;">
-            <label for="forecastReagentSelect" style="margin:0; font-size:16px;">Reagent:</label>
-            <select id="forecastReagentSelect" style="margin:0; width:auto; min-width:240px; padding:8px 12px;" onchange="renderSelectedForecast()"></select>
+      <!-- Card 1: Historic Consumption & 7-Day Forecast Curve -->
+      <div class="fc-card">
+        <div class="fc-card-header">
+          <h2 class="fc-card-title">Historic Consumption &amp; 7-Day Forecast Curve</h2>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <select id="forecastReagentSelect" class="fc-select" onchange="renderSelectedForecast()"></select>
           </div>
         </div>
 
-        <!-- SVG Scrying Chart -->
-        <div class="chart-box" id="forecastChartBox">
-          <div id="chartSvgWrapper"></div>
-        </div>
-
-        <!-- Prophecy & Math Breakdown Card -->
-        <div class="ticket" style="margin-top:20px; transform:none;" id="scryingDetailCard">
-          <span class="seal"></span>
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px;">
-            <div>
-              <h2 id="fcDetailTitle" style="margin:0;">Bat Wings (3x Festival Surge)</h2>
-              <div id="fcDetailSupplier" style="color:#6b5440; font-size:15px; margin-top:2px;">Preserved nocturnal fauna &bull; Grimoire &amp; Grove Apothecary (3d lead time)</div>
-            </div>
-            <div style="text-align:right;">
-              <div style="font-size:14px; text-transform:uppercase; color:#6b5440;">Recommended Reorder</div>
-              <div id="fcDetailReorder" style="font-family:'IM Fell English', serif; font-size:36px; color:#ff7518; font-weight:bold; line-height:1.1;">+65 pairs</div>
-            </div>
-          </div>
-
-          <!-- Plain Language Prophecy Explanation -->
-          <div style="background:#20132b; border-left:4px solid var(--pumpkin); padding:12px 16px; margin:14px 0; color:var(--parchment); font-size:16px; line-height:1.45;" id="fcExplanationText">
-            🔮 <strong>Prophecy Insight:</strong> Based on historic sales of 30 pairs over 7 days, average consumption is 4.3 pairs/day. During the Full Moon Festival, this item is cursed with a 3.0x demand surge, bringing projected 7-day demand to 90 pairs. Adding minimum safety stock (20 pairs) and subtracting your current stock (45 pairs), you should reorder 65 pairs.
-          </div>
-
-          <!-- Math Breakdown Grid -->
-          <div class="math-grid">
-            <div class="math-card">
-              <div class="m-lbl">Daily Burn Rate</div>
-              <div class="m-val" id="fcMathBurn">4.3 / day</div>
-            </div>
-            <div class="math-card">
-              <div class="m-lbl">7-Day Demand</div>
-              <div class="m-val" id="fcMathDemand">90 pairs</div>
-            </div>
-            <div class="math-card">
-              <div class="m-lbl">Safety Stock</div>
-              <div class="m-val" id="fcMathSafety">20 pairs</div>
-            </div>
-            <div class="math-card">
-              <div class="m-lbl">Current Stock</div>
-              <div class="m-val" id="fcMathCurrent">45 pairs</div>
-            </div>
-            <div class="math-card">
-              <div class="m-lbl">Stockout Forecast</div>
-              <div class="m-val" id="fcMathStockout" style="color:#9b1c1c;">3.5 days</div>
-            </div>
-          </div>
-        </div>
+        <div id="chartSvgWrapper" style="overflow-x:auto;"></div>
       </div>
 
-      <!-- ALL PANTRY RESTOCK RECOMMENDATIONS TABLE (Previous UI Data) -->
-      <div class="panel" style="overflow-x:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <div>
-            <h2 style="margin:0;">All Pantry Restock Recommendations</h2>
-            <div style="color:#bfae95; font-size:15px;">Complete algorithmic replenishment ledger for every reagent in the vault.</div>
-          </div>
-          <button class="btn-secondary" onclick="orderAllShortages()">Quick Order All Shortages</button>
+      <!-- Card 2: All Pantry Restock Recommendations Table -->
+      <div class="fc-card" style="padding: 24px 28px;">
+        <div class="fc-card-header" style="margin-bottom: 12px;">
+          <h2 class="fc-card-title">All Pantry Restock Recommendations</h2>
         </div>
 
-        <table class="ledger-table" id="allRestockTable">
-          <thead>
-            <tr>
-              <th>Reagent &amp; Unit</th>
-              <th>Current Stock</th>
-              <th>Min Safety Target</th>
-              <th>7-Day Forecast Demand</th>
-              <th>Recommended Reorder</th>
-              <th>Supplier &amp; Lead Time</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="allRestockTbody"></tbody>
-        </table>
-      </div>
-
-      <!-- Quick Record Incoming Shipment Form -->
-      <div class="grid">
-        <div class="ticket" id="restockBox">
-          <span class="seal"></span>
-          <h2>Record Incoming Delivery</h2>
-          <p class="note">Log delivered shipments from raven couriers into the vault.</p>
-
-          <label for="restockItem">Select Reagent</label>
-          <select id="restockItem"></select>
-
-          <label for="restockQty">Units Received</label>
-          <input type="number" id="restockQty" min="1" value="20">
-
-          <label for="restockSupplier">Delivering Supplier</label>
-          <select id="restockSupplier">
-            <option>Grimoire &amp; Grove Apothecary (Bat Post)</option>
-            <option>Obsidian Peak Foragers Guild (Broomstick #12)</option>
-            <option>Moonlit Caverns Cooperative (Subterranean B-7)</option>
-            <option>Blackwood Herbalists &amp; Vintners (Crow Post #09)</option>
-          </select>
-
-          <label for="restockNotes">Invoice / Dispatch Note</label>
-          <input id="restockNotes" placeholder="e.g., Courier dispatch receipt #1888-A">
-
-          <button class="btn" onclick="confirmRestock()">Deposit Reagents into Vault</button>
-          <p class="msg" id="restockMsg"></p>
-        </div>
-
-        <div class="panel">
-          <h2>Restock Strategy Guidelines</h2>
-          <p class="hint">How Madam Hexley calculates replenishment quantities:</p>
-          <div style="background:var(--parchment); color:var(--ink); border:1px solid var(--pumpkin); padding:16px; margin-bottom:12px;">
-            <strong style="display:block; font-family:'IM Fell English', serif; font-size:19px; color:#8a4a1c;">The Apothecary Formula:</strong>
-            <div style="font-family:monospace; margin:6px 0; font-size:15px; color:#2b1d14;">
-              Reorder Qty = Max(0, Projected 7d Demand + Safety Stock - Current Stock)
-            </div>
-            <p style="margin:6px 0 0; font-size:15px; color:#6b5440;">
-              Festival-cursed botanicals receive an automatic 3.0x velocity surge to prevent catastrophic stockouts during the Blood Moon gathering.
-            </p>
-          </div>
-          <button class="btn" style="background:#2a1a36; color:var(--parchment);" onclick="navigateTo('sale')">Switch to Record Sale &rarr;</button>
+        <div style="overflow-x: auto;">
+          <table class="fc-table" id="allRestockTable">
+            <thead>
+              <tr>
+                <th>Ingredient</th>
+                <th>Stock on Hand</th>
+                <th>Safety Stock</th>
+                <th>7-Day Demand</th>
+                <th>Reorder Suggestion</th>
+                <th>Supplier (Lead Time)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="allRestockTbody"></tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -1016,9 +1001,10 @@
       document.getElementById("dashVaultValue").textContent = "¢" + totalWorth.toFixed(2);
     }
 
-    function quickRestockItem(index, amount) {
+    function quickRestockItem(index, amount, evt) {
       var qty = amount || 20;
       items[index].stock += qty;
+      spawnParticle("+" + qty + " " + items[index].icon, "var(--gold)", evt);
       movements.unshift({
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
         type: "Restock",
@@ -1084,43 +1070,110 @@
     }
 
     // ==================== FORECAST & RESTOCK (PAGE 3) ====================
+    // Historical sales data matching the reference screenshot
+    var historicSalesSeries = {
+      "item-1": [
+        { label: "Mon, 10/26", actual: 8 },
+        { label: "Tue, 10/27", actual: 9 },
+        { label: "Wed, 10/28", actual: 7 },
+        { label: "Thu, 10/29", actual: 10 },
+        { label: "Fri, 10/30", actual: 8 },
+        { label: "Sat, 10/31", actual: 9 },
+        { label: "Sun, 11/1", actual: 28 }
+      ],
+      "item-2": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 2 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 3 },
+        { label: "Fri, 10/30", actual: 2 },
+        { label: "Sat, 10/31", actual: 3 },
+        { label: "Sun, 11/1", actual: 7 }
+      ],
+      "item-3": [
+        { label: "Mon, 10/26", actual: 3 },
+        { label: "Tue, 10/27", actual: 3 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 4 },
+        { label: "Fri, 10/30", actual: 3 },
+        { label: "Sat, 10/31", actual: 3 },
+        { label: "Sun, 11/1", actual: 3 }
+      ],
+      "item-4": [
+        { label: "Mon, 10/26", actual: 4 },
+        { label: "Tue, 10/27", actual: 4 },
+        { label: "Wed, 10/28", actual: 4 },
+        { label: "Thu, 10/29", actual: 4 },
+        { label: "Fri, 10/30", actual: 4 },
+        { label: "Sat, 10/31", actual: 4 },
+        { label: "Sun, 11/1", actual: 4 }
+      ],
+      "item-5": [
+        { label: "Mon, 10/26", actual: 1 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 1 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 1 },
+        { label: "Sun, 11/1", actual: 4 }
+      ],
+      "item-6": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 2 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 2 },
+        { label: "Fri, 10/30", actual: 2 },
+        { label: "Sat, 10/31", actual: 2 },
+        { label: "Sun, 11/1", actual: 2 }
+      ],
+      "item-7": [
+        { label: "Mon, 10/26", actual: 1 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 1 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 1 },
+        { label: "Sun, 11/1", actual: 2 }
+      ],
+      "item-8": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 2 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 2 },
+        { label: "Sun, 11/1", actual: 5 }
+      ]
+    };
+
     function calculateForecast(item) {
-      var avgDaily = item.dailyAvg || 3.0;
-      var normal7d = Math.round(avgDaily * 7);
+      var series = historicSalesSeries[item.id] || historicSalesSeries["item-1"];
+      var totalHistoric = series.reduce(function(acc, s) { return acc + s.actual; }, 0);
+      var avgDaily = totalHistoric / series.length;
       var multiplier = item.festival ? (item.festivalMul || 3) : 1;
-      var forecastDemand = Math.round(normal7d * multiplier);
+      var dailyForecast = Math.round(avgDaily * multiplier * 10) / 10;
+      var forecast7d = Math.round(dailyForecast * 7);
       var safetyStock = item.minStock;
       var currentStock = item.stock;
-      var reorderQty = Math.max(0, forecastDemand + safetyStock - currentStock);
-      var dailyBurn = avgDaily * multiplier;
-      var daysUntilStockout = dailyBurn > 0 ? (currentStock / dailyBurn).toFixed(1) : 999;
-
-      var explanation = "Based on historic sales of " + Math.round(avgDaily * 7) + " " + item.unit + " over 7 days, average consumption is " + avgDaily + " " + item.unit + "/day. Normal 7-day demand is " + normal7d + " " + item.unit + ".";
-      if (multiplier > 1) {
-        explanation += " During the Full Moon Festival, this item is cursed with a " + multiplier + "x demand surge, bringing projected 7-day demand to " + forecastDemand + " " + item.unit + ".";
-      }
-      explanation += " Adding minimum safety stock (" + safetyStock + " " + item.unit + ") and subtracting your current stock (" + currentStock + " " + item.unit + "), you should reorder " + reorderQty + " " + item.unit + ".";
+      var reorderQty = Math.max(0, forecast7d + safetyStock - currentStock);
 
       return {
+        series: series,
         avgDaily: avgDaily,
-        normal7d: normal7d,
-        multiplier: multiplier,
-        forecastDemand: forecastDemand,
+        dailyForecast: dailyForecast,
+        forecast7d: forecast7d,
         safetyStock: safetyStock,
         currentStock: currentStock,
-        reorderQty: reorderQty,
-        daysUntilStockout: daysUntilStockout,
-        explanation: explanation
+        reorderQty: reorderQty
       };
     }
 
     function renderForecastPage() {
-      // 1. Populate item selector
       var sel = document.getElementById("forecastReagentSelect");
       var prevVal = sel.value;
       sel.innerHTML = "";
       for (var i = 0; i < items.length; i++) {
-        sel.innerHTML += '<option value="' + i + '">' + items[i].icon + ' ' + items[i].name + ' (' + items[i].stock + ' ' + items[i].unit + ')</option>';
+        sel.innerHTML += '<option value="' + i + '">' + items[i].name + ' (' + items[i].stock + ' ' + items[i].unit + ' in stock)</option>';
       }
       if (prevVal !== "" && parseInt(prevVal, 10) < items.length) {
         sel.value = prevVal;
@@ -1130,17 +1183,7 @@
         selectedForecastIndex = 0;
       }
 
-      // Also populate the restock form select
-      var restockSel = document.getElementById("restockItem");
-      restockSel.innerHTML = "";
-      for (var j = 0; j < items.length; j++) {
-        restockSel.innerHTML += '<option value="' + j + '">' + items[j].icon + ' ' + items[j].name + ' (Vault: ' + items[j].stock + ')</option>';
-      }
-
-      // 2. Render details and SVG chart
       renderSelectedForecast();
-
-      // 3. Render All Pantry Restock Recommendations Table
       renderAllRestockTable();
     }
 
@@ -1149,79 +1192,44 @@
       selectedForecastIndex = parseInt(sel.value, 10);
       var item = items[selectedForecastIndex];
       var fc = calculateForecast(item);
-
-      // Title & Header Info
-      document.getElementById("fcDetailTitle").textContent = item.icon + " " + item.name + (item.festival ? " (🌕 " + item.festivalMul + "x Festival Surge)" : " (Standard Lunar Velocity)");
-      document.getElementById("fcDetailSupplier").textContent = "Reagent Category: Magical Botanical & Reagent • Supplier: " + item.supplier + " (" + item.leadDays + "d lead time)";
-      document.getElementById("fcDetailReorder").textContent = fc.reorderQty > 0 ? "+" + fc.reorderQty + " " + item.unit : "Sufficient";
-      document.getElementById("fcDetailReorder").style.color = fc.reorderQty > 0 ? "#ff7518" : "#2f5e2a";
-
-      // Explanation
-      document.getElementById("fcExplanationText").innerHTML = "🔮 <strong>Prophecy Insight:</strong> " + fc.explanation;
-
-      // Math Grid
-      document.getElementById("fcMathBurn").textContent = fc.avgDaily + " " + item.unit + "/d";
-      document.getElementById("fcMathDemand").textContent = fc.forecastDemand + " " + item.unit;
-      document.getElementById("fcMathSafety").textContent = fc.safetyStock + " " + item.unit;
-      document.getElementById("fcMathCurrent").textContent = fc.currentStock + " " + item.unit;
-      var daysColor = parseFloat(fc.daysUntilStockout) <= 2 ? "#9b1c1c" : (parseFloat(fc.daysUntilStockout) <= 5 ? "#ff7518" : "#2f5e2a");
-      document.getElementById("fcMathStockout").textContent = fc.daysUntilStockout > 90 ? "Stable (>30d)" : fc.daysUntilStockout + " days";
-      document.getElementById("fcMathStockout").style.color = daysColor;
-
-      // Render SVG Chart
       renderForecastSvgChart(item, fc);
     }
 
     function renderForecastSvgChart(item, fc) {
       var container = document.getElementById("chartSvgWrapper");
-      var svgW = 760;
-      var svgH = 210;
-      var padLeft = 46;
-      var padRight = 30;
-      var padTop = 24;
-      var padBottom = 34;
+      var svgW = 860;
+      var svgH = 200;
+      var padLeft = 40;
+      var padRight = 36;
+      var padTop = 32;
+      var padBottom = 32;
       var plotW = svgW - padLeft - padRight;
       var plotH = svgH - padTop - padBottom;
 
-      // Generate 7 past days + 7 future days
+      // 7 historical points
       var points = [];
-      var now = new Date();
-      var baseDaily = item.dailyAvg;
-
-      // Historical past 7 days
-      var seedFactors = [0.8, 1.2, 0.9, 1.4, 0.7, 1.3, 1.0];
-      for (var i = 6; i >= 0; i--) {
-        var d = new Date(now.getTime() - i * 86400000);
-        var factor = seedFactors[6 - i] || 1.0;
-        var actualQty = Math.round(baseDaily * factor);
+      for (var s = 0; s < fc.series.length; s++) {
         points.push({
-          label: d.toLocaleDateString("en-US", { weekday: "short", month: "numeric", day: "numeric" }),
-          actual: actualQty,
+          label: fc.series[s].label,
+          actual: fc.series[s].actual,
           forecast: null,
           isFuture: false
         });
       }
 
-      // Projected future 7 days
-      var futureDaily = Math.round((fc.forecastDemand / 7) * 10) / 10;
-      for (var j = 1; j <= 7; j++) {
-        var fd = new Date(now.getTime() + j * 86400000);
+      // 7 future points matching +1d (Mon) to +7d (Sun)
+      var futureDays = ["+1d (Mon)", "+2d (Tue)", "+3d (Wed)", "+4d (Thu)", "+5d (Fri)", "+6d (Sat)", "+7d (Sun)"];
+      for (var f = 0; f < futureDays.length; f++) {
         points.push({
-          label: "+" + j + "d (" + fd.toLocaleDateString("en-US", { weekday: "short" }) + ")",
+          label: futureDays[f],
           actual: null,
-          forecast: futureDaily,
+          forecast: fc.dailyForecast,
           isFuture: true
         });
       }
 
-      // Calculate max value for Y-axis scaling
-      var maxVal = 0;
-      for (var k = 0; k < points.length; k++) {
-        var v = points[k].actual !== null ? points[k].actual : points[k].forecast;
-        if (v > maxVal) maxVal = v;
-      }
-      maxVal = Math.max(12, Math.round(maxVal * 1.3));
-
+      // Max value for scaling
+      var maxVal = Math.max(15, fc.dailyForecast * 1.35, 38);
       var stepX = plotW / (points.length - 1);
       var barsHtml = "";
       var pathD = "";
@@ -1233,16 +1241,16 @@
         var y = padTop + plotH - (val / maxVal) * plotH;
 
         if (!pt.isFuture) {
-          // Historical bar
-          var barH = Math.max(4, (pt.actual / maxVal) * plotH);
+          // Historical Bar (purple with peach outline)
+          var barH = Math.max(6, (pt.actual / maxVal) * plotH);
           var barY = padTop + plotH - barH;
           barsHtml +=
-            '<rect x="' + (x - 11) + '" y="' + barY + '" width="22" height="' + barH + '" fill="#2a1a36" stroke="#ff7518" stroke-width="1.2" rx="2">' +
-            '<title>' + pt.label + ': ' + pt.actual + ' ' + item.unit + ' sold</title>' +
+            '<rect x="' + (x - 12) + '" y="' + barY + '" width="24" height="' + barH + '" fill="#241432" stroke="#c86d3b" stroke-width="1.1" rx="2">' +
+            '<title>' + pt.label + ': ' + pt.actual + ' actual sales</title>' +
             '</rect>' +
-            '<text x="' + x + '" y="' + (barY - 5) + '" font-size="11" fill="#ecdcbc" font-family="Crimson Text" text-anchor="middle">' + pt.actual + '</text>';
+            '<text x="' + x + '" y="' + (barY - 6) + '" font-size="11" fill="#ecdcbc" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.actual + '</text>';
         } else {
-          // Future forecast dashed line
+          // Forecast Curve connection
           if (!pathD) {
             var prevPt = points[idx - 1];
             var prevX = padLeft + (idx - 1) * stepX;
@@ -1253,30 +1261,29 @@
             pathD += " L " + x + " " + y;
           }
           barsHtml +=
-            '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="#ff7518" stroke="#f6e7c1" stroke-width="1.5">' +
-            '<title>' + pt.label + ': ' + pt.forecast + ' ' + item.unit + ' projected</title>' +
+            '<circle cx="' + x + '" cy="' + y + '" r="4.5" fill="#f8b072" stroke="#ffffff" stroke-width="1">' +
+            '<title>' + pt.label + ': ' + pt.forecast + ' projected</title>' +
             '</circle>' +
-            '<text x="' + x + '" y="' + (y - 8) + '" font-size="11" fill="#f2b25c" font-weight="bold" font-family="Crimson Text" text-anchor="middle">' + pt.forecast + '</text>';
+            '<text x="' + x + '" y="' + (y - 8) + '" font-size="11" fill="#f8b072" font-weight="600" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.forecast + '</text>';
         }
 
         // X-axis label
-        barsHtml += '<text x="' + x + '" y="' + (svgH - 10) + '" font-size="10" fill="#bfae95" font-family="Crimson Text" text-anchor="middle">' + pt.label + '</text>';
+        barsHtml += '<text x="' + x + '" y="' + (svgH - 10) + '" font-size="9.5" fill="#756284" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif" text-anchor="middle">' + pt.label + '</text>';
       }
 
       container.innerHTML =
-        '<svg class="chart-svg" viewBox="0 0 ' + svgW + ' ' + svgH + '">' +
-        '<line x1="' + padLeft + '" y1="' + (padTop + plotH) + '" x2="' + (svgW - padRight) + '" y2="' + (padTop + plotH) + '" stroke="#4a2d52" stroke-width="1"/>' +
-        '<line x1="' + padLeft + '" y1="' + padTop + '" x2="' + padLeft + '" y2="' + (padTop + plotH) + '" stroke="#4a2d52" stroke-width="1"/>' +
-        (pathD ? '<path d="' + pathD + '" fill="none" stroke="#f2b25c" stroke-width="2.5" stroke-dasharray="4,4"/>' : '') +
+        '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%; height:auto; display:block;">' +
+        '<line x1="' + padLeft + '" y1="' + (padTop + plotH) + '" x2="' + (svgW - padRight) + '" y2="' + (padTop + plotH) + '" stroke="#2d1c3e" stroke-width="1"/>' +
+        (pathD ? '<path d="' + pathD + '" fill="none" stroke="#f8b072" stroke-width="2" stroke-dasharray="4,4"/>' : '') +
         barsHtml +
         '</svg>' +
-        '<div style="display:flex; justify-content:center; gap:24px; font-size:14px; margin-top:8px; color:#bfae95;">' +
-        '<span style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:14px; height:10px; background:#2a1a36; border:1px solid #ff7518; border-radius:2px;"></span> Actual Sales History</span>' +
-        '<span style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block; width:16px; height:2px; background:#f2b25c; border-bottom:1px dashed #f2b25c;"></span> 7-Day Lunar Forecast Trajectory</span>' +
+        '<div style="display:flex; justify-content:center; align-items:center; gap:22px; font-size:12px; margin-top:14px; color:#9d8ba8; font-family:-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;">' +
+        '<span style="display:flex; align-items:center; gap:7px;"><span style="display:inline-block; width:12px; height:12px; background:#8a3ab9; border-radius:2px;"></span> Actual Sales</span>' +
+        '<span style="display:flex; align-items:center; gap:7px;"><span style="display:inline-block; width:16px; height:2px; background:#f8b072; border-bottom:2px dashed #f8b072;"></span> 7-Day Forecast Curve</span>' +
         '</div>';
     }
 
-    // Render Previous UI All Pantry Restock Table
+    // Render All Pantry Restock Recommendations Table matching Reference Screenshot
     function renderAllRestockTable() {
       var tbody = document.getElementById("allRestockTbody");
       tbody.innerHTML = "";
@@ -1284,22 +1291,26 @@
       for (var i = 0; i < items.length; i++) {
         var item = items[i];
         var fc = calculateForecast(item);
-        var statusColor = fc.reorderQty > 0 ? "#ff7518" : "#2f5e2a";
-        var statusText = fc.reorderQty > 0 ? "+" + fc.reorderQty + " " + item.unit : "Sufficient";
+        var subText = item.unit + (item.festival ? ' &bull; 🌕 ' + item.festivalMul + 'x Cursed' : ' &bull; Normal');
+        if (item.stock <= 0) subText = item.unit + ' &bull; Depleted';
+
+        var reorderHtml = fc.reorderQty > 0
+          ? '<span class="fc-reorder-val">+' + fc.reorderQty + ' ' + item.unit + '</span>'
+          : '<span class="fc-reorder-sufficient">Sufficient</span>';
 
         tbody.innerHTML +=
           '<tr>' +
           '<td>' +
-          '<strong>' + item.icon + ' ' + item.name + '</strong>' +
-          '<div style="font-size:14px; color:#6b5440;">' + item.unit + (item.festival ? ' &bull; 🌕 ' + item.festivalMul + 'x Cursed' : '') + '</div>' +
+          '<div class="fc-item-title">' + item.name + '</div>' +
+          '<div class="fc-item-sub">' + subText + '</div>' +
           '</td>' +
-          '<td><strong>' + item.stock + '</strong> ' + item.unit + '</td>' +
-          '<td>' + item.minStock + ' ' + item.unit + '</td>' +
-          '<td>' + fc.forecastDemand + ' ' + item.unit + '</td>' +
-          '<td><strong style="color:' + statusColor + '; font-size:17px;">' + statusText + '</strong></td>' +
+          '<td><strong style="color:#ffffff;">' + item.stock + '</strong></td>' +
+          '<td>' + item.minStock + '</td>' +
+          '<td>' + fc.forecast7d + '</td>' +
+          '<td>' + reorderHtml + '</td>' +
           '<td>' + item.supplier + ' (' + item.leadDays + 'd)</td>' +
           '<td>' +
-          '<button class="btn-sm" onclick="quickRestockItem(' + i + ', ' + (fc.reorderQty > 0 ? fc.reorderQty : 20) + ')">Order Restock</button>' +
+          '<button class="fc-btn-restock" onclick="quickRestockItem(' + i + ', ' + (fc.reorderQty > 0 ? fc.reorderQty : 20) + ')">Order Restock</button>' +
           '</td>' +
           '</tr>';
       }
@@ -1360,7 +1371,7 @@
       for (var i = 0; i < items.length; i++) {
         sale.push(0);
         box.innerHTML +=
-          '<button class="item" id="saleItem' + i + '" onclick="addItemToSale(' + i + ')">' +
+          '<button class="item" id="saleItem' + i + '" onclick="addItemToSale(' + i + ', event)">' +
           '<strong>' + items[i].icon + ' ' + items[i].name + '</strong>' +
           '<span class="stamp">Sold out</span>' +
           '<span class="stock" id="saleStock' + i + '"></span>' +
@@ -1491,9 +1502,59 @@
       }
     }
 
+    // ==================== MAGICAL ANIMATIONS & FEATURES ====================
+    function toggleBloodMoon() {
+      document.body.classList.toggle("blood-moon");
+      var isBlood = document.body.classList.contains("blood-moon");
+      spawnParticle(isBlood ? "🌕 ECLIPSE SUMMONED" : "🌑 LUNAR CALM", isBlood ? "#ff3344" : "#f2b25c");
+    }
+
+    function spawnParticle(text, color, evt) {
+      var p = document.createElement("div");
+      p.className = "float-particle";
+      p.textContent = text;
+      p.style.color = color || "var(--gold)";
+      var x = evt && evt.clientX ? evt.clientX : (window.innerWidth / 2);
+      var y = evt && evt.clientY ? evt.clientY : (window.innerHeight / 2);
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      document.body.appendChild(p);
+      setTimeout(function() { p.remove(); }, 850);
+    }
+
+    function initEmbers() {
+      var fx = document.getElementById("fxScene");
+      if (!fx) return;
+      var colors = ["#ff7518", "#8a4fd1", "#7fff5a", "#f2b25c", "#f6e7c1"];
+      for (var i = 0; i < 20; i++) {
+        var ember = document.createElement("div");
+        ember.className = "ember";
+        var size = Math.floor(Math.random() * 4) + 2;
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        ember.style.width = size + "px";
+        ember.style.height = size + "px";
+        ember.style.background = color;
+        ember.style.boxShadow = "0 0 " + (size * 2) + "px " + color;
+        ember.style.left = (Math.random() * 100) + "vw";
+        ember.style.animationDuration = (Math.random() * 12 + 10) + "s";
+        ember.style.animationDelay = (Math.random() * 10) + "s";
+        fx.appendChild(ember);
+      }
+    }
+
+    // Hook particle effect into addItemToSale
+    var originalAddItemToSale = addItemToSale;
+    addItemToSale = function(i, evt) {
+      if (items[i].stock - (sale[i] || 0) > 0) {
+        spawnParticle("+1 " + items[i].icon, "var(--slime)", evt);
+      }
+      originalAddItemToSale(i);
+    };
+
     // Boot
     loadState();
     buildSaleItems();
+    initEmbers();
 
     var hash = (window.location.hash || "").replace("#", "");
     if (hash && document.getElementById("view-" + hash)) {
