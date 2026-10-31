@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: Require authenticated user (supports anonymous auth or email)
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: Validate inventory item fields and prevent negative stock
+    function isValidInventoryItem(data) {
+      return data.name is string && data.name.size() > 0 &&
+             data.category in ['ingredient', 'potion', 'supply'] &&
+             data.quantity is number && data.quantity >= 0 &&
+             data.minStock is number && data.minStock >= 0 &&
+             data.unit is string && data.unit.size() > 0;
+    }
+
+    // 1. Inventory Items Collection
+    match /inventoryItems/{itemId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAuthenticated() && isValidInventoryItem(request.resource.data);
+      // Soft-delete / archive only; prevent deletion if sales reference exists
+      allow delete: if false;
+    }
+
+    // 2. Sales Collection (Immutable historic sale logs)
+    match /sales/{saleId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                      request.resource.data.items is list &&
+                      request.resource.data.totalAmount is number &&
+                      request.resource.data.totalAmount >= 0;
+      allow update, delete: if false; // Permanent audit records
+    }
+
+    // 3. Stock Movements Collection (Immutable stock movement audit trail)
+    match /stockMovements/{movementId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() &&
+                      request.resource.data.itemId is string &&
+                      request.resource.data.quantityDelta is number &&
+                      request.resource.data.quantityAfter is number &&
+                      request.resource.data.quantityAfter >= 0;
+      allow update, delete: if false; // Immutable audit trail
+    }
+
+    // 4. Suppliers Collection
+    match /suppliers/{supplierId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+                     request.resource.data.name is string &&
+                     request.resource.data.leadTimeDays is number &&
+                     request.resource.data.leadTimeDays > 0;
+    }
+
+    // 5. Settings Collection (Global store settings, festival multiplier)
+    match /settings/{docId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() &&
+                     request.resource.data.festivalMultiplier is number &&
+                     request.resource.data.festivalMultiplier >= 1;
+    }
+  }
+}
+

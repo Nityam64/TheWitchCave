@@ -1,10 +1,10 @@
+import os
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ml_engine.ai_core import run_prophecy_and_restock, detect_strange_happenings
 import firebase_db
 import import_sample_data
-import os
 
 app = FastAPI(title="The Witch's Potion Pantry API")
 
@@ -37,7 +37,7 @@ def get_full_pantry_status():
     items = firebase_db.get_all_ingredients()
     results = []
     for item in items:
-        # ai engine uses the daily sales list
+        # ai engine uses the backward-compatible 14-day daily sales list
         sales_history = item.get("sales", [])
         ai_metrics = run_prophecy_and_restock(
             sales_history,
@@ -55,12 +55,12 @@ def get_full_pantry_status():
 
 @app.get("/api/ingredients/{item_id}/history")
 def get_ingredient_history(item_id: str, days: int = Query(60, ge=1, le=365)):
-    # Try parsing integer if numeric
+    """Returns chronological [{date: YYYY-MM-DD, units_sold: int}] for the past N days."""
     target_id = int(item_id) if item_id.isdigit() else item_id
     history = firebase_db.get_ingredient_sales_history(target_id, days=days)
-    if not history:
-        raise HTTPException(status_code=404, detail="Ingredient not found or no history available")
-    return {"ingredient_id": target_id, "days": days, "history": history}
+    if history is None:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+    return history
 
 @app.post("/api/pantry/{item_id}/transaction")
 def record_transaction(item_id: str, payload: StockUpdate):
