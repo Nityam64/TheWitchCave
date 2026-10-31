@@ -22,11 +22,16 @@ export function showToast(message, type = "info") {
   if (!container) return;
   const toast = document.createElement("div");
   toast.className = `toast ${type === "error" ? "toast-error" : type === "success" ? "toast-success" : ""}`;
-  toast.innerHTML = `<span>${type === "error" ? "🛑" : type === "success" ? "✨" : "🔮"}</span> <span>${message}</span>`;
+  const icon = type === "error"
+    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`
+    : type === "success"
+    ? `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`
+    : `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`;
+  toast.innerHTML = `<span style="display:flex;align-items:center;">${icon}</span> <span>${message}</span>`;
   container.appendChild(toast);
   setTimeout(() => {
     toast.style.opacity = "0";
-    toast.style.transform = "translateY(10px)";
+    toast.style.transform = "translateY(8px)";
     setTimeout(() => toast.remove(), 250);
   }, 3500);
 }
@@ -240,8 +245,11 @@ function renderDashboard() {
 
   // Festival Banner update
   const festItems = items.filter(i => i.isFestivalAffected);
-  const festNames = festItems.map(i => i.name).join(", ") || "None selected";
-  document.getElementById("festival-item-names").textContent = festNames;
+  const festNamesHtml = festItems.length > 0
+    ? festItems.map(i => `<span class="apothecary-pill"><span class="pill-moon">☾</span> ${i.name}</span>`).join(" ")
+    : '<span class="apothecary-pill-empty">None currently designated</span>';
+  const festNamesEl = document.getElementById("festival-item-names");
+  if (festNamesEl) festNamesEl.innerHTML = festNamesHtml;
 
   // Unusual Consumption Alerts
   const unusualAlerts = detectUnusualConsumption(state.inventory, state.sales);
@@ -252,7 +260,9 @@ function renderDashboard() {
     } else {
       alertsContainer.innerHTML = unusualAlerts.map(alert => `
         <div class="alert-box ${alert.severity === "critical" ? "alert-critical" : "alert-warning"}">
-          <div class="alert-icon">⚠️</div>
+          <div class="alert-icon-box">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${alert.severity === "critical" ? "#fda4af" : "#fcd34d"}" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
           <div class="alert-content">
             <div class="alert-title">${alert.itemName}: ${alert.headline}</div>
             <div class="alert-text">
@@ -260,7 +270,7 @@ function renderDashboard() {
               ${alert.suggestion}
             </div>
             <div class="alert-meta">
-              <a href="#activity" class="nav-shortcut" style="color:#fcd34d; text-decoration:underline;">Inspect Movements &rarr;</a>
+              <a href="#activity" class="nav-shortcut" style="color:var(--accent-copper); text-decoration:underline;">Inspect Movements &rarr;</a>
             </div>
           </div>
         </div>
@@ -279,12 +289,12 @@ function renderDashboard() {
         const itemSummaries = (s.items || []).map(i => `${i.quantity}x ${i.itemName}`).join(", ");
         const timeAgo = formatTimeAgo(new Date(s.timestamp));
         return `
-          <div style="padding:10px 0; border-bottom:1px solid rgba(76,45,119,0.3); display:flex; justify-content:space-between; align-items:center;">
+          <div class="ledger-entry-row">
             <div>
-              <div style="font-weight:600; color:var(--text-cream);">${itemSummaries || "Potion item"}</div>
-              <div style="font-size:0.75rem; color:var(--text-dim);">${timeAgo} ${s.notes ? `• ${s.notes}` : ""}</div>
+              <div class="ledger-item-name">${itemSummaries || "Apothecary draught"}</div>
+              <div class="ledger-meta">${timeAgo} ${s.notes ? `&bull; ${s.notes}` : ""}</div>
             </div>
-            <div style="font-weight:700; color:var(--accent-festival);">¢${(s.totalAmount || 0).toFixed(2)}</div>
+            <div class="ledger-amount-copper">&cent;${(s.totalAmount || 0).toFixed(2)}</div>
           </div>
         `;
       }).join("");
@@ -302,12 +312,12 @@ function renderDashboard() {
         const isDeduction = m.quantityDelta < 0;
         const color = isDeduction ? "#fda4af" : "#6ee7b7";
         return `
-          <div style="padding:10px 0; border-bottom:1px solid rgba(76,45,119,0.3); display:flex; justify-content:space-between; align-items:center;">
+          <div class="ledger-entry-row">
             <div>
-              <div style="font-weight:600; color:var(--text-cream);">${m.itemName}</div>
-              <div style="font-size:0.75rem; color:var(--text-dim);">${m.reason || m.type}</div>
+              <div class="ledger-item-name">${m.itemName}</div>
+              <div class="ledger-meta">${capitalize(m.type)} &bull; ${m.reason || "Inventory count"}</div>
             </div>
-            <div style="font-weight:700; color:${color}; font-size:0.95rem;">
+            <div style="font-weight:700; color:${color}; font-size:0.92rem; font-feature-settings:'tnum';">
               ${isDeduction ? "" : "+"}${m.quantityDelta} &rarr; ${m.quantityAfter}
             </div>
           </div>
@@ -369,20 +379,20 @@ function renderInventory() {
 
   tbody.innerHTML = items.map(item => {
     let badgeClass = "badge-in-stock";
-    let badgeIcon = "✓";
+    let badgeIcon = "●";
     let badgeText = "In Stock";
 
     if (item.isArchived) {
       badgeClass = "badge-archived";
-      badgeIcon = "📦";
+      badgeIcon = "◌";
       badgeText = "Archived";
     } else if (item.quantity === 0) {
       badgeClass = "badge-out-of-stock";
-      badgeIcon = "🛑";
+      badgeIcon = "■";
       badgeText = "Out of Stock";
     } else if (item.quantity <= item.minStock) {
       badgeClass = "badge-low-stock";
-      badgeIcon = "⚠️";
+      badgeIcon = "▲";
       badgeText = "Low Stock";
     }
 
@@ -408,7 +418,7 @@ function renderInventory() {
           <div class="item-cell-sub">${item.leadTimeDays ? `${item.leadTimeDays}d lead time` : ""}</div>
         </td>
         <td>
-          ${item.isFestivalAffected ? `<span class="badge badge-festival">🌕 ${item.festivalMultiplier || 3}x Demand</span>` : `<span style="color:var(--text-dim);">Normal (1x)</span>`}
+          ${item.isFestivalAffected ? `<span class="badge badge-festival"><span class="badge-dot">☾</span> ${item.festivalMultiplier || 3}&times; Demand</span>` : `<span style="color:var(--text-dim);">Normal (1&times;)</span>`}
         </td>
         <td>
           <div style="display:flex; gap:6px;">
@@ -813,10 +823,10 @@ function renderForecastSvgChart(itemSales, forecastDemand) {
       const barH = (pt.actual / maxVal) * plotH;
       const barY = padTop + plotH - barH;
       barsHtml += `
-        <rect x="${x - 12}" y="${barY}" width="24" height="${barH}" fill="#7b2cbf" rx="3">
+        <rect x="${x - 12}" y="${barY}" width="24" height="${barH}" fill="#2e1f3b" stroke="#c86d3b" stroke-width="1" rx="2">
           <title>${pt.label}: ${pt.actual} units sold</title>
         </rect>
-        <text x="${x}" y="${barY - 5}" font-size="10" fill="#cbb4db" text-anchor="middle">${pt.actual}</text>
+        <text x="${x}" y="${barY - 5}" font-size="10" fill="#f5eedf" text-anchor="middle">${pt.actual}</text>
       `;
     } else {
       // Future projected forecast dot & line
@@ -831,10 +841,10 @@ function renderForecastSvgChart(itemSales, forecastDemand) {
         pathD += ` L ${x} ${y}`;
       }
       barsHtml += `
-        <circle cx="${x}" cy="${y}" r="4" fill="#ff9e00">
+        <circle cx="${x}" cy="${y}" r="4" fill="#dc7a42" stroke="#fff" stroke-width="1">
           <title>${pt.label}: ${pt.forecast} predicted</title>
         </circle>
-        <text x="${x}" y="${y - 8}" font-size="10" fill="#ff9e00" text-anchor="middle">${pt.forecast}</text>
+        <text x="${x}" y="${y - 8}" font-size="10" fill="#dc7a42" font-weight="700" text-anchor="middle">${pt.forecast}</text>
       `;
     }
 
