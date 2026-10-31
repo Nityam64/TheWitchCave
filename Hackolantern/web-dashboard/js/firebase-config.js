@@ -19,6 +19,8 @@ export function getActiveFirebaseConfig() {
       const parsed = JSON.parse(saved);
       if (parsed && parsed.projectId && !parsed.projectId.includes("YOUR_")) {
         return { config: parsed, isCustom: true };
+      } else {
+        localStorage.removeItem("HEXLEY_FIREBASE_CONFIG");
       }
     }
   } catch (err) {
