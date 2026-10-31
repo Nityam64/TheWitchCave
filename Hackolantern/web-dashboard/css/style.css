@@ -2,9 +2,18 @@
    Art-directed Victorian Apothecary at Midnight (Halloween Aesthetic)
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
+  /* Halloween Palette Touches */
+  --night: #140a1d;
+  --panel: #2a1a36;
+  --parchment: #ecdcbc;
+  --ink: #2b1d14;
+  --pumpkin: #ff7518;
+  --gold: #f2b25c;
+  --slime: #7fff5a;
+  --violet: #8a4fd1;
   /* Victorian Apothecary Midnight Palette */
   --bg-primary: #110c18;       /* Deep charcoal-plum midnight void */
   --bg-surface: #171120;       /* Dark polished cabinet shelf */
@@ -81,6 +90,146 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+/* =========================================================
+   HALLOWEEN NIGHT SCENE BACKDROP (.fx)
+   ========================================================= */
+.fx {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.moon {
+  position: absolute;
+  top: 40px;
+  right: 6%;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: #f6e7c1;
+  box-shadow: 0 0 60px rgba(246, 231, 193, 0.35);
+  opacity: 0.65;
+}
+
+.moon::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 22px;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+}
+
+.fog {
+  position: absolute;
+  bottom: 0;
+  left: -50%;
+  width: 200%;
+  height: 180px;
+  background: radial-gradient(ellipse at 50% 100%, rgba(138, 79, 209, 0.28), transparent 70%);
+  animation: drift 25s ease-in-out infinite alternate;
+}
+
+@keyframes drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(12%); }
+}
+
+.bat {
+  position: absolute;
+  top: 14%;
+  left: -60px;
+  font-size: 26px;
+  opacity: 0.55;
+  animation: fly 16s linear infinite;
+}
+
+.bat.b2 {
+  top: 32%;
+  font-size: 20px;
+  animation-duration: 22s;
+  animation-delay: 7s;
+}
+
+@keyframes fly {
+  to { transform: translateX(calc(100vw + 120px)); }
+}
+
+.ghost {
+  position: absolute;
+  right: 8%;
+  bottom: 18%;
+  font-size: 38px;
+  opacity: 0.45;
+  animation: bob 4s ease-in-out infinite;
+}
+
+.ghost.g2 {
+  right: auto;
+  left: 5%;
+  bottom: 35%;
+  font-size: 28px;
+  animation-delay: 2s;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px); }
+}
+
+.web {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+  opacity: 0.35;
+}
+
+.spider {
+  position: absolute;
+  top: 0;
+  left: 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.thread {
+  width: 1px;
+  height: 60px;
+  background: #b9a9c9;
+  animation: lower 4s ease-in-out infinite;
+}
+
+.spider span {
+  font-size: 22px;
+}
+
+@keyframes lower {
+  0%, 100% { height: 30px; }
+  50% { height: 120px; }
+}
+
+.bounce {
+  display: inline-block;
+  animation: bob 2s ease-in-out infinite;
+}
+
+@keyframes flicker {
+  0%, 100% { opacity: 1; }
+  20% { opacity: 0.88; }
+  40% { opacity: 1; }
+  70% { opacity: 0.92; }
+}
+
+.page-title {
+  animation: flicker 5s infinite;
 }
 
 /* =========================================================
@@ -1299,4 +1448,162 @@ body {
   .card {
     padding: 16px;
   }
+}
+
+/* =========================================================
+   HALLOWEEN RECORD SALE TICKET & PARCHMENT ITEMS
+   ========================================================= */
+.item-ticket-btn {
+  position: relative;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--pumpkin);
+  box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin);
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.item-ticket-btn strong {
+  display: block;
+  font-family: "IM Fell English", Georgia, serif;
+  font-weight: 600;
+  font-size: 1.12rem;
+  color: var(--ink);
+}
+
+.item-ticket-btn .stock {
+  display: block;
+  color: #2f5e2a;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.item-ticket-btn .price {
+  display: block;
+  color: #8a4a1c;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.item-ticket-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin), 0 0 16px var(--violet);
+}
+
+.item-ticket-btn.selected {
+  outline: 2px solid var(--slime);
+  box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin), 0 0 16px rgba(127, 255, 90, 0.4);
+}
+
+.item-ticket-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.stamp {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  transform: rotate(10deg);
+  border: 2px solid #9b1c1c;
+  color: #9b1c1c;
+  padding: 1px 7px;
+  font-family: "IM Fell English", serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: rgba(236, 220, 188, 0.9);
+}
+
+.item-ticket-btn:disabled .stamp {
+  display: block;
+}
+
+.ticket {
+  position: relative;
+  background: var(--parchment);
+  color: var(--ink);
+  padding: 24px 22px;
+  border: 1px solid var(--pumpkin);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
+  transform: rotate(-0.3deg);
+}
+
+.ticket-head {
+  color: var(--ink) !important;
+  border-bottom: 1px dashed var(--pumpkin) !important;
+  font-family: "IM Fell English", serif;
+  font-size: 1.25rem;
+}
+
+.seal {
+  position: absolute;
+  top: -12px;
+  right: 20px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #9bff7a, #2f7a25);
+  box-shadow: 0 0 0 3px var(--night);
+  z-index: 5;
+}
+
+.ticket-input {
+  background: #fbf5e6 !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--pumpkin) !important;
+}
+
+.ticket-input::placeholder {
+  color: #8c7661 !important;
+}
+
+.btn-confirm-potion {
+  width: 100%;
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 1.05rem;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  background: var(--ink);
+  color: var(--gold);
+  border: 2px solid var(--pumpkin);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
+  border-radius: var(--radius-sm);
+  animation: bubble 2.4s ease-in-out infinite;
+}
+
+.btn-confirm-potion:hover:not(:disabled) {
+  background: var(--pumpkin);
+  color: var(--ink);
+}
+
+.btn-confirm-potion:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  animation: none;
+}
+
+.flash {
+  animation: flash 0.9s ease;
+}
+
+@keyframes flash {
+  0%, 100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6); }
+  30% { box-shadow: 0 0 34px var(--slime); }
+}
+
+@keyframes bubble {
+  0%, 100% { box-shadow: 0 0 6px rgba(127, 255, 90, 0.3); }
+  50% { box-shadow: 0 0 22px rgba(127, 255, 90, 0.7); }
 }

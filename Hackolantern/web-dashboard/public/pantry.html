@@ -7,9 +7,26 @@
   <link rel="stylesheet" href="css/style.css?v=2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  <!-- Night atmospheric scene behind the page (Halloween backdrop) -->
+  <div class="fx" aria-hidden="true">
+    <div class="moon"></div>
+    <div class="fog"></div>
+    <svg class="web" viewBox="0 0 150 150">
+      <g fill="none" stroke="#c9b8dc" stroke-width="1.2">
+        <path d="M0 0 L140 18 M0 0 L110 110 M0 0 L18 140"/>
+        <path d="M40 0 Q40 40 0 40 M75 0 Q75 75 0 75 M110 0 Q110 110 0 110"/>
+      </g>
+    </svg>
+    <div class="spider"><div class="thread"></div><span>🕷️</span></div>
+    <span class="bat">🦇</span>
+    <span class="bat b2">🦇</span>
+    <span class="ghost">👻</span>
+    <span class="ghost g2">👻</span>
+  </div>
+
   <!-- Header & Top Navigation -->
   <header class="app-header">
     <div class="header-inner">
@@ -28,7 +45,7 @@
           <circle cx="17" cy="24" r="1" fill="#ffcd75"/>
         </svg>
         <div class="brand-title">
-          <span>Hexley’s Potion Pantry</span>
+          <span><span class="bounce">🎃</span> Hexley’s Potion Pantry</span>
           <span class="brand-sub">Victorian Apothecary &bull; Est. 1888</span>
         </div>
       </a>
@@ -340,30 +357,31 @@
           </div>
         </div>
 
-        <!-- Checkout Ticket -->
-        <div class="card">
-          <div class="card-title">Current Sale Ticket</div>
+        <!-- Checkout Ticket (Authentic Halloween Parchment Sale Ticket) -->
+        <div class="card ticket" id="sale-ticket-card">
+          <span class="seal"></span>
+          <div class="card-title ticket-head">Current Sale Ticket</div>
           <div id="sale-ticket-list" style="margin-bottom:16px; min-height:120px;">
-            <p style="color:var(--text-dim); font-size:0.9rem;">No ingredients selected yet.</p>
+            <p style="color:#6b5440; font-size:0.9rem; font-style:italic;">No ingredients selected yet. Click items on the left.</p>
           </div>
 
-          <div style="border-top:1px solid var(--border-subtle); padding-top:12px; margin-bottom:16px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:700;">
+          <div style="border-top:1px dashed var(--pumpkin); padding-top:12px; margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-weight:700; color:var(--ink);">
               <span>Total Units:</span>
               <span id="sale-total-qty">0</span>
             </div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700; color:var(--accent-festival);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:12px; font-weight:700; color:#8a4a1c; font-size:1.15rem;">
               <span>Estimated Cost:</span>
               <span id="sale-total-cost">¢0.00</span>
             </div>
             <div class="form-group">
-              <label class="form-label">Customer / Sale Notes (Optional)</label>
-              <input type="text" id="sale-notes" class="form-control" placeholder="e.g., Midnight traveler, healing tonic order">
+              <label class="form-label" style="color:var(--ink);" for="sale-notes">Customer / Sale Notes (Optional)</label>
+              <input type="text" id="sale-notes" class="form-control ticket-input" placeholder="e.g., Midnight traveler, healing tonic order">
             </div>
           </div>
 
-          <button id="btn-confirm-sale" class="btn btn-festival" style="width:100%;">
-            Confirm & Deduct Stock
+          <button id="btn-confirm-sale" class="btn btn-confirm-potion" style="width:100%;">
+            Confirm &amp; Deduct Stock
           </button>
         </div>
       </div>

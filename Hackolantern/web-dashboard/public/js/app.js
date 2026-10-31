@@ -558,23 +558,39 @@ function renderSalePage() {
 
   const activeItems = state.inventory.filter(i => !i.isArchived);
 
-  // Render clickable item cards
+  function getItemIcon(name) {
+    if (!name) return "🧪";
+    const lower = name.toLowerCase();
+    if (lower.includes("bat")) return "🦇";
+    if (lower.includes("mandrake")) return "🌿";
+    if (lower.includes("pepper")) return "🌶️";
+    if (lower.includes("eye")) return "👁️";
+    if (lower.includes("elixir") || lower.includes("shadow")) return "🔮";
+    if (lower.includes("flask") || lower.includes("cauldron")) return "🧪";
+    if (lower.includes("petal") || lower.includes("dust")) return "✨";
+    if (lower.includes("honey")) return "🍯";
+    if (lower.includes("root")) return "🥀";
+    if (lower.includes("death") || lower.includes("draught")) return "☠️";
+    if (lower.includes("mortar")) return "🥣";
+    if (lower.includes("dragon")) return "🐉";
+    return "🧪";
+  }
+
+  // Render clickable item cards (Victorian apothecary parchment cards with Sold Out stamp)
   grid.innerHTML = activeItems.map(item => {
     const isSelected = Boolean(state.cart[item.id]);
     const isOut = item.quantity === 0;
+    const icon = getItemIcon(item.name);
 
     return `
-      <div class="pantry-item-card ${isSelected ? "selected" : ""}" 
-           style="${isOut ? "opacity:0.4; cursor:not-allowed;" : ""}"
-           onclick="${isOut ? "" : `window.hexleyToggleCartItem('${item.id}')`}">
-        <div style="font-weight:700; color:var(--text-cream);">${item.name}</div>
-        <div style="font-size:0.8rem; color:var(--text-muted); margin-top:2px;">
-          Available: <strong style="color:${isOut ? "#fda4af" : "#6ee7b7"};">${item.quantity} ${item.unit}</strong>
-        </div>
-        <div style="font-size:0.75rem; color:var(--accent-festival); margin-top:4px;">
-          ¢${(item.costPerUnit || 5).toFixed(2)} / ${item.unit}
-        </div>
-      </div>
+      <button class="item-ticket-btn ${isSelected ? "selected" : ""}" 
+              ${isOut ? "disabled" : ""}
+              onclick="${isOut ? "" : `window.hexleyToggleCartItem('${item.id}')`}">
+        <span class="stamp">Sold out</span>
+        <strong>${icon} ${item.name}</strong>
+        <span class="stock">${isOut ? "Depleted" : `Available: ${item.quantity} ${item.unit}`}</span>
+        <span class="price">&cent;${(item.costPerUnit || 5).toFixed(2)} / ${item.unit}</span>
+      </button>
     `;
   }).join("");
 
@@ -685,6 +701,11 @@ async function handleConfirmSale() {
   try {
     const res = await dbService.recordSaleAtomic(salePayload);
     if (res.success) {
+      const ticketCard = document.getElementById("sale-ticket-card");
+      if (ticketCard) {
+        ticketCard.classList.add("flash");
+        setTimeout(() => ticketCard.classList.remove("flash"), 900);
+      }
       showToast("✨ Sale completed and stock deducted successfully!", "success");
       state.cart = {};
       if (document.getElementById("sale-notes")) {
