@@ -86,6 +86,46 @@
       background-color: rgba(127, 255, 90, 0.06);
     }
 
+    /* Specular Sheen for Cards */
+    .item, .stat-card, .ticket, .fc-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .item::before, .stat-card::before, .ticket::before, .fc-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -130%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: skewX(-25deg);
+      transition: left 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .item:hover::before, .stat-card:hover::before, .ticket:hover::before, .fc-card:hover::before {
+      left: 170%;
+    }
+
+    /* Click Shockwave */
+    .click-shockwave {
+      position: fixed;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      border: 2px solid var(--gold);
+      transform: translate(-50%, -50%) scale(0.2);
+      animation: shockwaveExpand 0.65s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes shockwaveExpand {
+      0% { opacity: 0.9; transform: translate(-50%, -50%) scale(0.2); border-color: var(--slime); }
+      50% { border-color: var(--gold); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(3.2); border-color: var(--pumpkin); }
+    }
+
     /* Page */
     body {
       margin: 0;
@@ -2165,6 +2205,16 @@
         curY = e.clientY;
       });
 
+      // Click Shockwave
+      window.addEventListener("click", function(e) {
+        var wave = document.createElement("div");
+        wave.className = "click-shockwave";
+        wave.style.left = e.clientX + "px";
+        wave.style.top = e.clientY + "px";
+        document.body.appendChild(wave);
+        setTimeout(function() { wave.remove(); }, 650);
+      });
+
       function loopCursor() {
         dot.style.left = curX + "px";
         dot.style.top = curY + "px";
@@ -2177,6 +2227,27 @@
         requestAnimationFrame(loopCursor);
       }
       loopCursor();
+
+      // Magnetic Button Snap
+      window.addEventListener("mousemove", function(e) {
+        var magBtns = document.querySelectorAll(".btn, .btn-sm, .stock-apply-btn, .filter-btn");
+        magBtns.forEach(function(btn) {
+          var rect = btn.getBoundingClientRect();
+          var btnCenterX = rect.left + rect.width / 2;
+          var btnCenterY = rect.top + rect.height / 2;
+          var distX = e.clientX - btnCenterX;
+          var distY = e.clientY - btnCenterY;
+          var dist = Math.sqrt(distX * distX + distY * distY);
+
+          if (dist < 55) {
+            var pullX = distX * 0.22;
+            var pullY = distY * 0.22;
+            btn.style.transform = "translate(" + pullX.toFixed(1) + "px, " + pullY.toFixed(1) + "px)";
+          } else {
+            btn.style.transform = "";
+          }
+        });
+      });
 
       function bindHoverTargets() {
         var targets = document.querySelectorAll("a, button, input, select, .item, .stat-card, .ticket, .filter-btn, .moon");
