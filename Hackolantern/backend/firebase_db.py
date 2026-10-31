@@ -67,30 +67,89 @@ for item in CORE_INGREDIENTS:
 _in_memory_db = {item["id"]: dict(item, daily_sales=dict(item["daily_sales"])) for item in CORE_INGREDIENTS}
 _in_memory_transactions = []
 _in_memory_events = {}
+
+# Backend Database Connections
 _firestore_db = None
+_mongo_client = None
+_mongo_db = None
 
-# Initialize Firebase
-creds_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
-if not creds_path:
-    local_creds = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
-    if os.path.exists(local_creds):
-        creds_path = local_creds
+def init_databases():
+    global _firestore_db, _mongo_client, _mongo_db
 
-if creds_path and os.path.exists(creds_path):
-    try:
-        import firebase_admin
-        from firebase_admin import credentials, firestore
+    # 1. Try MongoDB Atlas if MONGODB_URI is provided
+    mongodb_uri = os.environ.get("MONGODB_URI")
+    if not mongodb_uri:
+        env_path = os.path.join(os.path.dirname(__file__), ".env")
+        if os.path.exists(env_path):
+            try:
+                with open(env_path, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("MONGODB_URI="):
+                            mongodb_uri = line.split("=", 1)[1].strip().strip('"').strip("'")
+                            break
+            except Exception:
+                pass
 
-        if not firebase_admin._apps:
-            cred = credentials.Certificate(creds_path)
-            firebase_admin.initialize_app(cred)
-        _firestore_db = firestore.client()
-        logger.info(f"Connected to Firebase Firestore using credentials at: {creds_path}")
-    except Exception as e:
-        logger.warning(f"Failed to initialize Firebase Admin SDK ({e}). Falling back to in-memory store.")
-        _firestore_db = None
-else:
-    logger.warning("No serviceAccountKey.json or FIREBASE_CREDENTIALS_PATH found. Running with in-memory DB fallback.")
+    if mongodb_uri:
+        if "<db_password>" in mongodb_uri:
+            logger.info("MONGODB_URI configured but contains '<db_password>'. Please set your real database password in .env to activate MongoDB Atlas. (Currently running with in-memory DB fallback).")
+        else:
+            try:
+                import pymongo
+                _mongo_client = pymongo.MongoClient(mongodb_uri, serverSelectionTimeoutMS=4000)
+                _mongo_client.admin.command("ping")
+                db_name = "potion_pantry"
+                try:
+                    parsed_db = pymongo.uri_parser.parse_uri(mongodb_uri).get("database")
+                    if parsed_db:
+                        db_name = parsed_db
+                except Exception:
+                    pass
+                _mongo_db = _mongo_client[db_name]
+                logger.info(f"✨ Successfully connected to MongoDB Atlas database: '{db_name}'")
+            except Exception as e:
+                logger.warning(f"Failed to connect to MongoDB Atlas ({e}). Falling back to Firestore/In-Memory.")
+                _mongo_client = None
+                _mongo_db = None
+
+    # 2. Try Firebase Firestore if MongoDB is not active
+    if not _mongo_db:
+        creds_path = os.environ.get("FIREBASE_CREDENTIALS_PATH")
+        if not creds_path:
+            local_creds = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
+            if os.path.exists(local_creds):
+                creds_path = local_creds
+
+        if creds_path and os.path.exists(creds_path):
+            try:
+                import firebase_admin
+                from firebase_admin import credentials, firestore
+
+                if not firebase_admin._apps:
+                    cred = credentials.Certificate(creds_path)
+                    firebase_admin.initialize_app(cred)
+                _firestore_db = firestore.client()
+                logger.info(f"Connected to Firebase Firestore using credentials at: {creds_path}")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Firebase Admin SDK ({e}). Falling back to in-memory store.")
+                _firestore_db = None
+        else:
+            if not mongodb_uri or "<db_password>" in mongodb_uri:
+                logger.info("Running with thread-safe in-memory DB fallback (automatic sample data seeding active).")
+
+init_databases()
+
+def _clean_mongo_doc(doc: dict) -> dict:
+    """Strips MongoDB ObjectId and formats id."""
+    if not doc:
+        return doc
+    clean = dict(doc)
+    if "_id" in clean:
+        raw_id = str(clean.pop("_id"))
+        if "id" not in clean:
+            clean["id"] = int(raw_id) if raw_id.isdigit() else raw_id
+    return clean
 
 def get_last_14_days_sales(daily_sales: dict) -> list[int]:
     """Returns a list of the last 14 daily totals in chronological date order (fills missing days with 0)."""
@@ -103,7 +162,22 @@ def get_last_14_days_sales(daily_sales: dict) -> list[int]:
 
 def seed_firestore_if_empty():
     """Seeds the 4 core ingredients if the collection or memory store is empty."""
-    global _firestore_db, _in_memory_db
+    global _mongo_db, _firestore_db, _in_memory_db
+
+    # MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            if coll.count_documents({}) == 0:
+                for item in CORE_INGREDIENTS:
+                    doc = dict(item, _id=str(item["id"]), daily_sales=dict(item["daily_sales"]))
+                    coll.insert_one(doc)
+                logger.info("MongoDB pantry_ingredients collection seeded with core ingredients.")
+        except Exception as e:
+            logger.error(f"Error seeding MongoDB: {e}")
+        return
+
+    # Firestore
     if _firestore_db:
         try:
             coll_ref = _firestore_db.collection("pantry_ingredients")
@@ -116,13 +190,33 @@ def seed_firestore_if_empty():
         except Exception as e:
             logger.error(f"Error seeding Firestore: {e}")
     else:
+        # In-Memory
         if not _in_memory_db:
             _in_memory_db = {item["id"]: dict(item, daily_sales=dict(item["daily_sales"])) for item in CORE_INGREDIENTS}
 
 def get_all_ingredients():
     """Fetches all ingredients with backward-compatible 14-day sales list."""
-    global _firestore_db, _in_memory_db
+    global _mongo_db, _firestore_db, _in_memory_db
     results = []
+
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            for doc in coll.find({}):
+                clean = _clean_mongo_doc(doc)
+                ds = clean.get("daily_sales", {})
+                clean["daily_sales"] = ds
+                clean["sales"] = get_last_14_days_sales(ds)
+                clean["is_cursed"] = is_ingredient_cursed(clean["id"]) or clean.get("is_cursed", False)
+                results.append(clean)
+            if results:
+                results.sort(key=lambda x: str(x["id"]))
+                return results
+        except Exception as e:
+            logger.error(f"Error fetching from MongoDB ({e}). Falling back to memory.")
+
+    # 2. Firestore
     if _firestore_db:
         try:
             coll_ref = _firestore_db.collection("pantry_ingredients")
@@ -145,6 +239,7 @@ def get_all_ingredients():
         except Exception as e:
             logger.error(f"Error fetching from Firestore ({e}). Using in-memory fallback.")
 
+    # 3. In-Memory
     for item in _in_memory_db.values():
         item_copy = dict(item)
         ds = item_copy.get("daily_sales", {})
@@ -156,10 +251,31 @@ def get_all_ingredients():
     return results
 
 def get_ingredient(item_id):
-    global _firestore_db, _in_memory_db
+    global _mongo_db, _firestore_db, _in_memory_db
+    s_id = str(item_id)
+
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            query = {"$or": [{"_id": s_id}, {"id": s_id}]}
+            if s_id.isdigit():
+                query["$or"].append({"id": int(s_id)})
+            doc = coll.find_one(query)
+            if doc:
+                clean = _clean_mongo_doc(doc)
+                ds = clean.get("daily_sales", {})
+                clean["daily_sales"] = ds
+                clean["sales"] = get_last_14_days_sales(ds)
+                clean["is_cursed"] = is_ingredient_cursed(clean["id"]) or clean.get("is_cursed", False)
+                return clean
+        except Exception as e:
+            logger.error(f"Error getting ingredient from MongoDB: {e}")
+
+    # 2. Firestore
     if _firestore_db:
         try:
-            doc = _firestore_db.collection("pantry_ingredients").document(str(item_id)).get()
+            doc = _firestore_db.collection("pantry_ingredients").document(s_id).get()
             if doc.exists:
                 data = doc.to_dict()
                 if "id" not in data:
@@ -172,13 +288,13 @@ def get_ingredient(item_id):
         except Exception as e:
             logger.error(f"Error getting ingredient from Firestore: {e}")
 
-    # check int or str id
+    # 3. In-Memory
     item = _in_memory_db.get(item_id)
     if not item and isinstance(item_id, str) and item_id.isdigit():
         item = _in_memory_db.get(int(item_id))
     if not item:
         for k, v in _in_memory_db.items():
-            if str(k) == str(item_id):
+            if str(k) == s_id:
                 item = v
                 break
     if item:
@@ -194,14 +310,58 @@ def update_stock_and_sales(item_id, change_amount: int):
     Atomically updates stock and records sale to TODAY's date key in daily_sales map.
     Every transaction log entry has an ISO timestamp.
     """
-    global _firestore_db, _in_memory_db
+    global _mongo_db, _firestore_db, _in_memory_db
     now = datetime.utcnow()
     iso_timestamp = now.isoformat() + "Z"
     today_str = now.strftime("%Y-%m-%d")
+    s_id = str(item_id)
 
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            query = {"$or": [{"_id": s_id}, {"id": s_id}]}
+            if s_id.isdigit():
+                query["$or"].append({"id": int(s_id)})
+            doc = coll.find_one(query)
+            if doc:
+                new_stock = max(0, int(doc.get("current_stock", 0)) + change_amount)
+                daily_sales = dict(doc.get("daily_sales", {}))
+                if change_amount < 0:
+                    units = abs(change_amount)
+                    daily_sales[today_str] = int(daily_sales.get(today_str, 0)) + units
+
+                coll.update_one(
+                    {"_id": doc["_id"]},
+                    {"$set": {
+                        "current_stock": new_stock,
+                        "expected_stock": new_stock,
+                        "daily_sales": daily_sales,
+                        "updated_at": iso_timestamp
+                    }}
+                )
+                _mongo_db["transactions"].insert_one({
+                    "item_id": doc.get("id", s_id),
+                    "change_amount": change_amount,
+                    "timestamp": iso_timestamp,
+                    "resulting_stock": new_stock,
+                    "type": "sale" if change_amount < 0 else "restock"
+                })
+
+                clean = _clean_mongo_doc(doc)
+                clean["current_stock"] = new_stock
+                clean["expected_stock"] = new_stock
+                clean["daily_sales"] = daily_sales
+                clean["sales"] = get_last_14_days_sales(daily_sales)
+                clean["is_cursed"] = is_ingredient_cursed(clean["id"]) or clean.get("is_cursed", False)
+                return clean
+        except Exception as e:
+            logger.error(f"MongoDB update failed ({e}). Falling back.")
+
+    # 2. Firestore
     if _firestore_db:
         try:
-            doc_ref = _firestore_db.collection("pantry_ingredients").document(str(item_id))
+            doc_ref = _firestore_db.collection("pantry_ingredients").document(s_id)
             snapshot = doc_ref.get()
             if not snapshot.exists:
                 return None
@@ -238,13 +398,13 @@ def update_stock_and_sales(item_id, change_amount: int):
         except Exception as e:
             logger.error(f"Firestore update failed ({e}). Falling back to in-memory.")
 
-    # In-memory update
+    # 3. In-memory update
     target_key = None
     if item_id in _in_memory_db:
         target_key = item_id
     else:
         for k in _in_memory_db.keys():
-            if str(k) == str(item_id):
+            if str(k) == s_id:
                 target_key = k
                 break
     if target_key is None:
@@ -274,12 +434,43 @@ def update_stock_and_sales(item_id, change_amount: int):
 
 def audit_stock(item_id, missing_amount: int):
     """Reduces current_stock without reducing expected_stock to trigger anomaly."""
-    global _firestore_db, _in_memory_db
+    global _mongo_db, _firestore_db, _in_memory_db
     now = datetime.utcnow()
     iso_timestamp = now.isoformat() + "Z"
+    s_id = str(item_id)
+
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            query = {"$or": [{"_id": s_id}, {"id": s_id}]}
+            if s_id.isdigit():
+                query["$or"].append({"id": int(s_id)})
+            doc = coll.find_one(query)
+            if doc:
+                new_stock = max(0, int(doc.get("current_stock", 0)) - missing_amount)
+                coll.update_one(
+                    {"_id": doc["_id"]},
+                    {"$set": {"current_stock": new_stock, "updated_at": iso_timestamp}}
+                )
+                _mongo_db["transactions"].insert_one({
+                    "item_id": doc.get("id", s_id),
+                    "change_amount": -missing_amount,
+                    "timestamp": iso_timestamp,
+                    "type": "audit_discrepancy"
+                })
+                clean = _clean_mongo_doc(doc)
+                clean["current_stock"] = new_stock
+                clean["sales"] = get_last_14_days_sales(clean.get("daily_sales", {}))
+                clean["is_cursed"] = is_ingredient_cursed(clean["id"]) or clean.get("is_cursed", False)
+                return clean
+        except Exception as e:
+            logger.error(f"MongoDB audit failed ({e}).")
+
+    # 2. Firestore
     if _firestore_db:
         try:
-            doc_ref = _firestore_db.collection("pantry_ingredients").document(str(item_id))
+            doc_ref = _firestore_db.collection("pantry_ingredients").document(s_id)
             snapshot = doc_ref.get()
             if not snapshot.exists:
                 return None
@@ -303,12 +494,13 @@ def audit_stock(item_id, missing_amount: int):
         except Exception as e:
             logger.error(f"Firestore audit failed ({e}). Falling back to in-memory.")
 
+    # 3. In-Memory
     target_key = None
     if item_id in _in_memory_db:
         target_key = item_id
     else:
         for k in _in_memory_db.keys():
-            if str(k) == str(item_id):
+            if str(k) == s_id:
                 target_key = k
                 break
     if target_key is None:
@@ -323,8 +515,22 @@ def audit_stock(item_id, missing_amount: int):
 
 def set_cursed_ingredients(cursed_ids: list):
     """Updates legacy is_cursed for all ingredients."""
-    global _firestore_db, _in_memory_db
+    global _mongo_db, _firestore_db, _in_memory_db
     c_set = {str(x) for x in cursed_ids}
+
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            coll = _mongo_db["pantry_ingredients"]
+            for doc in coll.find({}):
+                doc_id = str(doc.get("id", doc.get("_id")))
+                is_cursed = (doc_id in c_set) or (str(doc.get("_id")) in c_set)
+                coll.update_one({"_id": doc["_id"]}, {"$set": {"is_cursed": is_cursed}})
+            return True
+        except Exception as e:
+            logger.error(f"MongoDB curse update failed: {e}")
+
+    # 2. Firestore
     if _firestore_db:
         try:
             coll_ref = _firestore_db.collection("pantry_ingredients")
@@ -339,6 +545,7 @@ def set_cursed_ingredients(cursed_ids: list):
         except Exception as e:
             logger.error(f"Firestore curse update failed ({e}). Falling back to in-memory.")
 
+    # 3. In-Memory
     for k, item in _in_memory_db.items():
         item["is_cursed"] = (str(k) in c_set) or (str(item.get("id")) in c_set)
     return True
@@ -361,15 +568,14 @@ def get_ingredient_sales_history(item_id, days: int = 60) -> list[dict]:
 
 
 # =====================================================================
-# Events Management System (Firestore 'events' collection + In-Memory)
+# Events Management System (MongoDB 'events' + Firestore + In-Memory)
 # =====================================================================
 
 def add_event(event_data: dict) -> dict:
     """Creates a new surge event with name, ingredient_ids, start_date, end_date, and multiplier."""
-    global _firestore_db, _in_memory_events
+    global _mongo_db, _firestore_db, _in_memory_events
     event_id = str(event_data.get("id") or f"event_{uuid.uuid4().hex[:8]}")
     
-    # Normalize ingredient ids to strings and ints
     raw_ids = event_data.get("ingredient_ids", [])
     normalized_ids = []
     for x in raw_ids:
@@ -388,6 +594,17 @@ def add_event(event_data: dict) -> dict:
         "created_at": datetime.utcnow().isoformat() + "Z"
     }
 
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            doc = dict(new_event, _id=event_id)
+            _mongo_db["events"].replace_one({"_id": event_id}, doc, upsert=True)
+            logger.info(f"Event {event_id} added to MongoDB Atlas.")
+            return new_event
+        except Exception as e:
+            logger.error(f"MongoDB add_event failed: {e}")
+
+    # 2. Firestore
     if _firestore_db:
         try:
             _firestore_db.collection("events").document(event_id).set(new_event)
@@ -396,12 +613,27 @@ def add_event(event_data: dict) -> dict:
         except Exception as e:
             logger.error(f"Firestore add_event failed ({e}). Falling back to in-memory store.")
 
+    # 3. In-Memory
     _in_memory_events[event_id] = new_event
     return new_event
 
 def get_all_events() -> list[dict]:
     """Returns all scheduled events sorted by start date."""
-    global _firestore_db, _in_memory_events
+    global _mongo_db, _firestore_db, _in_memory_events
+
+    # 1. MongoDB
+    if _mongo_db is not None:
+        try:
+            events = []
+            for doc in _mongo_db["events"].find({}):
+                clean = _clean_mongo_doc(doc)
+                events.append(clean)
+            events.sort(key=lambda x: str(x.get("start_date", "")))
+            return events
+        except Exception as e:
+            logger.error(f"MongoDB get_all_events failed: {e}")
+
+    # 2. Firestore
     if _firestore_db:
         try:
             docs = _firestore_db.collection("events").stream()
@@ -416,14 +648,24 @@ def get_all_events() -> list[dict]:
         except Exception as e:
             logger.error(f"Firestore get_all_events failed ({e}). Falling back to in-memory store.")
 
+    # 3. In-Memory
     events = list(_in_memory_events.values())
     events.sort(key=lambda x: str(x.get("start_date", "")))
     return events
 
 def get_event(event_id: str) -> dict | None:
     """Fetches a single event by ID."""
-    global _firestore_db, _in_memory_events
+    global _mongo_db, _firestore_db, _in_memory_events
     s_id = str(event_id)
+
+    if _mongo_db is not None:
+        try:
+            doc = _mongo_db["events"].find_one({"$or": [{"_id": s_id}, {"id": s_id}]})
+            if doc:
+                return _clean_mongo_doc(doc)
+        except Exception as e:
+            logger.error(f"MongoDB get_event failed: {e}")
+
     if _firestore_db:
         try:
             doc = _firestore_db.collection("events").document(s_id).get()
@@ -438,9 +680,17 @@ def get_event(event_id: str) -> dict | None:
 
 def delete_event(event_id: str) -> bool:
     """Deletes an event by ID."""
-    global _firestore_db, _in_memory_events
+    global _mongo_db, _firestore_db, _in_memory_events
     s_id = str(event_id)
     deleted = False
+
+    if _mongo_db is not None:
+        try:
+            res = _mongo_db["events"].delete_one({"$or": [{"_id": s_id}, {"id": s_id}]})
+            if res.deleted_count > 0:
+                deleted = True
+        except Exception as e:
+            logger.error(f"MongoDB delete_event failed: {e}")
 
     if _firestore_db:
         try:

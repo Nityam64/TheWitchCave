@@ -93,8 +93,40 @@ def import_data(filepath=None):
                 curr = ingredients_map[ing_id]["daily_sales"].get(date_str, 0)
                 ingredients_map[ing_id]["daily_sales"][date_str] = curr + units_sold
 
-    # Save to Firestore or in-memory
-    if firebase_db._firestore_db:
+    # Save to MongoDB, Firestore, or in-memory
+    if firebase_db._mongo_db is not None:
+        coll = firebase_db._mongo_db["pantry_ingredients"]
+        for ing_id, item in ingredients_map.items():
+            doc_id = str(ing_id)
+            doc_data = dict(item)
+            doc_data["_id"] = doc_id
+            existing = coll.find_one({"_id": doc_id})
+            if existing:
+                merged_daily = dict(existing.get("daily_sales", {}))
+                merged_daily.update(item["daily_sales"])
+                coll.update_one(
+                    {"_id": doc_id},
+                    {"$set": {
+                        "daily_sales": merged_daily,
+                        "updated_at": datetime.utcnow().isoformat() + "Z"
+                    }}
+                )
+            else:
+                coll.insert_one(doc_data)
+
+            # Sync sales history to matching core item if numeric ID exists with same name
+            for existing_item in coll.find({}):
+                if existing_item.get("name", "").lower() == item["name"].lower():
+                    merged = dict(existing_item.get("daily_sales", {}))
+                    merged.update(item["daily_sales"])
+                    coll.update_one(
+                        {"_id": existing_item["_id"]},
+                        {"$set": {"daily_sales": merged}}
+                    )
+
+            imported_count += 1
+        logger.info(f"Imported {imported_count} ingredients into MongoDB Atlas.")
+    elif firebase_db._firestore_db:
         coll = firebase_db._firestore_db.collection("pantry_ingredients")
         for ing_id, item in ingredients_map.items():
             doc_ref = coll.document(str(ing_id))
@@ -119,6 +151,12 @@ def import_data(filepath=None):
                 firebase_db._in_memory_db[ing_id]["daily_sales"].update(item["daily_sales"])
             else:
                 firebase_db._in_memory_db[ing_id] = item
+
+            # Also sync sales history to matching core item if numeric ID exists with same name
+            for existing_id, existing_item in list(firebase_db._in_memory_db.items()):
+                if existing_item.get("name", "").lower() == item["name"].lower():
+                    existing_item["daily_sales"].update(item["daily_sales"])
+
             imported_count += 1
         logger.info(f"Imported {imported_count} ingredients into in-memory database.")
 

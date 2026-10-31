@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List, Union
 from datetime import datetime, timedelta
-from ml_engine.ai_core import run_prophecy_and_restock, detect_strange_happenings
+from ml_engine.ai_core import run_prophecy_and_restock, detect_strange_happenings, generate_forecast
 import firebase_db
 import import_sample_data
 import os
@@ -59,6 +59,7 @@ def get_full_pantry_status():
         current_multiplier = firebase_db.get_event_multiplier_for_date(ing_id, today_str)
         lead_time = int(item.get("lead_time_days") or 3)
 
+        daily_sales = item.get("daily_sales", {})
         ai_metrics = run_prophecy_and_restock(
             sales_history=sales_history,
             current_stock=item.get("current_stock", 0),
@@ -66,7 +67,9 @@ def get_full_pantry_status():
             is_cursed=is_cursed,
             events=events,
             lead_time_days=lead_time,
-            reference_date=today
+            reference_date=today,
+            daily_sales=daily_sales,
+            ingredient_id=ing_id
         )
         anomalies = detect_strange_happenings(
             sales_history=sales_history,
@@ -91,6 +94,23 @@ def get_ingredient_history(item_id: str, days: int = Query(60, ge=1, le=365)):
     if not history:
         raise HTTPException(status_code=404, detail="Ingredient not found or no history available")
     return {"ingredient_id": target_id, "days": days, "history": history}
+
+@app.get("/api/ingredients/{item_id}/forecast")
+def get_ingredient_forecast(item_id: str, days: int = Query(14, ge=1, le=90)):
+    target_id = int(item_id) if item_id.isdigit() else item_id
+    item = firebase_db.get_ingredient(target_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Ingredient not found")
+
+    events = firebase_db.get_events_for_ingredient(target_id)
+    daily_sales = item.get("daily_sales", {})
+    return generate_forecast(
+        daily_sales=daily_sales,
+        days=days,
+        events=events,
+        reference_date=datetime.now().date(),
+        ingredient_id=target_id
+    )
 
 @app.post("/api/pantry/{item_id}/transaction")
 def record_transaction(item_id: str, payload: StockUpdate):
