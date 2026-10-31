@@ -632,6 +632,105 @@
       margin-left: 6px;
     }
 
+    /* ==================== INVENTORY SECTION (PROTOTYPE DESIGN) ==================== */
+    #inventory .det-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    #inventory .det-top h3 { font-family: "IM Fell English", serif; font-size: 30px; margin: 0 0 4px; font-weight: normal; color: var(--ink); }
+    #inventory .det-top .big { text-align: right; font-family: "IM Fell English", serif; font-size: 36px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    #inventory .det-top .big.red { color: #9a3324; }
+    #inventory .det-top .big.green { color: #4f6d36; }
+    #inventory .det-top .note { font-style: italic; font-size: 15px; color: #6d5440; }
+    #inventory .det-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; font-size: 16px; color: var(--ink); }
+    #inventory .det-bottom b { font-variant-numeric: tabular-nums; }
+    #inventory .trend { width: 100%; height: auto; margin-top: 14px; display: block; }
+    #inventory .trend .axis { stroke: #b89463; stroke-width: 1.5; }
+    #inventory .trend text { fill: #6d5440; font-size: 14px; font-family: "EB Garamond", Georgia, serif; }
+    #inventory .trend polyline { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards; }
+    #inventory .line-buy { stroke: #4f6d36; }
+    #inventory .line-sold { stroke: #d0672f; }
+    #inventory .legend { font-size: 14px; color: #6d5440; margin-top: 6px; }
+    #inventory .legend .green { color: #4f6d36; font-weight: 600; }
+    #inventory .legend .ember { color: #d0672f; font-weight: 600; }
+    @keyframes invDraw { to { stroke-dashoffset: 0; } }
+
+    #inventory #detail {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      border-radius: 3px;
+      padding: 22px 24px;
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 10px 24px rgba(0,0,0,0.35);
+      margin-bottom: 24px;
+    }
+
+    #inventory .adj { display: flex; gap: 6px; align-items: center; padding: 6px 10px; background: #e4d3ab; border-radius: 2px; }
+    #inventory .adj input { width: 70px; font: inherit; padding: 6px; text-align: center; color: var(--ink); background: #f8efd9; border: 1px solid #b89463; border-radius: 2px; font-weight: 600; }
+    #inventory .adj .btn { background: #1d1410; color: #f3dcb0; border: 1px solid var(--pumpkin); padding: 6px 12px; border-radius: 2px; font-family: inherit; font-size: 15px; cursor: pointer; transition: transform .12s ease, background .2s ease; }
+    #inventory .adj .btn:hover { background: #382417; }
+    #inventory .adj .btn:active { transform: scale(.96); }
+
+    #inventory .deck { overflow: hidden; margin-top: 26px; padding: 16px 0 22px; touch-action: pan-y; user-select: none; cursor: grab; }
+    #inventory .deck:active { cursor: grabbing; }
+    #inventory .track { display: flex; transition: transform .5s ease; }
+    #inventory .track.drag { transition: none; }
+    #inventory .deck-card {
+      flex: 0 0 240px;
+      width: 240px;
+      margin-right: 22px;
+      position: relative;
+      transform-origin: 50% 50%;
+      text-align: left;
+      color: var(--ink);
+      background: var(--parchment);
+      border: 0;
+      border-radius: 3px;
+      padding: 18px;
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463;
+      transform: perspective(700px) rotateY(var(--tilt, 0deg)) scale(.94);
+      transition: transform .4s ease, box-shadow .4s ease;
+      font: inherit;
+      cursor: pointer;
+    }
+    #inventory .deck-card.on {
+      transform: perspective(700px) rotateY(0deg) scale(1);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 12px 24px rgba(0,0,0,.4);
+    }
+    #inventory .deck-card h3 { margin-right: 70px; font-size: 22px; font-family: "IM Fell English", serif; font-weight: normal; margin-top: 0; margin-bottom: 6px; }
+    #inventory .deck-card .note { font-style: italic; font-size: 14px; color: #6d5440; }
+    #inventory .count { text-align: center; margin: 12px 0 0; color: #bfae95; font-size: 16px; font-style: italic; }
+    #inventory .bar { height: 8px; margin: 10px 0 12px; background: #d8c49e; border-radius: 2px; overflow: hidden; }
+    #inventory .bar i { display: block; height: 100%; width: var(--w); background: #4f6d36; transition: width .5s ease; }
+    #inventory .bar i.low { background: #9a3324; }
+    #inventory .stamp { position: absolute; top: 14px; right: 14px; padding: 1px 8px; border: 2px solid #9a3324; color: #9a3324; font-style: italic; font-family: "IM Fell English", serif; transform: rotate(-6deg); animation: invStamp .4s ease backwards .25s; }
+    @keyframes invStamp { from { opacity: 0; transform: rotate(-6deg) scale(1.35); } }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 10005;
+      padding: 12px 18px;
+      background: var(--parchment);
+      color: var(--ink);
+      border-left: 4px solid var(--pumpkin);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      border-radius: 2px;
+      font-family: "IM Fell English", serif;
+      font-size: 17px;
+      transform: translateY(-20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .3s ease, opacity .3s ease;
+    }
+    .toast.show {
+      transform: none;
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #inventory .track, #inventory .deck-card, #inventory polyline { transition: none !important; animation: none !important; stroke-dashoffset: 0 !important; }
+    }
+
     /* Right: sale ticket / parchment card */
     .ticket {
       position: relative;
@@ -1139,24 +1238,13 @@
     </section>
 
     <!-- ==================== 2. INVENTORY VIEW ==================== -->
-    <section class="view-section" id="view-inventory">
+    <section class="view-section" id="inventory">
       <h1>Pantry Botanical &amp; Reagent Vault</h1>
       <p class="lead">Complete catalog of dried flora, pickled fauna, essences, and enchanted glass.</p>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
-        <div class="filter-bar" style="margin-bottom:0;">
-          <button class="filter-btn active" onclick="filterInventory('all', this)">All Reagents</button>
-          <button class="filter-btn" onclick="filterInventory('low', this)">Low / Depleted</button>
-          <button class="filter-btn" onclick="filterInventory('festival', this)">Festival Critical</button>
-        </div>
-        <div>
-          <input type="text" id="invSearch" class="search-box" placeholder="Search reagents..." oninput="renderInventoryGrid()">
-        </div>
-      </div>
-
-      <div class="panel">
-        <div class="items" id="inventoryGrid"></div>
-      </div>
+      <div class="card" id="detail"></div>
+      <div class="deck" id="deck"><div class="track" id="track"></div></div>
+      <p class="note count" id="count"></p>
     </section>
 
     <!-- ==================== 3. FORECAST & RESTOCK VIEW (PAGE 3) ==================== -->
@@ -1367,14 +1455,14 @@
       var tabs = document.querySelectorAll(".tabs a");
       tabs.forEach(function(t) { t.classList.remove("on"); });
 
-      var activeView = document.getElementById("view-" + pageId);
+      var activeView = document.getElementById(pageId) || document.getElementById("view-" + pageId);
       var activeTab = document.getElementById("tab-" + pageId);
 
       if (activeView) activeView.classList.add("active");
       if (activeTab) activeTab.classList.add("on");
 
       if (pageId === "dashboard") renderDashboard();
-      if (pageId === "inventory") renderInventoryGrid();
+      if (pageId === "inventory") { drawInv(); placeDeck(); }
       if (pageId === "forecast") renderForecastPage();
       if (pageId === "sale") { updateSaleItems(); showTicket(); }
       if (pageId === "activity") renderActivityTable();
@@ -1446,6 +1534,8 @@
     function quickRestockItem(index, amount, evt) {
       var qty = amount || 20;
       items[index].stock += qty;
+      if (!items[index].buy) items[index].buy = [0, 0, 0, 0, 0, 0];
+      items[index].buy[5] += qty;
       spawnParticle("+" + qty + " " + items[index].icon, "var(--gold)", evt);
       movements.unshift({
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
@@ -1455,8 +1545,9 @@
       });
       saveState();
       renderDashboard();
-      if (document.getElementById("view-inventory").classList.contains("active")) {
-        renderInventoryGrid();
+      var invSec = document.getElementById("inventory") || document.getElementById("view-inventory");
+      if (invSec && invSec.classList.contains("active")) {
+        drawInv();
       }
       if (document.getElementById("view-forecast").classList.contains("active")) {
         renderForecastPage();
@@ -1464,53 +1555,307 @@
       updateSaleItems();
     }
 
-    // ==================== INVENTORY ====================
-    function filterInventory(category, btn) {
-      currentFilter = category;
-      var btns = document.querySelectorAll(".filter-btn");
-      btns.forEach(function(b) { b.classList.remove("active"); });
-      if (btn) btn.classList.add("active");
-      renderInventoryGrid();
+    // ==================== INVENTORY (CARD DECK & DETAIL) ====================
+    var cur = 0; // selected item index
+
+    function getMonthLabels() {
+      var months = [];
+      for (var m = 5; m >= 0; m--) {
+        var d = new Date();
+        d.setMonth(d.getMonth() - m);
+        months.push(d.toLocaleString("en", { month: "short" }));
+      }
+      return months;
     }
 
+    function initInventoryTrends() {
+      var monthLabels = getMonthLabels();
+
+      items.forEach(function(item) {
+        if (!item.buy || item.buy.length !== 6) item.buy = [0, 0, 0, 0, 0, 0];
+        if (!item.sold || item.sold.length !== 6) item.sold = [0, 0, 0, 0, 0, 0];
+        if (item.min === undefined) item.min = item.minStock || 15;
+        if (item.from === undefined) item.from = item.supplier || "Apothecary Vault";
+      });
+
+      // Count units bought and sold per calendar month from existing Stock Activity records
+      movements.forEach(function(mov) {
+        var matched = null;
+        for (var i = 0; i < items.length; i++) {
+          if (mov.text && mov.text.indexOf(items[i].name) !== -1) {
+            matched = items[i];
+            break;
+          }
+        }
+        if (!matched) return;
+
+        var mIdx = 5; // default to current month
+        if (mov.time) {
+          for (var k = 0; k < monthLabels.length; k++) {
+            if (mov.time.toLowerCase().indexOf(monthLabels[k].toLowerCase()) !== -1) {
+              mIdx = k;
+              break;
+            }
+          }
+        }
+
+        var qty = 0;
+        var num = mov.text ? mov.text.match(/\d+/) : null;
+        if (num) qty = parseInt(num[0], 10) || 0;
+        if (qty <= 0) return;
+
+        if (mov.type === "Restock" || mov.text.indexOf("+") !== -1) {
+          matched.buy[mIdx] += qty;
+        } else if (mov.type === "Sale" || mov.text.indexOf("−") !== -1 || mov.text.indexOf("-") !== -1 || mov.text.indexOf("x") !== -1) {
+          matched.sold[mIdx] += qty;
+        }
+      });
+    }
+
+    function drawInv() {
+      initInventoryTrends();
+      drawDetail();
+      drawDeck();
+    }
     function renderInventoryGrid() {
-      var grid = document.getElementById("inventoryGrid");
-      var search = (document.getElementById("invSearch").value || "").toLowerCase();
-      grid.innerHTML = "";
+      drawInv();
+    }
 
-      for (var i = 0; i < items.length; i++) {
-        var it = items[i];
-        if (search && it.name.toLowerCase().indexOf(search) === -1) continue;
-        if (currentFilter === "low" && it.stock > it.minStock) continue;
-        if (currentFilter === "festival" && !it.festival) continue;
+    function drawDetail() {
+      var detailEl = document.getElementById("detail");
+      if (!detailEl || !items[cur]) return;
+      var i = items[cur];
+      var minVal = i.minStock !== undefined ? i.minStock : (i.min || 15);
+      var low = i.stock < minVal;
+      var bought = i.buy ? i.buy.reduce(function(a, b) { return a + b; }, 0) : 0;
+      var sold = i.sold ? i.sold.reduce(function(a, b) { return a + b; }, 0) : 0;
+      var supplierName = i.supplier || i.from || "Apothecary Vault";
 
-        var isOut = it.stock <= 0;
-        var isLow = it.stock > 0 && it.stock <= it.minStock;
-        var fillPct = Math.min(100, Math.max(5, Math.round((it.stock / Math.max(1, it.minStock * 2)) * 100)));
-        var gaugeClass = isOut ? "potion-fill depleted" : (isLow ? "potion-fill low" : "potion-fill");
-        var festivalTag = it.festival ? ' <span style="font-size:14px; color:#ff7518; font-weight:normal;">[🌕 ' + it.festivalMul + 'x Festival]</span>' : '';
+      detailEl.innerHTML =
+        '<div class="det-top">' +
+          '<div>' +
+            '<h3>' + i.name + '</h3>' +
+            '<div class="note">¢' + i.price.toFixed(2) + ' / ' + i.unit + ' &bull; ' + supplierName + '</div>' +
+          '</div>' +
+          '<div class="big ' + (low ? 'red' : 'green') + '">' +
+            i.stock + '<br>' +
+            '<span class="note">' + i.unit + ' in vault, min ' + minVal + '</span>' +
+          '</div>' +
+        '</div>' +
+        trendSvg(i) +
+        '<div class="det-bottom">' +
+          '<span>Bought, last 6 months: <b>' + bought + '</b></span>' +
+          '<span>Sold, last 6 months: <b>' + sold + '</b></span>' +
+          '<div class="adj">' +
+            '<button class="btn" data-act="minus">&minus;</button>' +
+            '<input type="number" min="0" id="in-cur" value="' + i.stock + '">' +
+            '<button class="btn" data-act="plus">+</button>' +
+            '<button class="btn" data-act="update">Update</button>' +
+          '</div>' +
+        '</div>';
 
-        grid.innerHTML +=
-          '<div class="item" style="cursor:default; animation: cardDropIn 0.3s ease-out ' + (i * 0.05) + 's backwards;">' +
-          '<strong>' + it.icon + ' ' + it.name + festivalTag + '</strong>' +
-          (isOut ? '<span class="stamp" style="display:block;">Sold out</span>' : (isLow ? '<span class="stamp-badge" style="position:absolute; top:12px; right:12px;">LOW STOCK</span>' : '')) +
-          '<div class="potion-gauge" title="Pantry Fill Level: ' + it.stock + '/' + (it.minStock * 2) + ' ' + it.unit + '">' +
-          '<div class="' + gaugeClass + '" style="width:' + fillPct + '%;"></div>' +
-          '</div>' +
-          '<span class="stock">Vault Stock: ' + it.stock + ' ' + it.unit + ' <span style="color:#6b5440; font-weight:normal;">(Min target: ' + it.minStock + ')</span></span>' +
-          '<span class="price">¢' + it.price.toFixed(2) + ' / ' + it.unit + ' &bull; ' + it.supplier + '</span>' +
-          '<div class="stock-control">' +
-          '<span style="font-size:14px; color:#6b5440; font-weight:600;">Adjust Stock:</span>' +
-          '<div class="stock-input-wrap">' +
-          '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'invInput_' + i + '\', -1)">−</button>' +
-          '<input type="number" id="invInput_' + i + '" class="stock-num-input" value="' + it.stock + '" min="0" onkeydown="if(event.key===\'Enter\') setDirectStock(' + i + ', this.value, event)" title="Type any value and press Enter or Update">' +
-          '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'invInput_' + i + '\', 1)">+</button>' +
-          '</div>' +
-          '<button class="stock-apply-btn" type="button" onclick="setDirectStock(' + i + ', document.getElementById(\'invInput_' + i + '\').value, event)">' +
-          '<span>Update</span>' +
-          '</button>' +
-          '</div>' +
-          '</div>';
+      var countEl = document.getElementById("count");
+      if (countEl) countEl.textContent = (cur + 1) + " of " + items.length;
+    }
+
+    function trendSvg(i) {
+      var months = getMonthLabels();
+      var buyArr = i.buy || [0, 0, 0, 0, 0, 0];
+      var soldArr = i.sold || [0, 0, 0, 0, 0, 0];
+      var max = Math.max(1, Math.max.apply(null, buyArr), Math.max.apply(null, soldArr));
+      var pts = function(arr) {
+        return arr.map(function(v, k) {
+          return (40 + k * 104) + "," + (165 - (v / max) * 140);
+        }).join(" ");
+      };
+
+      var labelsHtml = months.map(function(m, k) {
+        return '<text x="' + (40 + k * 104) + '" y="190" text-anchor="middle">' + m + '</text>';
+      }).join("");
+
+      return (
+        '<svg class="trend" viewBox="0 0 600 200" role="img" aria-label="Bought and sold, last 6 months">' +
+          '<line class="axis" x1="40" y1="165" x2="600" y2="165"></line>' +
+          '<polyline pathLength="1" class="line-buy" points="' + pts(buyArr) + '"></polyline>' +
+          '<polyline pathLength="1" class="line-sold" points="' + pts(soldArr) + '"></polyline>' +
+          labelsHtml +
+        '</svg>' +
+        '<div class="legend"><span class="green">&bull; Bought</span> &nbsp; <span class="ember">&bull; Sold</span></div>'
+      );
+    }
+
+    function drawDeck() {
+      var trackEl = document.getElementById("track");
+      if (!trackEl) return;
+      trackEl.innerHTML = items.map(function(i, n) {
+        var minVal = i.minStock !== undefined ? i.minStock : (i.min || 15);
+        var low = i.stock < minVal;
+        var pct = Math.min(100, Math.round(i.stock / minVal * 100));
+        var stamp = i.stock === 0 ? '<span class="stamp">Sold out</span>'
+                    : (low ? '<span class="stamp">Low stock</span>' : '');
+        return (
+          '<button class="deck-card" data-n="' + n + '">' +
+            stamp +
+            '<h3>' + i.name + '</h3>' +
+            '<div class="note">' + i.stock + ' ' + i.unit + ' in vault</div>' +
+            '<div class="bar"><i class="' + (low ? 'low' : '') + '" style="--w:' + pct + '%;"></i></div>' +
+            '<div class="note">¢' + i.price.toFixed(2) + ' / ' + i.unit + '</div>' +
+          '</button>'
+        );
+      }).join("");
+      placeDeck();
+    }
+
+    var CARD = 240, STEP = 262;
+    var dragStart = null, dragDx = 0, moved = false;
+
+    function slideX(n) {
+      var deck = document.getElementById("deck");
+      if (!deck) return 0;
+      return deck.clientWidth / 2 - 120 - n * STEP;
+    }
+
+    function placeDeck() {
+      var track = document.getElementById("track");
+      if (!track) return;
+      track.style.transform = "translateX(" + slideX(cur) + "px)";
+      var cards = document.querySelectorAll("#inventory .deck-card");
+      cards.forEach(function(c, n) {
+        var d = n - cur;
+        c.classList.toggle("on", d === 0);
+        c.style.zIndex = 100 - Math.abs(d);
+        var T = Math.max(-50, Math.min(50, d * 30));
+        c.style.setProperty("--tilt", T + "deg");
+        if (d === 0) {
+          c.style.transform = "perspective(700px) rotateY(0deg) scale(1)";
+        } else {
+          c.style.transform = "perspective(700px) rotateY(" + T + "deg) scale(0.94)";
+        }
+      });
+    }
+
+    function endDrag() {
+      if (dragStart === null) return;
+      dragStart = null;
+      var steps = Math.round(-dragDx / STEP);
+      if (steps === 0 && Math.abs(dragDx) > 40) steps = dragDx < 0 ? 1 : -1;
+      var old = cur;
+      cur = Math.min(items.length - 1, Math.max(0, cur + steps));
+      var track = document.getElementById("track");
+      if (track) track.classList.remove("drag");
+      if (cur !== old) drawDetail();
+      placeDeck();
+    }
+
+    function go(step) {
+      cur = Math.min(items.length - 1, Math.max(0, cur + step));
+      drawDetail();
+      placeDeck();
+    }
+
+    var toastTimer;
+    function toast(msg) {
+      var t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { t.classList.remove("show"); }, 2500);
+    }
+
+    // Initialize Inventory deck & detail interactions
+    function initInventoryDeckInteractions() {
+      var deck = document.getElementById("deck");
+      var track = document.getElementById("track");
+      var detail = document.getElementById("detail");
+
+      if (deck) {
+        deck.addEventListener("pointerdown", function(e) {
+          if (e.button !== 0) return;
+          dragStart = e.clientX;
+          dragDx = 0;
+          moved = false;
+          if (track) track.classList.add("drag");
+        });
+
+        deck.addEventListener("click", function(e) {
+          var c = e.target.closest("[data-n]");
+          if (moved) return;
+          if (!c) return;
+          cur = Number(c.dataset.n);
+          drawDetail();
+          placeDeck();
+        });
+
+        var wheelLock = false;
+        deck.addEventListener("wheel", function(e) {
+          if (Math.abs(e.deltaX) < 10 || Math.abs(e.deltaX) < Math.abs(e.deltaY) || wheelLock) return;
+          e.preventDefault();
+          wheelLock = true;
+          go(e.deltaX > 0 ? 1 : -1);
+          setTimeout(function() { wheelLock = false; }, 450);
+        }, { passive: false });
+      }
+
+      document.addEventListener("pointermove", function(e) {
+        if (dragStart === null) return;
+        dragDx = e.clientX - dragStart;
+        if (Math.abs(dragDx) > 5) moved = true;
+        if (track) track.style.transform = "translateX(" + (slideX(cur) + dragDx) + "px)";
+      });
+
+      document.addEventListener("pointerup", endDrag);
+      document.addEventListener("pointercancel", endDrag);
+
+      document.addEventListener("keydown", function(e) {
+        if (e.target.tagName === "INPUT") return;
+        var invSec = document.getElementById("inventory") || document.getElementById("view-inventory");
+        if (!invSec || !invSec.classList.contains("active")) return;
+        if (e.key === "ArrowRight") go(1);
+        if (e.key === "ArrowLeft") go(-1);
+      });
+
+      if (detail) {
+        detail.addEventListener("click", function(e) {
+          var b = e.target.closest("button");
+          if (!b) return;
+          var item = items[cur];
+          var box = document.getElementById("in-cur");
+          if (!box) return;
+
+          if (b.dataset.act === "minus") box.value = Math.max(0, Number(box.value) - 1);
+          if (b.dataset.act === "plus") box.value = Number(box.value) + 1;
+
+          if (b.dataset.act === "update") {
+            var next = Math.max(0, Math.floor(Number(box.value) || 0));
+            var diff = next - item.stock;
+            if (diff === 0) {
+              toast(item.name + " is already at " + next + ".");
+              return;
+            }
+            if (diff > 0) {
+              if (!item.buy) item.buy = [0, 0, 0, 0, 0, 0];
+              item.buy[5] += diff;
+            }
+            item.stock = next;
+            movements.unshift({
+              time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" }),
+              type: diff > 0 ? "Restock" : "Sale",
+              text: item.name + " " + (diff > 0 ? "+" : "−") + Math.abs(diff) + " " + item.unit,
+              note: ""
+            });
+            saveState();
+            drawDetail();
+            drawDeck();
+            renderDashboard();
+            renderActivityTable();
+            if (document.getElementById("view-forecast") && document.getElementById("view-forecast").classList.contains("active")) {
+              renderForecastPage();
+            }
+            updateSaleItems();
+            toast(item.name + " updated.");
+          }
+        });
       }
     }
 
@@ -1542,7 +1887,7 @@
 
       spawnParticle((delta >= 0 ? "+" : "") + delta + " " + items[index].icon, delta >= 0 ? "var(--slime)" : "#ff7518", evt);
       saveState();
-      renderInventoryGrid();
+      drawInv();
       renderDashboard();
       if (document.getElementById("view-forecast").classList.contains("active")) {
         renderForecastPage();
@@ -1561,7 +1906,7 @@
       });
       spawnParticle((delta > 0 ? "+" : "") + delta + " " + items[index].icon, delta > 0 ? "var(--slime)" : "#ff7518", evt);
       saveState();
-      renderInventoryGrid();
+      drawInv();
       renderDashboard();
       if (document.getElementById("view-forecast").classList.contains("active")) {
         renderForecastPage();
@@ -1962,6 +2307,8 @@
       for (var i = 0; i < items.length; i++) {
         if (sale[i] > 0) {
           items[i].stock -= sale[i];
+          if (!items[i].sold) items[i].sold = [0, 0, 0, 0, 0, 0];
+          items[i].sold[5] += sale[i];
           count += sale[i];
           soldDescriptions.push(items[i].name + " x " + sale[i]);
           sale[i] = 0;
@@ -1985,6 +2332,10 @@
 
       lastAdded = -1;
       saveState();
+      var invSec = document.getElementById("inventory") || document.getElementById("view-inventory");
+      if (invSec && invSec.classList.contains("active")) {
+        drawInv();
+      }
       updateSaleItems();
       showTicket();
     }
@@ -2298,9 +2649,15 @@
     loadState();
     buildSaleItems();
     initEmbers();
+    initInventoryTrends();
+    initInventoryDeckInteractions();
+
+    window.addEventListener("resize", function() {
+      placeDeck();
+    });
 
     var hash = (window.location.hash || "").replace("#", "");
-    if (hash && document.getElementById("view-" + hash)) {
+    if (hash && (document.getElementById(hash) || document.getElementById("view-" + hash))) {
       navigateTo(hash);
     } else {
       navigateTo("dashboard");
@@ -2308,5 +2665,6 @@
     if (window.bindHoverTargets) window.bindHoverTargets();
     if (window.updateCardTilts) window.updateCardTilts();
   </script>
+  <div class="toast" id="toast"></div>
 </body>
 </html>
