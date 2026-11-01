@@ -813,10 +813,10 @@
       position: relative;
       background: var(--parchment);
       color: var(--ink);
-      border-radius: 3px;
-      padding: 22px 24px;
-      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 10px 24px rgba(0,0,0,0.35);
-      margin-bottom: 24px;
+      border-radius: 4px;
+      padding: 28px 30px;
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 12px 28px rgba(0,0,0,0.38);
+      margin-bottom: 28px;
     }
 
     #inventory .adj { display: flex; gap: 6px; align-items: center; padding: 6px 10px; background: #e4d3ab; border-radius: 2px; }
@@ -825,39 +825,43 @@
     #inventory .adj .btn:hover { background: #382417; }
     #inventory .adj .btn:active { transform: scale(.96); }
 
-    #inventory .deck { overflow: hidden; margin-top: 26px; padding: 16px 0 22px; touch-action: pan-y; user-select: none; cursor: grab; }
+    #inventory .deck { overflow: hidden; margin-top: 28px; padding: 20px 0 32px; touch-action: pan-y; user-select: none; cursor: grab; }
     #inventory .deck:active { cursor: grabbing; }
     #inventory .track { display: flex; transition: transform .5s ease; }
     #inventory .track.drag { transition: none; }
     #inventory .deck-card {
-      flex: 0 0 240px;
-      width: 240px;
-      margin-right: 22px;
+      flex: 0 0 310px;
+      width: 310px;
+      min-height: 195px;
+      margin-right: 26px;
       position: relative;
       transform-origin: 50% 50%;
       text-align: left;
       color: var(--ink);
       background: var(--parchment);
       border: 0;
-      border-radius: 3px;
-      padding: 18px;
+      border-radius: 4px;
+      padding: 24px 22px;
       box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463;
       transform: perspective(700px) rotateY(var(--tilt, 0deg)) scale(.94);
       transition: transform .4s ease, box-shadow .4s ease;
       font: inherit;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
     #inventory .deck-card.on {
       transform: perspective(700px) rotateY(0deg) scale(1);
-      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 12px 24px rgba(0,0,0,.4);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 16px 34px rgba(0,0,0,.45);
     }
-    #inventory .deck-card h3 { margin-right: 70px; font-size: 22px; font-family: "IM Fell English", serif; font-weight: normal; margin-top: 0; margin-bottom: 6px; }
-    #inventory .deck-card .note { font-style: italic; font-size: 14px; color: #6d5440; }
-    #inventory .count { text-align: center; margin: 12px 0 0; color: #bfae95; font-size: 16px; font-style: italic; }
-    #inventory .bar { height: 8px; margin: 10px 0 12px; background: #d8c49e; border-radius: 2px; overflow: hidden; }
+    #inventory .deck-card h3 { margin-right: 76px; font-size: 25px; font-family: "IM Fell English", serif; font-weight: normal; margin-top: 0; margin-bottom: 8px; line-height: 1.2; }
+    #inventory .deck-card .note { font-style: italic; font-size: 15.5px; color: #6d5440; }
+    #inventory .count { text-align: center; margin: 16px 0 0; color: #bfae95; font-size: 16.5px; font-style: italic; }
+    #inventory .bar { height: 10px; margin: 14px 0 16px; background: #d8c49e; border-radius: 3px; overflow: hidden; }
     #inventory .bar i { display: block; height: 100%; width: var(--w); background: #4f6d36; transition: width .5s ease; }
     #inventory .bar i.low { background: #9a3324; }
-    #inventory .stamp { position: absolute; top: 14px; right: 14px; padding: 1px 8px; border: 2px solid #9a3324; color: #9a3324; font-style: italic; font-family: "IM Fell English", serif; transform: rotate(-6deg); animation: invStamp .4s ease backwards .25s; }
+    #inventory .stamp { position: absolute; top: 16px; right: 16px; padding: 2px 10px; font-size: 14px; border: 2px solid #9a3324; color: #9a3324; font-style: italic; font-family: "IM Fell English", serif; transform: rotate(-6deg); animation: invStamp .4s ease backwards .25s; }
     @keyframes invStamp { from { opacity: 0; transform: rotate(-6deg) scale(1.35); } }
 
     /* Toast notification */
@@ -2205,13 +2209,13 @@
       placeDeck();
     }
 
-    var CARD = 240, STEP = 262;
+    var CARD = 310, STEP = 336;
     var dragStart = null, dragDx = 0, moved = false;
 
     function slideX(n) {
       var deck = document.getElementById("deck");
       if (!deck) return 0;
-      return deck.clientWidth / 2 - 120 - n * STEP;
+      return deck.clientWidth / 2 - 155 - n * STEP;
     }
 
     function placeDeck() {
