@@ -400,12 +400,16 @@ def detect_strange_happenings(
     expected_stock: int = 0,
     actual_stock: int = 0,
     current_multiplier: float = 1.0,
-    daily_sales: dict = None
+    daily_sales: dict = None,
+    events: list[dict] = None,
+    ingredient_id: Any = None
 ) -> list:
     """
     Detects shrinkage (missing stock) and scans entire daily_sales history
     using rolling mean/std (Z-score > 2.0) and IQR outlier detection to return
     a list of ALL historical spike dates in addition to real-time MISSING_STOCK.
+    If events are registered, expected sales on event dates are scaled by the
+    event multiplier so legitimate festivals are not misflagged as anomalies.
     """
     alerts = []
 
@@ -455,12 +459,30 @@ def detect_strange_happenings(
             if std < 0.5:
                 std = max(float(mean * 0.2), 1.0)
 
-            effective_mult = float(current_multiplier) if (idx == len(series_points) - 1 and current_multiplier > 1.0) else 1.0
-            expected_sale = mean * effective_mult
+            effective_mult = 1.0
+            if events:
+                for evt in events:
+                    s_date = str(evt.get("start_date", ""))
+                    e_date = str(evt.get("end_date", ""))
+                    raw_ings = evt.get("ingredient_ids") or evt.get("affected_ingredients") or []
+                    e_ings = [str(x).lower().replace(" ", "_") for x in raw_ings]
+                    if s_date and e_date and s_date <= d_str <= e_date:
+                        if not e_ings or (ingredient_id and (
+                            str(ingredient_id).lower().replace(" ", "_") in e_ings or
+                            any(str(x) in str(ingredient_id).lower().replace(" ", "_") for x in e_ings) or
+                            any(str(ingredient_id).lower().replace(" ", "_") in str(x) for x in e_ings)
+                        )):
+                            effective_mult = max(effective_mult, float(evt.get("multiplier", 3.0)))
+            elif idx == len(series_points) - 1 and current_multiplier > 1.0:
+                effective_mult = float(current_multiplier)
 
-            z_score = (qty - expected_sale) / std
+            expected_sale = mean * effective_mult
+            effective_std = std * np.sqrt(effective_mult) if effective_mult > 1.0 else std
+            effective_iqr = iqr_threshold * effective_mult if iqr_threshold != float("inf") else float("inf")
+
+            z_score = (qty - expected_sale) / max(effective_std, 0.5)
             is_z_outlier = z_score > 2.0
-            is_iqr_outlier = (qty > iqr_threshold and z_score > 1.5)
+            is_iqr_outlier = (qty > effective_iqr and z_score > 1.5)
 
             if (is_z_outlier or is_iqr_outlier) and d_str not in seen_spikes and qty > 0:
                 seen_spikes.add(d_str)
