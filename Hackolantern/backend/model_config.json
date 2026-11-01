@@ -1,0 +1,27 @@
+{
+  "best_model_overall": "same_weekday_4w",
+  "best_per_ingredient": {
+    "bat_wings": "same_weekday_4w",
+    "frost_honey": "same_weekday_4w",
+    "ghost_pepper": "same_weekday_4w",
+    "mandrake_root": "same_weekday_4w",
+    "moonpetal_dust": "same_weekday_4w",
+    "newt_eyes": "same_weekday_4w",
+    "rose_root": "same_weekday_4w"
+  },
+  "model_stats": {
+    "moving_average_7d": {
+      "avg_mae": 1.18,
+      "avg_mape": 16.0
+    },
+    "same_weekday_4w": {
+      "avg_mae": 0.0,
+      "avg_mape": 0.0
+    },
+    "holt_winters": {
+      "avg_mae": 0.0,
+      "avg_mape": 0.0
+    }
+  },
+  "last_evaluated_at": "2026-11-01T03:04:47.169637"
+}

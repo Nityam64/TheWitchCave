@@ -96,6 +96,26 @@ class DatabaseService {
       items.push({ ...item, id: savedId, createdAt: now, updatedAt: now });
     }
     localStorage.setItem("hexley_inventory", JSON.stringify(items));
+
+    // Synchronize new ingredient creation with the FastAPI / Firestore backend
+    try {
+      fetch("http://localhost:8000/api/pantry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: item.name,
+          current_stock: Number(item.quantity) || 0,
+          safety_stock: Number(item.minStock) || 10,
+          supplier: item.supplierName || "Diagon Alley Apothecary",
+          lead_time_days: Number(item.leadTimeDays) || 3,
+          category: item.category || "Potions & Herbs",
+          unit: item.unit || "jars"
+        })
+      }).catch(err => {
+        console.warn("Backend /api/pantry sync:", err.message);
+      });
+    } catch (_) {}
+
     return savedId;
   }
 

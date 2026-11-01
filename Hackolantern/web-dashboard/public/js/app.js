@@ -69,7 +69,7 @@ function updateDbStatusUI(res) {
 
   badge.className = "db-status-badge status-demo";
   if (icon) icon.textContent = "●";
-  if (text) text.textContent = "Local Apothecary Archive";
+  if (text) text.textContent = "Local Storage Active";
 }
 
 // --- DATA LOADING ---
