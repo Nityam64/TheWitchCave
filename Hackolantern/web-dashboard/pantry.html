@@ -1322,6 +1322,84 @@
     }
 
     /* ==================== ALCHEMIST GUILD AUTH MODAL ==================== */
+    .auth-backdrop,
+    .auth-backdrop *,
+    .auth-modal,
+    .auth-modal *,
+    #vaultAuthBackdrop,
+    #vaultAuthBackdrop * {
+      cursor: auto !important;
+    }
+
+    .auth-backdrop input,
+    .auth-backdrop textarea,
+    .auth-backdrop select,
+    .auth-modal input,
+    .auth-modal textarea,
+    .auth-modal select,
+    .auth-input,
+    .auth-select {
+      cursor: text !important;
+      caret-color: var(--pumpkin, #ff7518) !important;
+    }
+
+    .auth-backdrop button,
+    .auth-backdrop a,
+    .auth-backdrop [role="button"],
+    .auth-backdrop input[type="submit"],
+    .auth-backdrop input[type="button"],
+    .auth-backdrop input[type="checkbox"],
+    .auth-backdrop label,
+    .auth-modal button,
+    .auth-modal a,
+    .auth-modal [role="button"],
+    .auth-modal label,
+    .auth-close-btn,
+    .auth-tab-btn,
+    .auth-btn-primary,
+    .auth-quick-demo-pill,
+    .auth-guest-link {
+      cursor: pointer !important;
+    }
+
+    body.auth-modal-open .cursor-dot,
+    body.auth-modal-open .cursor-ring,
+    body:has(.auth-backdrop.active) .cursor-dot,
+    body:has(.auth-backdrop.active) .cursor-ring,
+    .auth-backdrop.active ~ .cursor-dot,
+    .auth-backdrop.active ~ .cursor-ring {
+      display: none !important;
+      opacity: 0 !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    body.auth-modal-open,
+    body.auth-modal-open *,
+    body:has(.auth-backdrop.active),
+    body:has(.auth-backdrop.active) * {
+      cursor: auto;
+    }
+    body.auth-modal-open input,
+    body.auth-modal-open textarea,
+    body.auth-modal-open select,
+    body:has(.auth-backdrop.active) input,
+    body:has(.auth-backdrop.active) textarea,
+    body:has(.auth-backdrop.active) select {
+      cursor: text !important;
+      caret-color: var(--pumpkin, #ff7518) !important;
+    }
+    body.auth-modal-open button,
+    body.auth-modal-open a,
+    body.auth-modal-open label,
+    body.auth-modal-open [role="button"],
+    body:has(.auth-backdrop.active) button,
+    body:has(.auth-backdrop.active) a,
+    body:has(.auth-backdrop.active) label,
+    body:has(.auth-backdrop.active) [role="button"] {
+      cursor: pointer !important;
+    }
+
     .auth-backdrop {
       position: fixed;
       inset: 0;
@@ -3457,6 +3535,7 @@
     function openVaultAuthModal(tab) {
       var modal = document.getElementById("vaultAuthBackdrop");
       if (modal) modal.classList.add("active");
+      document.body.classList.add("auth-modal-open");
       switchVaultAuthTab(tab || 'signin');
       clearVaultAuthFeedback();
     }
@@ -3464,6 +3543,7 @@
     function closeVaultAuthModal() {
       var modal = document.getElementById("vaultAuthBackdrop");
       if (modal) modal.classList.remove("active");
+      document.body.classList.remove("auth-modal-open");
     }
 
     function switchVaultAuthTab(tab) {

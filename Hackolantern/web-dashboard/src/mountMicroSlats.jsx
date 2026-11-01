@@ -12,3 +12,4 @@ export function renderMicroSlats(container, props = {}) {
 if (typeof window !== 'undefined') {
   window.renderMicroSlats = renderMicroSlats;
 }
+
