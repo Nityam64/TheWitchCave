@@ -1,0 +1,3173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Hexley's Potion Pantry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* Colors */
+    :root {
+      --night: #140a1d;      /* page background */
+      --panel: #2a1a36;      /* dark panel */
+      --parchment: #ecdcbc;  /* paper */
+      --ink: #2b1d14;        /* text on paper */
+      --pumpkin: #ff7518;    /* title and borders */
+      --gold: #f2b25c;       /* headings */
+      --slime: #7fff5a;      /* poison glow */
+      --violet: #8a4fd1;     /* hover glow */
+    }
+
+    /* Antigravity Global Motion & Cursor */
+    * {
+      cursor: none; /* Antigravity custom cursor */
+    }
+
+    /* Fine paper texture */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 95;
+      opacity: 0.035;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    #antigravityCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Custom Antigravity Magnetic Cursor */
+    .cursor-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 10px;
+      height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 10000;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 14px var(--pumpkin), 0 0 28px var(--gold);
+      transition: width 0.2s, height 0.2s, background-color 0.2s;
+    }
+    .cursor-ring {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 44px;
+      height: 44px;
+      border: 1.5px solid rgba(242, 178, 92, 0.45);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+                  height 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+                  border-color 0.3s,
+                  background-color 0.3s;
+    }
+    body.cursor-hover .cursor-dot {
+      width: 16px;
+      height: 16px;
+      background: var(--slime);
+      box-shadow: 0 0 20px var(--slime);
+    }
+    body.cursor-hover .cursor-ring {
+      width: 68px;
+      height: 68px;
+      border-color: rgba(127, 255, 90, 0.75);
+      background-color: rgba(127, 255, 90, 0.06);
+    }
+
+    /* Specular Sheen for Cards */
+    .item, .stat-card, .ticket, .fc-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .item::before, .stat-card::before, .ticket::before, .fc-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -130%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+      transform: skewX(-25deg);
+      transition: left 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+      z-index: 3;
+    }
+    .item:hover::before, .stat-card:hover::before, .ticket:hover::before, .fc-card:hover::before {
+      left: 170%;
+    }
+
+    /* Click Shockwave */
+    .click-shockwave {
+      position: fixed;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      border: 2px solid var(--gold);
+      transform: translate(-50%, -50%) scale(0.2);
+      animation: shockwaveExpand 0.65s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    }
+    @keyframes shockwaveExpand {
+      0% { opacity: 0.9; transform: translate(-50%, -50%) scale(0.2); border-color: var(--slime); }
+      50% { border-color: var(--gold); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(3.2); border-color: var(--pumpkin); }
+    }
+
+    /* Page */
+    body {
+      margin: 0;
+      background: var(--night);
+      color: var(--parchment);
+      font: 18px/1.5 "Crimson Text", Georgia, serif;
+      position: relative;
+    }
+    /* Ambient candlelight glow in background */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 25%, rgba(255, 117, 24, 0.08) 0%, rgba(138, 79, 209, 0.05) 55%, transparent 80%);
+      pointer-events: none;
+      z-index: -2;
+      animation: candleFlicker 7s ease-in-out infinite alternate;
+    }
+    @keyframes candleFlicker {
+      0% { opacity: 0.65; transform: scale(1); }
+      35% { opacity: 0.95; transform: scale(1.02) translate(-8px, 4px); }
+      70% { opacity: 0.6; transform: scale(0.98); }
+      100% { opacity: 1; transform: scale(1.04) translate(6px, -4px); }
+    }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 24px 60px; position: relative; z-index: 10; }
+
+    /* Keyboard focus outline */
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+    }
+
+    /* Night scene: sits behind the page */
+    .fx {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    /* Moon: a circle with a dark circle on top makes a crescent */
+    .moon {
+      position: absolute;
+      top: 40px;
+      right: 6%;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: #f6e7c1;
+      box-shadow: 0 0 60px rgba(246, 231, 193, 0.35);
+      cursor: pointer;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.5s ease;
+      pointer-events: auto;
+    }
+    .moon:hover {
+      transform: scale(1.12) rotate(-8deg);
+      box-shadow: 0 0 95px rgba(255, 117, 24, 0.75), 0 0 40px rgba(246, 231, 193, 0.6);
+    }
+    .moon::after {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 22px;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: var(--night);
+      transition: background 0.5s ease;
+    }
+
+    /* Blood Moon Mode */
+    body.blood-moon .moon {
+      background: #e63946;
+      box-shadow: 0 0 95px rgba(230, 57, 70, 0.9);
+      animation: bloodPulse 3.5s infinite alternate;
+    }
+    body.blood-moon .moon::after {
+      background: #18050e;
+    }
+    body.blood-moon {
+      --night: #18050e;
+      --panel: #2e0f1e;
+      --pumpkin: #ff3344;
+      --gold: #ff9955;
+      --slime: #ff0055;
+      --violet: #b5179e;
+    }
+    body.blood-moon .fog {
+      background: radial-gradient(ellipse at 50% 100%, rgba(230, 57, 70, 0.4), transparent 70%);
+    }
+    @keyframes bloodPulse {
+      0% { box-shadow: 0 0 60px rgba(230, 57, 70, 0.6); transform: scale(1); }
+      100% { box-shadow: 0 0 120px rgba(255, 51, 68, 0.95); transform: scale(1.04); }
+    }
+
+    /* Glowing Embers / Witch Sparks rising */
+    .ember {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      animation: riseEmber linear infinite;
+    }
+    @keyframes riseEmber {
+      0% { transform: translateY(105vh) translateX(0) scale(0.6); opacity: 0; }
+      15% { opacity: 0.85; filter: drop-shadow(0 0 6px currentColor); }
+      80% { opacity: 0.6; }
+      100% { transform: translateY(-10vh) translateX(50px) scale(1.3); opacity: 0; }
+    }
+
+    /* Fog drifting at the bottom */
+    .fog {
+      position: absolute;
+      bottom: 0;
+      left: -50%;
+      width: 200%;
+      height: 180px;
+      background: radial-gradient(ellipse at 50% 100%, rgba(138, 79, 209, 0.35), transparent 70%);
+      animation: drift 25s ease-in-out infinite alternate;
+    }
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(12%); }
+    }
+
+    /* Bats flying across */
+    .bat {
+      position: absolute;
+      top: 14%;
+      left: -60px;
+      font-size: 26px;
+      opacity: 0.65;
+      animation: flyBat 16s linear infinite;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.2s ease;
+    }
+    .bat:hover {
+      transform: scale(1.4) rotate(15deg);
+    }
+    .bat.b2 { top: 32%; font-size: 20px; animation-duration: 22s; animation-delay: 7s; }
+    @keyframes flyBat {
+      0% { transform: translateX(0) translateY(0); }
+      25% { transform: translateX(25vw) translateY(-14px) rotate(4deg); }
+      50% { transform: translateX(50vw) translateY(10px) rotate(-4deg); }
+      75% { transform: translateX(75vw) translateY(-8px) rotate(2deg); }
+      100% { transform: translateX(calc(100vw + 120px)) translateY(0); }
+    }
+
+    /* Ghosts bobbing up and down */
+    .ghost {
+      position: absolute;
+      right: 8%;
+      bottom: 18%;
+      font-size: 40px;
+      opacity: 0.55;
+      animation: spectralBob 4.5s ease-in-out infinite;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .ghost:hover {
+      transform: scale(1.25) translateY(-10px);
+      opacity: 0.9;
+    }
+    .ghost.g2 { right: auto; left: 5%; bottom: 35%; font-size: 30px; animation-delay: 2.2s; }
+    @keyframes spectralBob {
+      0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.55; }
+      50% { transform: translateY(-22px) rotate(4deg); opacity: 0.75; filter: drop-shadow(0 0 12px rgba(138, 79, 209, 0.4)); }
+    }
+
+    /* Cobweb in the top-left corner */
+    .web {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 150px;
+      opacity: 0.4;
+      transition: opacity 0.3s ease;
+    }
+    .web:hover { opacity: 0.75; }
+
+    /* Spider on a thread that stretches up and down */
+    .spider {
+      position: absolute;
+      top: 0;
+      left: 60px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .spider:hover {
+      transform: translateY(110px);
+    }
+    .thread {
+      width: 1px;
+      height: 60px;
+      background: #b9a9c9;
+      animation: lower 4s ease-in-out infinite;
+    }
+    .spider span { font-size: 24px; transition: transform 0.2s ease; }
+    .spider:hover span { transform: scale(1.3) rotate(20deg); }
+    @keyframes lower {
+      0%, 100% { height: 30px; }
+      50% { height: 120px; }
+    }
+
+    /* Header */
+    .head {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      border-bottom: 1px solid var(--pumpkin);
+      padding-bottom: 14px;
+    }
+    .brand {
+      font-family: "Creepster", cursive;
+      font-size: 34px;
+      color: var(--pumpkin);
+      letter-spacing: 1px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .sub { color: var(--gold); font-style: italic; }
+    .tabs a {
+      color: var(--parchment);
+      opacity: 0.7;
+      text-decoration: none;
+      margin-left: 18px;
+      padding-bottom: 4px;
+      cursor: pointer;
+      display: inline-block;
+      transition: opacity 0.2s, color 0.2s;
+    }
+    .tabs a:hover { opacity: 1; color: var(--gold); }
+    .tabs a.on { opacity: 1; color: var(--gold); border-bottom: 2px solid var(--gold); }
+
+    /* Bouncing pumpkin */
+    .bounce { display: inline-block; animation: bob 2s ease-in-out infinite; }
+
+    /* Title: big spooky font with a flicker */
+    h1 {
+      font-family: "Creepster", cursive;
+      font-weight: normal;
+      font-size: 58px;
+      color: var(--pumpkin);
+      text-shadow: 0 0 10px rgba(255, 117, 24, 0.6), 0 0 30px rgba(255, 117, 24, 0.3);
+      margin: 36px 0 4px;
+      animation: flicker 4s infinite;
+    }
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      20% { opacity: 0.85; }
+      40% { opacity: 1; }
+      70% { opacity: 0.9; }
+    }
+    h2 {
+      font-family: "IM Fell English", serif;
+      font-weight: normal;
+      font-size: 26px;
+      color: var(--gold);
+      margin: 0 0 6px;
+    }
+    .lead, .hint { color: #bfae95; margin: 0 0 20px; }
+
+    /* Section Visibility with Smooth Entry */
+    .view-section { display: none; }
+    .view-section.active {
+      display: block;
+      animation: viewEnter 0.35s ease-out;
+    }
+    @keyframes viewEnter {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Floating Click & Magic Sparkle Particle */
+    .float-particle {
+      position: fixed;
+      pointer-events: none;
+      font-family: "IM Fell English", serif;
+      font-weight: bold;
+      font-size: 20px;
+      z-index: 9999;
+      animation: floatUpFade 0.85s forwards ease-out;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+    }
+    @keyframes floatUpFade {
+      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8) translateY(0); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) translateY(-25px); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1) translateY(-50px); }
+    }
+    @keyframes sparkleFade {
+      0% { opacity: 0.9; transform: translate(-50%, -50%) scale(0.6) translateY(0); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.3) translateY(-22px) rotate(25deg); }
+    }
+
+    /* Layout Grids */
+    .grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    .grid-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 840px) {
+      .grid, .grid-equal { grid-template-columns: 1fr; }
+      .tabs a { margin-left: 10px; margin-top: 6px; }
+      h1 { font-size: 44px; }
+    }
+
+    /* Panels & Parchments */
+    .panel { background: var(--panel); border: 1px solid #4a2d52; padding: 24px; position: relative; margin-bottom: 24px; }
+    .items { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media (max-width: 560px) {
+      .items { grid-template-columns: 1fr; }
+    }
+
+    /* Item labels: paper cards with subtle antique ink border */
+    .item {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid rgba(43, 29, 20, 0.22);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+      border-radius: 4px;
+      padding: 16px;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .item strong { display: block; font-family: "IM Fell English", serif; font-weight: normal; font-size: 22px; }
+    .item .stock { display: block; color: #2f5e2a; font-weight: 600; }
+    .item .price { display: block; color: #8a4a1c; }
+    .item:hover:not(:disabled) {
+      transform: translateY(-2px);
+      border-color: rgba(43, 29, 20, 0.42);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
+    }
+    .item:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    /* Potion stock level gauge */
+    .potion-gauge {
+      height: 6px;
+      background: rgba(43, 29, 20, 0.12);
+      border-radius: 3px;
+      overflow: hidden;
+      margin: 8px 0;
+      border: 1px solid rgba(43, 29, 20, 0.15);
+    }
+    .potion-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #2f5e2a, #7fff5a);
+      border-radius: 3px;
+      transition: width 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .potion-fill.low {
+      background: linear-gradient(90deg, #8a4a1c, #ff7518);
+    }
+    .potion-fill.depleted {
+      background: linear-gradient(90deg, #9b1c1c, #e63946);
+    }
+
+    /* Aesthetic Victorian Stock Adjustment Box */
+    .stock-control {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(43, 29, 20, 0.04);
+      border: 1px solid rgba(43, 29, 20, 0.15);
+      padding: 6px 10px;
+      border-radius: 3px;
+    }
+    .stock-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      background: transparent;
+      border: 1px solid rgba(43, 29, 20, 0.24);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .stock-btn-stepper {
+      background: rgba(43, 29, 20, 0.08);
+      color: var(--ink);
+      border: none;
+      width: 28px;
+      height: 32px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, color 0.15s;
+    }
+    .stock-btn-stepper:hover {
+      background: rgba(43, 29, 20, 0.18);
+      color: var(--ink);
+    }
+    .stock-btn-stepper:active {
+      transform: scale(0.94);
+    }
+    .stock-num-input {
+      width: 56px;
+      height: 32px;
+      border: none;
+      border-left: 1px solid rgba(43, 29, 20, 0.16);
+      border-right: 1px solid rgba(43, 29, 20, 0.16);
+      background: transparent !important;
+      color: var(--ink);
+      font-family: "IM Fell English", Georgia, serif;
+      font-size: 20px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+      padding: 0 4px;
+      box-sizing: border-box;
+      -moz-appearance: textfield;
+    }
+    .stock-num-input::-webkit-outer-spin-button,
+    .stock-num-input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .stock-num-input:focus {
+      outline: none;
+      background: transparent !important;
+      box-shadow: none !important;
+    }
+    .stock-num-input::placeholder {
+      color: transparent;
+    }
+    .stock-apply-btn {
+      background: #2b1d14;
+      color: var(--parchment);
+      border: 1px solid #2b1d14;
+      border-radius: 3px;
+      padding: 6px 14px;
+      font-family: "IM Fell English", serif;
+      font-size: 15px;
+      font-weight: normal;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stock-apply-btn:hover {
+      background: #4a3324;
+      border-color: #4a3324;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 3px 10px rgba(43, 29, 20, 0.3);
+    }
+    .stock-apply-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* Muted antique stamps (no harsh red boundaries) */
+    .stamp {
+      display: none;
+      position: absolute;
+      top: 12px;
+      right: 10px;
+      transform: rotate(6deg);
+      border: 1px solid #781e1e;
+      color: #781e1e;
+      background: rgba(120, 30, 30, 0.05);
+      border-radius: 2px;
+      padding: 1px 8px;
+      font-family: "IM Fell English", serif;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+    .item:disabled .stamp { display: block; }
+    .stamp-badge {
+      display: inline-block;
+      border: 1px solid rgba(138, 74, 28, 0.45);
+      color: #8a4a1c;
+      background: rgba(138, 74, 28, 0.06);
+      border-radius: 2px;
+      padding: 1px 7px;
+      font-family: "IM Fell English", serif;
+      font-size: 13px;
+      transform: rotate(-2deg);
+      margin-left: 6px;
+    }
+
+    /* ==================== INVENTORY SECTION (PROTOTYPE DESIGN) ==================== */
+    #inventory .det-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    #inventory .det-top h3 { font-family: "IM Fell English", serif; font-size: 30px; margin: 0 0 4px; font-weight: normal; color: var(--ink); }
+    #inventory .det-top .big { text-align: right; font-family: "IM Fell English", serif; font-size: 36px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+    #inventory .det-top .big.red { color: #9a3324; }
+    #inventory .det-top .big.green { color: #4f6d36; }
+    #inventory .det-top .note { font-style: italic; font-size: 15px; color: #6d5440; }
+    #inventory .det-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; margin-top: 14px; font-size: 16px; color: var(--ink); }
+    #inventory .det-bottom b { font-variant-numeric: tabular-nums; }
+    #inventory .trend { width: 100%; height: auto; margin-top: 14px; display: block; }
+    #inventory .trend .axis { stroke: #b89463; stroke-width: 1.5; }
+    #inventory .trend text { fill: #6d5440; font-size: 14px; font-family: "EB Garamond", Georgia, serif; }
+    #inventory .trend polyline { fill: none; stroke-width: 3; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards; }
+    #inventory .line-buy { stroke: #4f6d36; }
+    #inventory .line-sold { stroke: #d0672f; }
+    #inventory .legend { font-size: 14px; color: #6d5440; margin-top: 6px; }
+    #inventory .legend .green { color: #4f6d36; font-weight: 600; }
+    #inventory .legend .ember { color: #d0672f; font-weight: 600; }
+    @keyframes invDraw { to { stroke-dashoffset: 0; } }
+
+    /* Graph Variant Switcher & Interactive Elements */
+    #inventory .chart-variant-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: 14px;
+      margin-bottom: 8px;
+    }
+    #inventory .chart-pill {
+      background: rgba(43, 29, 20, 0.08);
+      border: 1px solid rgba(184, 148, 99, 0.4);
+      color: #6d5440;
+      padding: 5px 13px;
+      border-radius: 100px;
+      font-size: 13.5px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    #inventory .chart-pill:hover {
+      border-color: #d0672f;
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+    #inventory .chart-pill.active {
+      background: #1d1410;
+      color: #f3dcb0;
+      border-color: #d0672f;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+    }
+    #inventory .chart-filter-group {
+      display: inline-flex;
+      background: rgba(43, 29, 20, 0.06);
+      border: 1px solid rgba(184, 148, 99, 0.35);
+      border-radius: 100px;
+      padding: 2px;
+      margin-left: 4px;
+    }
+    #inventory .filter-btn {
+      background: transparent;
+      border: none;
+      font-size: 12.5px;
+      font-family: inherit;
+      color: #6d5440;
+      padding: 3px 10px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    #inventory .filter-btn:hover {
+      color: var(--ink);
+    }
+    #inventory .filter-btn.active {
+      background: #2b1d14;
+      color: #f3dcb0;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    #inventory .chart-kpi-ribbon {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(43, 29, 20, 0.04);
+      border: 1px solid rgba(184, 148, 99, 0.3);
+      border-radius: 4px;
+      padding: 7px 12px;
+      margin-top: 6px;
+      margin-bottom: 8px;
+      font-size: 13.5px;
+    }
+    #inventory .kpi-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #6d5440;
+    }
+    #inventory .kpi-chip strong {
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
+    }
+    #inventory .kpi-badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    #inventory .kpi-badge.safe { background: rgba(79, 109, 54, 0.15); color: #3b5527; border: 1px solid rgba(79, 109, 54, 0.35); }
+    #inventory .kpi-badge.warn { background: rgba(208, 103, 47, 0.15); color: #9c4516; border: 1px solid rgba(208, 103, 47, 0.35); }
+    #inventory .kpi-badge.crit { background: rgba(154, 51, 36, 0.15); color: #82271a; border: 1px solid rgba(154, 51, 36, 0.35); }
+
+    #inventory .trend-wrapper {
+      position: relative;
+      width: 100%;
+      margin-top: 6px;
+      background: radial-gradient(circle at 50% 25%, rgba(243, 220, 176, 0.08) 0%, rgba(20, 14, 10, 0.02) 100%), #f8f1df;
+      border: 1px solid rgba(184, 148, 99, 0.4);
+      border-radius: 4px;
+      padding: 8px 12px 6px;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.04), 0 2px 6px rgba(0,0,0,0.03);
+    }
+    #inventory .trend-tooltip {
+      position: absolute;
+      background: rgba(24, 16, 12, 0.96);
+      color: #f7eedb;
+      border: 1px solid #d0672f;
+      padding: 8px 14px;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: "EB Garamond", Georgia, serif;
+      pointer-events: none;
+      z-index: 50;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 12px rgba(208, 103, 47, 0.25);
+      transform: translate(-50%, -125%);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+      backdrop-filter: blur(4px);
+    }
+    #inventory .trend-tooltip.show {
+      opacity: 1;
+    }
+    #inventory .chart-node {
+      transition: r 0.2s ease, stroke-width 0.2s ease, filter 0.2s ease;
+      cursor: pointer;
+    }
+    #inventory .chart-node:hover {
+      r: 6.5;
+      stroke-width: 2.5;
+      filter: drop-shadow(0 0 6px currentColor);
+    }
+    #inventory .chart-bar-rect {
+      transition: height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), y 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s;
+    }
+    #inventory .chart-bar-rect:hover {
+      opacity: 0.85;
+      filter: brightness(1.15) drop-shadow(0 0 5px rgba(208, 103, 47, 0.4));
+    }
+    #inventory .grid-line {
+      stroke: rgba(184, 148, 99, 0.2);
+      stroke-dasharray: 3, 3;
+      stroke-width: 1;
+    }
+    #inventory .y-label {
+      fill: #8f7256;
+      font-size: 11px;
+      font-family: "EB Garamond", Georgia, serif;
+      font-variant-numeric: tabular-nums;
+    }
+
+    #inventory #detail {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      border-radius: 4px;
+      padding: 28px 30px;
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 12px 28px rgba(0,0,0,0.38);
+      margin-bottom: 28px;
+    }
+
+    #inventory .adj { display: flex; gap: 6px; align-items: center; padding: 6px 10px; background: #e4d3ab; border-radius: 2px; }
+    #inventory .adj input { width: 70px; font: inherit; padding: 6px; text-align: center; color: var(--ink); background: #f8efd9; border: 1px solid #b89463; border-radius: 2px; font-weight: 600; }
+    #inventory .adj .btn { background: #1d1410; color: #f3dcb0; border: 1px solid var(--pumpkin); padding: 6px 12px; border-radius: 2px; font-family: inherit; font-size: 15px; cursor: pointer; transition: transform .12s ease, background .2s ease; }
+    #inventory .adj .btn:hover { background: #382417; }
+    #inventory .adj .btn:active { transform: scale(.96); }
+
+    #inventory .deck { overflow: hidden; margin-top: 28px; padding: 20px 0 32px; touch-action: pan-y; user-select: none; cursor: grab; }
+    #inventory .deck:active { cursor: grabbing; }
+    #inventory .track { display: flex; transition: transform .5s ease; }
+    #inventory .track.drag { transition: none; }
+    #inventory .deck-card {
+      flex: 0 0 310px;
+      width: 310px;
+      min-height: 195px;
+      margin-right: 26px;
+      position: relative;
+      transform-origin: 50% 50%;
+      text-align: left;
+      color: var(--ink);
+      background: var(--parchment);
+      border: 0;
+      border-radius: 4px;
+      padding: 24px 22px;
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463;
+      transform: perspective(700px) rotateY(var(--tilt, 0deg)) scale(.94);
+      transition: transform .4s ease, box-shadow .4s ease;
+      font: inherit;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    #inventory .deck-card.on {
+      transform: perspective(700px) rotateY(0deg) scale(1);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px #b89463, 0 16px 34px rgba(0,0,0,.45);
+    }
+    #inventory .deck-card h3 { margin-right: 76px; font-size: 25px; font-family: "IM Fell English", serif; font-weight: normal; margin-top: 0; margin-bottom: 8px; line-height: 1.2; }
+    #inventory .deck-card .note { font-style: italic; font-size: 15.5px; color: #6d5440; }
+    #inventory .count { text-align: center; margin: 16px 0 0; color: #bfae95; font-size: 16.5px; font-style: italic; }
+    #inventory .bar { height: 10px; margin: 14px 0 16px; background: #d8c49e; border-radius: 3px; overflow: hidden; }
+    #inventory .bar i { display: block; height: 100%; width: var(--w); background: #4f6d36; transition: width .5s ease; }
+    #inventory .bar i.low { background: #9a3324; }
+    #inventory .stamp { position: absolute; top: 16px; right: 16px; padding: 2px 10px; font-size: 14px; border: 2px solid #9a3324; color: #9a3324; font-style: italic; font-family: "IM Fell English", serif; transform: rotate(-6deg); animation: invStamp .4s ease backwards .25s; }
+    @keyframes invStamp { from { opacity: 0; transform: rotate(-6deg) scale(1.35); } }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 10005;
+      padding: 12px 18px;
+      background: var(--parchment);
+      color: var(--ink);
+      border-left: 4px solid var(--pumpkin);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      border-radius: 2px;
+      font-family: "IM Fell English", serif;
+      font-size: 17px;
+      transform: translateY(-20px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform .3s ease, opacity .3s ease;
+    }
+    .toast.show {
+      transform: none;
+      opacity: 1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #inventory .track, #inventory .deck-card, #inventory polyline { transition: none !important; animation: none !important; stroke-dashoffset: 0 !important; }
+    }
+
+    /* Right: sale ticket / parchment card */
+    .ticket {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      padding: 26px 24px 24px;
+      border: 1px solid var(--pumpkin);
+      transform: rotate(-0.4deg);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    }
+    .ticket:hover {
+      transform: rotate(0deg) scale(1.015);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 20px rgba(255, 117, 24, 0.25);
+    }
+    .ticket h2 { color: var(--ink); }
+    .seal {
+      position: absolute;
+      top: -14px;
+      right: 24px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #9bff7a, #2f7a25);
+      box-shadow: 0 0 0 3px var(--night);
+      animation: sealPulse 3.5s ease-in-out infinite;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: pointer;
+    }
+    .seal:hover {
+      transform: scale(1.22) rotate(18deg);
+      box-shadow: 0 0 20px var(--slime), 0 0 0 3px var(--night);
+    }
+    @keyframes sealPulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 0 3px var(--night); }
+      50% { transform: scale(1.07); box-shadow: 0 0 14px rgba(127, 255, 90, 0.6), 0 0 0 3px var(--night); }
+    }
+    .line {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px dashed var(--pumpkin);
+      padding: 6px 0;
+    }
+    .line.new { animation: drop 0.35s ease; }
+    .note { font-style: italic; color: #6b5440; margin: 8px 0; }
+    .total { display: flex; justify-content: space-between; margin-top: 12px; font-size: 20px; }
+    .cost { color: #8a4a1c; font-weight: 600; }
+    .ticket label, .panel label { display: block; margin-top: 14px; font-size: 16px; color: var(--ink); }
+    .panel label { color: var(--gold); }
+    .ticket input, .ticket select, .panel input, .panel select, .panel textarea {
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 6px;
+      padding: 10px;
+      font: inherit;
+      background: #fbf5e6;
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      font: inherit;
+      font-size: 19px;
+      background: var(--ink);
+      color: var(--gold);
+      border: 2px solid var(--pumpkin);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:not(:disabled) {
+      animation: bubble 2.4s ease-in-out infinite;
+    }
+    .btn:hover:not(:disabled) {
+      background: var(--pumpkin);
+      color: var(--ink);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 117, 24, 0.4);
+    }
+    .btn::after {
+      content: "";
+      position: absolute;
+      top: -60%;
+      left: -60%;
+      width: 220%;
+      height: 220%;
+      background: linear-gradient(45deg, transparent, rgba(255, 117, 24, 0.15), rgba(127, 255, 90, 0.2), transparent);
+      transform: rotate(35deg);
+      animation: shimmerSteam 3.2s infinite linear;
+      pointer-events: none;
+    }
+    @keyframes shimmerSteam {
+      0% { transform: translate(-100%, -100%) rotate(35deg); }
+      100% { transform: translate(100%, 100%) rotate(35deg); }
+    }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      background: #2a1a36;
+      color: var(--gold);
+      border: 1px solid var(--pumpkin);
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 16px;
+      cursor: pointer;
+      animation: none;
+      width: auto;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: var(--pumpkin); color: var(--ink); }
+    .btn-sm {
+      padding: 4px 10px;
+      font-size: 14px;
+      background: var(--ink);
+      color: var(--parchment);
+      border: 1px solid var(--pumpkin);
+      cursor: pointer;
+    }
+    .btn-sm:hover { background: var(--pumpkin); color: var(--ink); }
+
+    .msg { min-height: 1.5em; margin: 12px 0 0; color: #2f5e2a; font-weight: 600; text-align: center; }
+
+    /* Dashboard Cards Grid */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) {
+      .stat-cards { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 500px) {
+      .stat-cards { grid-template-columns: 1fr; }
+    }
+    .stat-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      padding: 18px 16px;
+      position: relative;
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin);
+    }
+    .stat-card .label { font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b5440; }
+    .stat-card .val { font-family: "IM Fell English", serif; font-size: 32px; color: var(--ink); line-height: 1.2; margin: 4px 0; }
+    .stat-card .subtext { font-size: 14px; color: #2f5e2a; font-style: italic; }
+
+    /* Festival Banner */
+    .festival-plate {
+      background: #20132b;
+      border: 1px solid var(--pumpkin);
+      padding: 18px 22px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      box-shadow: 0 0 25px rgba(255, 117, 24, 0.2);
+    }
+    .festival-icon { font-size: 36px; animation: bob 3s ease-in-out infinite; }
+    .festival-text h3 { margin: 0 0 4px; font-family: "IM Fell English", serif; font-size: 22px; color: var(--gold); font-weight: normal; }
+    .festival-text p { margin: 0; color: #bfae95; font-size: 16px; }
+
+    /* Tables */
+    .ledger-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: var(--ink);
+      background: var(--parchment);
+      font-size: 16px;
+      border: 1px solid var(--pumpkin);
+    }
+    .ledger-table th {
+      background: #ddcbb0;
+      color: var(--ink);
+      font-family: "IM Fell English", serif;
+      font-weight: normal;
+      font-size: 18px;
+      text-align: left;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--pumpkin);
+    }
+    .ledger-table td {
+      padding: 10px 14px;
+      border-bottom: 1px dashed #d1bda2;
+      vertical-align: middle;
+    }
+    .ledger-table tr:last-child td { border-bottom: none; }
+    .ledger-table tr:hover { background: #fbf5e6; }
+    .tag-sale { color: #8a4a1c; font-weight: 600; }
+    .tag-restock { color: #2f5e2a; font-weight: 600; }
+    .tag-alert { color: #9b1c1c; font-weight: 600; }
+
+    /* Filter Pill Row */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .filter-btn {
+      background: #2a1a36;
+      border: 1px solid #4a2d52;
+      color: var(--parchment);
+      padding: 6px 14px;
+      font: inherit;
+      font-size: 15px;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: all 0.15s;
+    }
+    .filter-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .filter-btn.active {
+      background: var(--pumpkin);
+      color: var(--night);
+      border-color: var(--pumpkin);
+      font-weight: 600;
+    }
+
+    /* Search input inside panel */
+    .search-box {
+      background: rgba(236, 220, 188, 0.08);
+      border: 1px solid rgba(242, 178, 92, 0.35);
+      color: var(--parchment);
+      font: inherit;
+      padding: 8px 12px;
+      border-radius: 3px;
+      width: 240px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .search-box::placeholder {
+      color: rgba(236, 220, 188, 0.5);
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: var(--gold);
+      background: rgba(236, 220, 188, 0.12);
+    }
+
+    /* Supplier Card */
+    .supplier-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
+      padding: 18px;
+      margin-bottom: 14px;
+      position: relative;
+    }
+    .supplier-card h3 {
+      font-family: "IM Fell English", serif;
+      font-size: 22px;
+      color: var(--ink);
+      margin: 0 0 4px;
+      font-weight: normal;
+    }
+    .supplier-dispatch { color: #6b5440; font-size: 15px; margin-bottom: 8px; }
+    .supplier-meta { display: flex; justify-content: space-between; font-size: 14px; color: #2f5e2a; font-weight: 600; }
+
+    /* Forecast & Restock Page 3 Art-Directed Theme (matching Screenshot) */
+    .fc-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 3px var(--parchment), inset 0 0 0 4px var(--pumpkin), 0 6px 24px rgba(0, 0, 0, 0.45);
+      border-radius: 2px;
+      padding: 24px 28px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+    .fc-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      border-bottom: 1px dashed var(--pumpkin);
+      padding-bottom: 14px;
+    }
+    .fc-card-title {
+      font-size: 26px;
+      font-weight: normal;
+      color: var(--ink);
+      margin: 0;
+      font-family: "IM Fell English", serif;
+      letter-spacing: -0.01em;
+    }
+    .fc-select {
+      background: #fbf5e6;
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      border-radius: 2px;
+      padding: 8px 14px;
+      font-family: "Crimson Text", Georgia, serif;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: inset 0 0 0 1px var(--parchment);
+    }
+    .fc-select:focus {
+      outline: 2px solid var(--gold);
+    }
+    .fc-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid var(--pumpkin);
+    }
+    .fc-table th {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      background: #ddcbb0;
+      text-transform: uppercase;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--pumpkin);
+      font-family: "IM Fell English", serif;
+    }
+    .fc-table td {
+      padding: 14px 14px;
+      border-bottom: 1px dashed #d1bda2;
+      color: var(--ink);
+      font-size: 16px;
+      vertical-align: middle;
+      font-family: "Crimson Text", Georgia, serif;
+    }
+    .fc-table tr:last-child td {
+      border-bottom: none;
+    }
+    .fc-table tr:hover {
+      background: #fbf5e6;
+    }
+    .fc-item-title {
+      font-family: "IM Fell English", serif;
+      font-size: 20px;
+      font-weight: normal;
+      color: var(--ink);
+    }
+    .fc-item-sub {
+      font-size: 14px;
+      color: #6b5440;
+      margin-top: 2px;
+    }
+    .fc-reorder-val {
+      font-family: "IM Fell English", serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #8a4a1c;
+    }
+    .fc-reorder-sufficient {
+      font-family: "IM Fell English", serif;
+      font-size: 17px;
+      font-weight: 600;
+      color: #2f5e2a;
+    }
+    .fc-btn-restock {
+      background: #181122;
+      color: var(--parchment);
+      border: 2px solid var(--pumpkin);
+      border-radius: 2px;
+      padding: 6px 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: "Crimson Text", Georgia, serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .fc-btn-restock:hover {
+      background: var(--pumpkin);
+      color: var(--ink);
+      transform: translateY(-1px);
+    }
+
+    /* Animations */
+    @keyframes bubble {
+      0%, 100% { box-shadow: 0 0 6px rgba(127, 255, 90, 0.3); }
+      50% { box-shadow: 0 0 22px rgba(127, 255, 90, 0.7); }
+    }
+    @keyframes drop {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: none; }
+    }
+    /* Green flash when a sale or restock is confirmed */
+    .flash { animation: flash 0.9s ease; }
+    @keyframes flash {
+      0%, 100% { box-shadow: none; }
+      30% { box-shadow: 0 0 30px var(--slime); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Fine paper noise texture overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Antigravity floating runes & motes canvas -->
+  <canvas id="antigravityCanvas"></canvas>
+
+  <!-- Interactive Magnetic Celestial Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Night scene behind the page (decoration only) -->
+  <div class="fx" aria-hidden="true" id="fxScene">
+    <div class="moon" id="lunarMoon" onclick="toggleBloodMoon()" title="Click to summon Blood Moon Eclipse 🌕 ➔ 🌑"></div>
+    <div class="fog"></div>
+    <svg class="web" viewBox="0 0 150 150">
+      <g fill="none" stroke="#c9b8dc" stroke-width="1.2">
+        <path d="M0 0 L140 18 M0 0 L110 110 M0 0 L18 140"/>
+        <path d="M40 0 Q40 40 0 40 M75 0 Q75 75 0 75 M110 0 Q110 110 0 110"/>
+      </g>
+    </svg>
+    <div class="spider"><div class="thread"></div><span>🕷️</span></div>
+    <span class="bat">🦇</span>
+    <span class="bat b2">🦇</span>
+    <span class="ghost">👻</span>
+    <span class="ghost g2">👻</span>
+  </div>
+
+  <div class="wrap">
+    <!-- Header -->
+    <header class="head">
+      <div>
+        <a class="brand" onclick="navigateTo('dashboard')"><span class="bounce">🎃</span> Hexley's Potion Pantry</a>
+        <div class="sub">Victorian apothecary, est. 1888 &bull; <a href="getstarted.html" style="color:var(--gold); text-decoration:none; font-style:normal;" title="View interactive Get Started showcase">Get Started Tour &rarr;</a></div>
+      </div>
+      <nav class="tabs" id="mainTabs">
+        <a onclick="navigateTo('dashboard')" id="tab-dashboard" class="on">Dashboard</a>
+        <a onclick="navigateTo('inventory')" id="tab-inventory">Inventory</a>
+        <a onclick="navigateTo('forecast')" id="tab-forecast">Forecast &amp; Restock</a>
+        <a onclick="navigateTo('sale')" id="tab-sale">Record Sale</a>
+        <a onclick="navigateTo('activity')" id="tab-activity">Stock Activity</a>
+        <a onclick="navigateTo('settings')" id="tab-settings">Suppliers &amp; Settings</a>
+      </nav>
+    </header>
+
+    <!-- ==================== 1. DASHBOARD VIEW ==================== -->
+    <section class="view-section active" id="view-dashboard">
+      <h1>Apothecary Vault &amp; Stock Ledger</h1>
+      <p class="lead">Real-time pantry status, lunar curse surveillance, and urgent restock thresholds.</p>
+
+      <!-- Stat Cards -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="label">Total Reagents</div>
+          <div class="val" id="dashTotalReagents">6 Items</div>
+          <div class="subtext" id="dashTotalUnits">160 units tracked</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Urgent Shortages</div>
+          <div class="val" style="color:#9b1c1c;" id="dashShortageCount">2 Reagents</div>
+          <div class="subtext" style="color:#9b1c1c;">Below min threshold</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Full Moon Multiplier</div>
+          <div class="val" style="color:#ff7518;">3.0x Surge</div>
+          <div class="subtext">Lunar peak in 2 days</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Vault Value</div>
+          <div class="val" style="color:#8a4a1c;" id="dashVaultValue">¢1,245.50</div>
+          <div class="subtext">Current inventory worth</div>
+        </div>
+      </div>
+
+      <!-- Festival Banner -->
+      <div class="festival-plate">
+        <div class="festival-icon">🌕</div>
+        <div class="festival-text">
+          <h3>Blood Moon Festival Peak Approaching</h3>
+          <p>Demand for Bat Wings and Mandrake Root surges up to 300%. Check Scrying Forecast to prevent pantry stockouts before midnight deliveries.</p>
+        </div>
+        <div style="margin-left: auto;">
+          <button class="btn-secondary" onclick="navigateTo('forecast')">Scry Restock &rarr;</button>
+        </div>
+      </div>
+
+      <!-- Quick Grids -->
+      <div class="grid">
+        <div class="panel">
+          <h2>Depleted &amp; Low Stock Ledger</h2>
+          <p class="hint">Reagents requiring immediate raven dispatch restock.</p>
+          <div id="dashAlertList"></div>
+        </div>
+        <div class="ticket">
+          <span class="seal"></span>
+          <h2>Quick Apothecary Actions</h2>
+          <p class="note">Perform rapid ledger transactions or restock ingredients.</p>
+          <button class="btn" style="margin-top:14px;" onclick="navigateTo('forecast')">Scrying Forecast &amp; Restock &rarr;</button>
+          <button class="btn" style="margin-top:14px; background:#2a1a36; color:var(--parchment);" onclick="navigateTo('sale')">Record Customer Sale &rarr;</button>
+          <button class="btn" style="margin-top:14px; background:#1c1328; color:var(--gold);" onclick="navigateTo('inventory')">Browse Full Vault Catalog &rarr;</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 2. INVENTORY VIEW ==================== -->
+    <section class="view-section" id="inventory">
+      <h1>Pantry Botanical &amp; Reagent Vault</h1>
+      <p class="lead">Complete catalog of dried flora, pickled fauna, essences, and enchanted glass.</p>
+
+      <div class="card" id="detail"></div>
+      <div class="deck" id="deck"><div class="track" id="track"></div></div>
+      <p class="note count" id="count"></p>
+    </section>
+
+    <!-- ==================== 3. FORECAST & RESTOCK VIEW (PAGE 3) ==================== -->
+    <section class="view-section" id="view-forecast">
+      <!-- Card 1: Historic Consumption & 7-Day Forecast Curve -->
+      <div class="fc-card">
+        <div class="fc-card-header">
+          <h2 class="fc-card-title">Historic Consumption &amp; 7-Day Forecast Curve</h2>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <select id="forecastReagentSelect" class="fc-select" onchange="renderSelectedForecast()"></select>
+          </div>
+        </div>
+
+        <!-- Featured Reagent Ledger Card matching Screenshot -->
+        <div id="fcFeaturedCard" style="background:var(--parchment); color:var(--ink); border:1px solid rgba(43, 29, 20, 0.22); box-shadow:0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45); padding:18px 20px; margin-bottom:20px; border-radius:4px;"></div>
+
+        <div id="chartSvgWrapper" style="overflow-x:auto; background:#fbf5e6; border:1px solid var(--pumpkin); padding:16px; border-radius:2px;"></div>
+      </div>
+
+      <!-- Card 2: All Pantry Restock Recommendations Table -->
+      <div class="fc-card" style="padding: 24px 28px;">
+        <div class="fc-card-header" style="margin-bottom: 12px;">
+          <h2 class="fc-card-title">All Pantry Restock Recommendations</h2>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="fc-table" id="allRestockTable">
+            <thead>
+              <tr>
+                <th>Ingredient</th>
+                <th>Stock on Hand</th>
+                <th>Safety Stock</th>
+                <th>7-Day Demand</th>
+                <th>Reorder Suggestion</th>
+                <th>Supplier (Lead Time)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="allRestockTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== 4. RECORD SALE VIEW ==================== -->
+    <section class="view-section" id="view-sale">
+      <h1>Record witch shop sale</h1>
+      <p class="lead">Atomic stock deduction with complete movement history logging.</p>
+
+      <main class="grid">
+        <section class="panel">
+          <h2>Select pantry items</h2>
+          <p class="hint">Click an ingredient to add it to the sale ticket.</p>
+          <div class="items" id="saleItems"></div>
+        </section>
+
+        <section class="ticket" id="saleTicket">
+          <span class="seal"></span>
+          <h2>Current sale ticket</h2>
+          <div id="lines"></div>
+          <div class="total"><span>Total units</span><span id="units">0</span></div>
+          <div class="total cost"><span>Estimated cost</span><span id="cost">¢0.00</span></div>
+          <label for="note">Customer or sale notes (optional)</label>
+          <input id="note" placeholder="e.g., Midnight traveler, healing tonic order">
+          <button class="btn" id="confirm" onclick="confirmSale()" disabled>Confirm &amp; Deduct Stock</button>
+          <p class="msg" id="msg"></p>
+        </section>
+      </main>
+    </section>
+
+    <!-- ==================== 5. STOCK ACTIVITY VIEW ==================== -->
+    <section class="view-section" id="view-activity">
+      <h1>Apothecary Movement History</h1>
+      <p class="lead">Immutable chronological trail of customer sales, owl dispatches, and vault adjustments.</p>
+
+      <div class="panel" style="overflow-x: auto;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <h2 style="margin:0;">Chronological Ledger</h2>
+          <button class="btn-secondary" onclick="clearActivityLogs()">Clear History</button>
+        </div>
+        <table class="ledger-table" id="activityTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Action</th>
+              <th>Reagent &amp; Movement</th>
+              <th>Ledger Notes</th>
+            </tr>
+          </thead>
+          <tbody id="activityTbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== 6. SUPPLIERS & SETTINGS VIEW ==================== -->
+    <section class="view-section" id="view-settings">
+      <h1>Suppliers &amp; Apothecary Configuration</h1>
+      <p class="lead">Merchant coven dispatch contracts, lunar threshold parameters, and vault rules.</p>
+
+      <div class="grid-equal">
+        <!-- Merchant Coven Directory -->
+        <div class="panel">
+          <h2>Merchant Coven Directory</h2>
+          <p class="hint">Affiliated suppliers and raven delivery speeds.</p>
+
+          <div class="supplier-card">
+            <h3>Grimoire &amp; Grove Apothecary</h3>
+            <div class="supplier-dispatch">Raven Owl Dispatch #04 &bull; Preserved fauna, nocturnal wings, moorland herbs</div>
+            <div class="supplier-meta"><span>Lead Time: 3 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Obsidian Peak Foragers Guild</h3>
+            <div class="supplier-dispatch">Broomstick Express Couriers #12 &bull; Volcanic peppers, sulfur crystals, cliff roots</div>
+            <div class="supplier-meta"><span>Lead Time: 5 days</span><span>Rating: ★★★★☆</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Moonlit Caverns Cooperative</h3>
+            <div class="supplier-dispatch">Subterranean Bat Post B-7 &bull; Fungal spores, cave honey, hand-blown glassware</div>
+            <div class="supplier-meta"><span>Lead Time: 2 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+
+          <div class="supplier-card">
+            <h3>Blackwood Herbalists &amp; Vintners</h3>
+            <div class="supplier-dispatch">Whispering Crow Post #09 &bull; Mandrake roots, venom extractions, rare distillates</div>
+            <div class="supplier-meta"><span>Lead Time: 4 days</span><span>Rating: ★★★★★</span></div>
+          </div>
+        </div>
+
+        <!-- Apothecary Settings -->
+        <div class="ticket">
+          <span class="seal"></span>
+          <h2>Apothecary Vault Settings</h2>
+          <p class="note">Adjust global coven thresholds and ledger preferences.</p>
+
+          <label for="cfgStoreName">Apothecary Shop Title</label>
+          <input id="cfgStoreName" value="Hexley's Potion Pantry">
+
+          <label for="cfgFestivalMul">Festival Surge Demand Multiplier</label>
+          <input type="number" id="cfgFestivalMul" value="3.0" step="0.5" min="1.0" max="10.0">
+
+          <label for="cfgDefaultMin">Default Minimum Safety Stock</label>
+          <input type="number" id="cfgDefaultMin" value="15" min="1">
+
+          <label for="cfgCurrency">Coinage Symbol</label>
+          <input id="cfgCurrency" value="¢">
+
+          <button class="btn" onclick="saveSettings()">Save Configuration</button>
+          <button class="btn" style="background:#2a1a36; color:var(--parchment); margin-top:10px; animation:none;" onclick="resetDemoVault()">Reset to Default Sample Vault</button>
+          <p class="msg" id="settingsMsg"></p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // Canonical Apothecary Reagents Database with supplier metadata
+    var defaultItems = [
+      { id: "item-1", icon: "🦇", name: "Bat Wings", unit: "pairs", stock: 45, minStock: 20, price: 4.5, festival: true, festivalMul: 3, supplier: "Grimoire & Grove Apothecary", leadDays: 3, dailyAvg: 4.3 },
+      { id: "item-2", icon: "🌿", name: "Mandrake Root", unit: "roots", stock: 12, minStock: 15, price: 12.0, festival: true, festivalMul: 3, supplier: "Blackwood Herbalists & Vintners", leadDays: 4, dailyAvg: 2.0 },
+      { id: "item-3", icon: "🌶️", name: "Ghost Pepper Essence", unit: "vials", stock: 60, minStock: 25, price: 6.0, festival: false, festivalMul: 1, supplier: "Obsidian Peak Foragers Guild", leadDays: 5, dailyAvg: 3.0 },
+      { id: "item-4", icon: "👁️", name: "Newt Eyes", unit: "jars", stock: 0, minStock: 30, price: 8.5, festival: false, festivalMul: 1, supplier: "Grimoire & Grove Apothecary", leadDays: 3, dailyAvg: 4.0 },
+      { id: "item-5", icon: "🔮", name: "Elixir of Shadow Sight", unit: "bottles", stock: 8, minStock: 10, price: 25.0, festival: true, festivalMul: 3, supplier: "Moonlit Caverns Cooperative", leadDays: 2, dailyAvg: 1.0 },
+      { id: "item-6", icon: "🧪", name: "Cauldron Glass Flasks", unit: "flasks", stock: 35, minStock: 20, price: 3.0, festival: false, festivalMul: 1, supplier: "Moonlit Caverns Cooperative", leadDays: 2, dailyAvg: 2.0 },
+      { id: "item-7", icon: "🐉", name: "Dried Dragon Scales", unit: "ounces", stock: 18, minStock: 10, price: 45.0, festival: false, festivalMul: 1, supplier: "Obsidian Peak Foragers Guild", leadDays: 5, dailyAvg: 1.2 },
+      { id: "item-8", icon: "🐺", name: "Distilled Wolfsbane", unit: "vials", stock: 14, minStock: 15, price: 18.5, festival: true, festivalMul: 2.5, supplier: "Blackwood Herbalists & Vintners", leadDays: 4, dailyAvg: 1.8 }
+    ];
+
+    // State
+    var items = [];
+    var movements = [];
+    var currentFilter = "all";
+    var selectedForecastIndex = 0;
+
+    function loadState() {
+      try {
+        var savedItems = localStorage.getItem("hexley_items_v2");
+        var savedMovements = localStorage.getItem("hexley_movements_v2");
+        items = savedItems ? JSON.parse(savedItems) : JSON.parse(JSON.stringify(defaultItems));
+        movements = savedMovements ? JSON.parse(savedMovements) : [
+          { time: "Oct 31, 11:30 PM", type: "Sale", text: "Bat Wings x 3", note: "Customer: Midnight traveler, healing tonic order" },
+          { time: "Oct 31, 09:15 PM", type: "Restock", text: "Ghost Pepper Essence +20", note: "Delivery: Obsidian Peak Foragers Guild" },
+          { time: "Oct 31, 06:00 PM", type: "Sale", text: "Elixir of Shadow Sight x 2", note: "Customer: High Priestess Coven gathering" }
+        ];
+      } catch (e) {
+        items = JSON.parse(JSON.stringify(defaultItems));
+        movements = [];
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem("hexley_items_v2", JSON.stringify(items));
+        localStorage.setItem("hexley_movements_v2", JSON.stringify(movements));
+      } catch (e) {}
+    }
+
+    // Sale Ticket State
+    var sale = [];
+    var lastAdded = -1;
+
+    // Navigation Router
+    function navigateTo(pageId) {
+      var views = document.querySelectorAll(".view-section");
+      views.forEach(function(v) { v.classList.remove("active"); });
+
+      var tabs = document.querySelectorAll(".tabs a");
+      tabs.forEach(function(t) { t.classList.remove("on"); });
+
+      var activeView = document.getElementById(pageId) || document.getElementById("view-" + pageId);
+      var activeTab = document.getElementById("tab-" + pageId);
+
+      if (activeView) activeView.classList.add("active");
+      if (activeTab) activeTab.classList.add("on");
+
+      if (pageId === "dashboard") renderDashboard();
+      if (pageId === "inventory") { drawInv(); placeDeck(); }
+      if (pageId === "forecast") renderForecastPage();
+      if (pageId === "sale") { updateSaleItems(); showTicket(); }
+      if (pageId === "activity") renderActivityTable();
+
+      window.location.hash = pageId;
+      window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if (window.updateCardTilts) setTimeout(window.updateCardTilts, 50);
+      if (window.bindHoverTargets) setTimeout(window.bindHoverTargets, 50);
+    }
+
+    // ==================== DASHBOARD ====================
+    function renderDashboard() {
+      var totalUnits = 0;
+      var totalWorth = 0;
+      var shortageCount = 0;
+      var alertBox = document.getElementById("dashAlertList");
+      alertBox.innerHTML = "";
+
+      for (var i = 0; i < items.length; i++) {
+        var it = items[i];
+        totalUnits += it.stock;
+        totalWorth += (it.stock * it.price);
+        if (it.stock <= it.minStock) {
+          shortageCount++;
+          var isSoldOut = it.stock <= 0;
+          var statusStamp = isSoldOut ? '<span class="stamp-badge" style="border-color:#781e1e; color:#781e1e; background:rgba(120,30,30,0.06);">SOLD OUT</span>' : '<span class="stamp-badge">LOW STOCK</span>';
+          var suggestedQty = Math.max(10, (it.minStock * 2) - it.stock);
+          alertBox.innerHTML +=
+            '<div style="background:var(--parchment); color:var(--ink); border:1px solid rgba(43, 29, 20, 0.22); box-shadow:0 2px 6px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45); border-radius:4px; padding:14px 16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">' +
+            '<div>' +
+            '<strong style="font-family:\'IM Fell English\', serif; font-size:20px;">' + it.icon + ' ' + it.name + '</strong> ' + statusStamp +
+            '<div style="font-size:15px; color:#6b5440; margin-top:2px;">In stock: <strong style="color:var(--ink); font-size:16px;">' + it.stock + ' ' + it.unit + '</strong> (Safety target: ' + it.minStock + ')</div>' +
+            '</div>' +
+            '<div style="display:flex; align-items:center; gap:8px;">' +
+            '<div class="stock-input-wrap">' +
+            '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'dashRestock_' + i + '\', -5)" title="Decrease restock quantity">&minus;</button>' +
+            '<input type="number" id="dashRestock_' + i + '" class="stock-num-input" value="' + suggestedQty + '" min="1" max="9999" onkeydown="if(event.key===\'Enter\') quickRestockFromInput(' + i + ', event)" title="Enter custom restock amount">' +
+            '<button class="stock-btn-stepper" type="button" onclick="stepStockInput(\'dashRestock_' + i + '\', 5)" title="Increase restock quantity">+</button>' +
+            '</div>' +
+            '<button class="stock-apply-btn" type="button" onclick="quickRestockFromInput(' + i + ', event)">' +
+            '<span>+ Restock</span>' +
+            '</button>' +
+            '</div>' +
+            '</div>';
+        }
+      }
+
+      if (shortageCount === 0) {
+        alertBox.innerHTML = '<p class="note" style="color:#7fff5a;">All pantry reagents are sufficiently stocked above minimum thresholds.</p>';
+      }
+
+      document.getElementById("dashTotalReagents").textContent = items.length + " Items";
+      document.getElementById("dashTotalUnits").textContent = totalUnits + " units in pantry";
+      document.getElementById("dashShortageCount").textContent = shortageCount + " Reagents";
+      document.getElementById("dashVaultValue").textContent = "¢" + totalWorth.toFixed(2);
+    }
+
+    function quickRestockFromInput(index, evt) {
+      var inputEl = document.getElementById("dashRestock_" + index);
+      var qty = inputEl ? parseInt(inputEl.value, 10) : 20;
+      if (isNaN(qty) || qty <= 0) {
+        alert("Please enter a valid positive restock quantity.");
+        return;
+      }
+      quickRestockItem(index, qty, evt);
+    }
+
+    function quickRestockItem(index, amount, evt) {
+      var qty = amount || 20;
+      items[index].stock += qty;
+      if (!items[index].buy) items[index].buy = [0, 0, 0, 0, 0, 0];
+      items[index].buy[5] += qty;
+      spawnParticle("+" + qty + " " + items[index].icon, "var(--gold)", evt);
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Restock",
+        text: items[index].name + " +" + qty + " " + items[index].unit,
+        note: "Quick restock order to " + items[index].supplier
+      });
+      saveState();
+      renderDashboard();
+      var invSec = document.getElementById("inventory") || document.getElementById("view-inventory");
+      if (invSec && invSec.classList.contains("active")) {
+        drawInv();
+      }
+      if (document.getElementById("view-forecast").classList.contains("active")) {
+        renderForecastPage();
+      }
+      updateSaleItems();
+    }
+
+    // ==================== INVENTORY (CARD DECK & DETAIL) ====================
+    var cur = 0; // selected item index
+
+    function getMonthLabels() {
+      var months = [];
+      for (var m = 5; m >= 0; m--) {
+        var d = new Date();
+        d.setMonth(d.getMonth() - m);
+        months.push(d.toLocaleString("en", { month: "short" }));
+      }
+      return months;
+    }
+
+    function initInventoryTrends() {
+      var monthLabels = getMonthLabels();
+
+      items.forEach(function(item) {
+        if (!item.buy || item.buy.length !== 6) item.buy = [0, 0, 0, 0, 0, 0];
+        if (!item.sold || item.sold.length !== 6) item.sold = [0, 0, 0, 0, 0, 0];
+        if (item.min === undefined) item.min = item.minStock || 15;
+        if (item.from === undefined) item.from = item.supplier || "Apothecary Vault";
+      });
+
+      // Count units bought and sold per calendar month from existing Stock Activity records
+      movements.forEach(function(mov) {
+        var matched = null;
+        for (var i = 0; i < items.length; i++) {
+          if (mov.text && mov.text.indexOf(items[i].name) !== -1) {
+            matched = items[i];
+            break;
+          }
+        }
+        if (!matched) return;
+
+        var mIdx = 5; // default to current month
+        if (mov.time) {
+          for (var k = 0; k < monthLabels.length; k++) {
+            if (mov.time.toLowerCase().indexOf(monthLabels[k].toLowerCase()) !== -1) {
+              mIdx = k;
+              break;
+            }
+          }
+        }
+
+        var qty = 0;
+        var num = mov.text ? mov.text.match(/\d+/) : null;
+        if (num) qty = parseInt(num[0], 10) || 0;
+        if (qty <= 0) return;
+
+        if (mov.type === "Restock" || mov.text.indexOf("+") !== -1) {
+          matched.buy[mIdx] += qty;
+        } else if (mov.type === "Sale" || mov.text.indexOf("−") !== -1 || mov.text.indexOf("-") !== -1 || mov.text.indexOf("x") !== -1) {
+          matched.sold[mIdx] += qty;
+        }
+      });
+    }
+
+    function drawInv() {
+      initInventoryTrends();
+      drawDetail();
+      drawDeck();
+    }
+    function renderInventoryGrid() {
+      drawInv();
+    }
+
+    var chartVariant = "curve"; // "curve", "line", "bars", "balance", "forecast"
+    var chartStream = "all"; // "all", "buy", "sold"
+
+    window.setChartVariant = function(v) {
+      chartVariant = v;
+      drawDetail();
+    };
+
+    window.setChartStream = function(s) {
+      chartStream = s;
+      drawDetail();
+    };
+
+    function drawDetail() {
+      var detailEl = document.getElementById("detail");
+      if (!detailEl || !items[cur]) return;
+      var i = items[cur];
+      var minVal = i.minStock !== undefined ? i.minStock : (i.min || 15);
+      var low = i.stock < minVal;
+      var bought = i.buy ? i.buy.reduce(function(a, b) { return a + b; }, 0) : 0;
+      var sold = i.sold ? i.sold.reduce(function(a, b) { return a + b; }, 0) : 0;
+      var netVelocity = bought - sold;
+      var supplierName = i.supplier || i.from || "Apothecary Vault";
+      var months = getMonthLabels();
+
+      // Analytical KPIs
+      var avgBurn = (sold / 6).toFixed(1);
+      var runwayVal = avgBurn > 0 ? (i.stock / (sold / 6)).toFixed(1) : "99+";
+      var runwayNum = parseFloat(runwayVal);
+      var runwayBadge = low
+        ? '<span class="kpi-badge crit">Critical Depletion</span>'
+        : (runwayNum < 2 ? '<span class="kpi-badge warn">Stock Watch (' + runwayVal + ' mo)</span>' : '<span class="kpi-badge safe">Vault Healthy (' + runwayVal + ' mo)</span>');
+      var turnoverPct = Math.round((sold / (i.stock + sold || 1)) * 100);
+
+      var soldArr = i.sold || [0, 0, 0, 0, 0, 0];
+      var peakIdx = 0;
+      var peakVal = -1;
+      soldArr.forEach(function(v, k) {
+        if (v > peakVal) { peakVal = v; peakIdx = k; }
+      });
+      var peakMonth = months[peakIdx] || "N/A";
+
+      detailEl.innerHTML =
+        '<div class="det-top">' +
+          '<div>' +
+            '<h3>' + i.name + '</h3>' +
+            '<div class="note">¢' + i.price.toFixed(2) + ' / ' + i.unit + ' &bull; ' + supplierName + '</div>' +
+          '</div>' +
+          '<div class="big ' + (low ? 'red' : 'green') + '">' +
+            i.stock + '<br>' +
+            '<span class="note">' + i.unit + ' in vault, min ' + minVal + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="chart-variant-bar">' +
+          '<span style="font-size:13px; color:#6d5440; margin-right:2px; font-weight:600;">View Mode:</span>' +
+          '<button class="chart-pill ' + (chartVariant === "curve" ? "active" : "") + '" onclick="setChartVariant(\'curve\')">🌊 Spline Area</button>' +
+          '<button class="chart-pill ' + (chartVariant === "line" ? "active" : "") + '" onclick="setChartVariant(\'line\')">📈 Dual Lines</button>' +
+          '<button class="chart-pill ' + (chartVariant === "bars" ? "active" : "") + '" onclick="setChartVariant(\'bars\')">📊 Phial Columns</button>' +
+          '<button class="chart-pill ' + (chartVariant === "balance" ? "active" : "") + '" onclick="setChartVariant(\'balance\')">⚖️ Net Velocity</button>' +
+          '<button class="chart-pill ' + (chartVariant === "forecast" ? "active" : "") + '" onclick="setChartVariant(\'forecast\')">🔮 Lunar Forecast</button>' +
+          '<div class="chart-filter-group" style="margin-left:auto;">' +
+            '<button class="filter-btn ' + (chartStream === "all" ? "active" : "") + '" onclick="setChartStream(\'all\')">All Streams</button>' +
+            '<button class="filter-btn ' + (chartStream === "buy" ? "active" : "") + '" onclick="setChartStream(\'buy\')">Inflow 🟢</button>' +
+            '<button class="filter-btn ' + (chartStream === "sold" ? "active" : "") + '" onclick="setChartStream(\'sold\')">Outflow 🟠</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="chart-kpi-ribbon">' +
+          '<div class="kpi-chip"><span>Turnover Velocity:</span> <strong>' + turnoverPct + '%</strong></div>' +
+          '<div class="kpi-chip"><span>Monthly Burn:</span> <strong>~' + avgBurn + ' ' + i.unit + '/mo</strong></div>' +
+          '<div class="kpi-chip"><span>Peak Outflow:</span> <strong>' + peakMonth + ' (' + peakVal + ' ' + i.unit + ')</strong></div>' +
+          '<div class="kpi-chip" style="margin-left:auto;"><span>Reserve Status:</span> ' + runwayBadge + '</div>' +
+        '</div>' +
+        '<div class="trend-wrapper">' +
+          trendSvg(i) +
+          '<div class="trend-tooltip" id="trendTooltip"></div>' +
+        '</div>' +
+        '<div class="det-bottom">' +
+          '<span>Bought, last 6 months: <b>' + bought + '</b></span>' +
+          '<span>Sold, last 6 months: <b>' + sold + '</b></span>' +
+          '<div class="adj">' +
+            '<button class="btn" data-act="minus">&minus;</button>' +
+            '<input type="number" min="0" id="in-cur" value="' + i.stock + '">' +
+            '<button class="btn" data-act="plus">+</button>' +
+            '<button class="btn" data-act="update">Update</button>' +
+          '</div>' +
+        '</div>';
+
+      var countEl = document.getElementById("count");
+      if (countEl) countEl.textContent = (cur + 1) + " of " + items.length;
+      attachTrendHover(i);
+    }
+
+    function getSplinePath(pts) {
+      if (pts.length < 2) return "";
+      var d = "M " + pts[0].x + " " + pts[0].y;
+      for (var i = 0; i < pts.length - 1; i++) {
+        var p0 = pts[i === 0 ? 0 : i - 1];
+        var p1 = pts[i];
+        var p2 = pts[i + 1];
+        var p3 = pts[i + 2] || p2;
+
+        var cp1x = p1.x + (p2.x - p0.x) / 6;
+        var cp1y = p1.y + (p2.y - p0.y) / 6;
+        var cp2x = p2.x - (p3.x - p1.x) / 6;
+        var cp2y = p2.y - (p3.y - p1.y) / 6;
+
+        d += " C " + cp1x.toFixed(1) + " " + cp1y.toFixed(1) + ", " + cp2x.toFixed(1) + " " + cp2y.toFixed(1) + ", " + p2.x.toFixed(1) + " " + p2.y.toFixed(1);
+      }
+      return d;
+    }
+
+    function trendSvg(i) {
+      var months = getMonthLabels();
+      var buyArr = i.buy || [0, 0, 0, 0, 0, 0];
+      var soldArr = i.sold || [0, 0, 0, 0, 0, 0];
+      var max = Math.max(1, Math.max.apply(null, buyArr), Math.max.apply(null, soldArr));
+
+      // Gridlines & Reference ticks
+      var ticks = [
+        { y: 25, val: max },
+        { y: 60, val: Math.round(max * 0.75) },
+        { y: 95, val: Math.round(max * 0.5) },
+        { y: 130, val: Math.round(max * 0.25) },
+        { y: 165, val: 0 }
+      ];
+
+      var gridHtml = ticks.map(function(t) {
+        return (
+          '<line class="grid-line" x1="44" y1="' + t.y + '" x2="585" y2="' + t.y + '"></line>' +
+          '<text class="y-label" x="38" y="' + (t.y + 3.5) + '" text-anchor="end">' + t.val + '</text>'
+        );
+      }).join("");
+
+      var buyPts = buyArr.map(function(v, k) {
+        return { x: 50 + k * 102, y: 165 - (v / max) * 140, val: v, month: months[k] };
+      });
+      var soldPts = soldArr.map(function(v, k) {
+        return { x: 50 + k * 102, y: 165 - (v / max) * 140, val: v, month: months[k] };
+      });
+
+      var labelsHtml = months.map(function(m, k) {
+        return '<text x="' + (50 + k * 102) + '" y="188" text-anchor="middle" font-family="\'EB Garamond\', Georgia, serif" font-size="13.5" fill="#6d5440">' + m + '</text>';
+      }).join("");
+
+      var defsHtml =
+        '<defs>' +
+          '<linearGradient id="invGradBuy" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="#4f6d36" stop-opacity="0.48"/>' +
+            '<stop offset="85%" stop-color="#4f6d36" stop-opacity="0.06"/>' +
+            '<stop offset="100%" stop-color="#4f6d36" stop-opacity="0.0"/>' +
+          '</linearGradient>' +
+          '<linearGradient id="invGradSold" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="#d0672f" stop-opacity="0.48"/>' +
+            '<stop offset="85%" stop-color="#d0672f" stop-opacity="0.06"/>' +
+            '<stop offset="100%" stop-color="#d0672f" stop-opacity="0.0"/>' +
+          '</linearGradient>' +
+          '<linearGradient id="invGradForecast" x1="0" y1="0" x2="0" y2="1">' +
+            '<stop offset="0%" stop-color="#7a4f91" stop-opacity="0.4"/>' +
+            '<stop offset="100%" stop-color="#7a4f91" stop-opacity="0.0"/>' +
+          '</linearGradient>' +
+          '<filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">' +
+            '<feGaussianBlur stdDeviation="2.5" result="blur" />' +
+            '<feMerge>' +
+              '<feMergeNode in="blur" />' +
+              '<feMergeNode in="SourceGraphic" />' +
+            '</feMerge>' +
+          '</filter>' +
+        '</defs>';
+
+      var mainContentHtml = "";
+      var legendHtml = '<div class="legend" style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">' +
+        '<div>' +
+          (chartStream !== "sold" ? '<span class="green">&bull; Inflow (Bought)</span> &nbsp;&nbsp;' : '') +
+          (chartStream !== "buy" ? '<span class="ember">&bull; Outflow (Sold)</span> &nbsp;&nbsp;' : '') +
+          (chartVariant === "forecast" ? '<span style="color:#7a4f91; font-weight:600;">🔮 Lunar Projection</span>' : '') +
+        '</div>' +
+        '<span style="font-size:12.5px; color:#8f7256; font-style:italic;">Hover cursor to inspect lunar flux</span>' +
+      '</div>';
+
+      if (chartVariant === "curve") {
+        var splineBuy = getSplinePath(buyPts);
+        var areaBuy = splineBuy + " L " + buyPts[buyPts.length - 1].x + " 165 L " + buyPts[0].x + " 165 Z";
+        var splineSold = getSplinePath(soldPts);
+        var areaSold = splineSold + " L " + soldPts[soldPts.length - 1].x + " 165 L " + soldPts[0].x + " 165 Z";
+
+        var nodesHtml = "";
+        for (var k = 0; k < 6; k++) {
+          if (chartStream !== "sold") {
+            nodesHtml += '<circle cx="' + buyPts[k].x + '" cy="' + buyPts[k].y + '" r="4.5" fill="#4f6d36" stroke="#f8efd9" stroke-width="1.8" class="chart-node"><title>' + months[k] + ' Inflow: ' + buyArr[k] + '</title></circle>';
+          }
+          if (chartStream !== "buy") {
+            nodesHtml += '<circle cx="' + soldPts[k].x + '" cy="' + soldPts[k].y + '" r="4.5" fill="#d0672f" stroke="#f8efd9" stroke-width="1.8" class="chart-node"><title>' + months[k] + ' Outflow: ' + soldArr[k] + '</title></circle>';
+          }
+        }
+
+        mainContentHtml =
+          (chartStream !== "sold" ? '<path d="' + areaBuy + '" fill="url(#invGradBuy)"/>' : '') +
+          (chartStream !== "buy" ? '<path d="' + areaSold + '" fill="url(#invGradSold)"/>' : '') +
+          (chartStream !== "sold" ? '<path pathLength="1" d="' + splineBuy + '" fill="none" stroke="#4f6d36" stroke-width="3" stroke-linecap="round" style="stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards;"/>' : '') +
+          (chartStream !== "buy" ? '<path pathLength="1" d="' + splineSold + '" fill="none" stroke="#d0672f" stroke-width="3" stroke-linecap="round" style="stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards;"/>' : '') +
+          nodesHtml;
+      } else if (chartVariant === "forecast") {
+        // Forecast Mode: 6 Months History + 2 Projected Lunar Cycles
+        var lastSold = soldArr[5] || 10;
+        var prevSold = soldArr[4] || 10;
+        var mult = config.festivalDemandMultiplier || 1.15;
+        var p1 = Math.round((prevSold * 0.4 + lastSold * 0.6) * mult);
+        var p2 = Math.round(p1 * 1.08);
+
+        var splineSoldF = getSplinePath(soldPts);
+        var areaSoldF = splineSoldF + " L " + soldPts[soldPts.length - 1].x + " 165 L " + soldPts[0].x + " 165 Z";
+
+        // Projections from last point (50 + 5*102 = 560)
+        var lastX = 560;
+        var lastY = soldPts[5].y;
+        var f1X = 575; // Projection marker
+        var f1Y = 165 - (Math.min(max * 1.2, p1) / max) * 140;
+
+        var nodesHtmlF = "";
+        for (var k = 0; k < 6; k++) {
+          nodesHtmlF += '<circle cx="' + soldPts[k].x + '" cy="' + soldPts[k].y + '" r="4" fill="#d0672f" stroke="#f8efd9" stroke-width="1.8" class="chart-node"></circle>';
+        }
+
+        mainContentHtml =
+          '<path d="' + areaSoldF + '" fill="url(#invGradSold)"/>' +
+          '<path pathLength="1" d="' + splineSoldF + '" fill="none" stroke="#d0672f" stroke-width="2.8" stroke-linecap="round" style="stroke-dasharray: 1; stroke-dashoffset: 1; animation: invDraw 1s ease forwards;"/>' +
+          '<line x1="' + lastX + '" y1="' + lastY + '" x2="' + f1X + '" y2="' + f1Y + '" stroke="#7a4f91" stroke-width="3" stroke-dasharray="4,4" filter="url(#glowEffect)"></line>' +
+          '<circle cx="' + f1X + '" cy="' + f1Y + '" r="5.5" fill="#7a4f91" stroke="#f8efd9" stroke-width="2" class="chart-node"><title>Projected Demand: ~' + p1 + ' units</title></circle>' +
+          '<text x="' + (f1X - 6) + '" y="' + (f1Y - 10) + '" font-size="11" fill="#7a4f91" font-weight="bold" text-anchor="middle">🔮 +' + p1 + '</text>' +
+          nodesHtmlF;
+      } else if (chartVariant === "bars") {
+        var barsHtml = "";
+        for (var k = 0; k < 6; k++) {
+          var xMid = 50 + k * 102;
+          var hBuy = Math.max(3, (buyArr[k] / max) * 140);
+          var yBuy = 165 - hBuy;
+          var hSold = Math.max(3, (soldArr[k] / max) * 140);
+          var ySold = 165 - hSold;
+
+          if (chartStream === "all") {
+            barsHtml +=
+              '<rect class="chart-bar-rect" x="' + (xMid - 16) + '" y="' + yBuy + '" width="14" height="' + hBuy + '" fill="#4f6d36" rx="3"><title>' + months[k] + ' Inflow: ' + buyArr[k] + '</title></rect>' +
+              '<rect class="chart-bar-rect" x="' + (xMid + 2) + '" y="' + ySold + '" width="14" height="' + hSold + '" fill="#d0672f" rx="3"><title>' + months[k] + ' Outflow: ' + soldArr[k] + '</title></rect>' +
+              '<text x="' + (xMid - 9) + '" y="' + (yBuy - 5) + '" font-size="11" fill="#4f6d36" font-weight="bold" text-anchor="middle">' + buyArr[k] + '</text>' +
+              '<text x="' + (xMid + 9) + '" y="' + (ySold - 5) + '" font-size="11" fill="#d0672f" font-weight="bold" text-anchor="middle">' + soldArr[k] + '</text>';
+          } else if (chartStream === "buy") {
+            barsHtml +=
+              '<rect class="chart-bar-rect" x="' + (xMid - 10) + '" y="' + yBuy + '" width="20" height="' + hBuy + '" fill="#4f6d36" rx="4"><title>' + months[k] + ' Inflow: ' + buyArr[k] + '</title></rect>' +
+              '<text x="' + xMid + '" y="' + (yBuy - 5) + '" font-size="12" fill="#4f6d36" font-weight="bold" text-anchor="middle">' + buyArr[k] + '</text>';
+          } else {
+            barsHtml +=
+              '<rect class="chart-bar-rect" x="' + (xMid - 10) + '" y="' + ySold + '" width="20" height="' + hSold + '" fill="#d0672f" rx="4"><title>' + months[k] + ' Outflow: ' + soldArr[k] + '</title></rect>' +
+              '<text x="' + xMid + '" y="' + (ySold - 5) + '" font-size="12" fill="#d0672f" font-weight="bold" text-anchor="middle">' + soldArr[k] + '</text>';
+          }
+        }
+        mainContentHtml = barsHtml;
+      } else if (chartVariant === "balance") {
+        var baseY = 100;
+        var maxDiff = Math.max(1, Math.max.apply(null, buyArr.map(function(v, k) { return Math.abs(v - soldArr[k]); })));
+        var balanceHtml = '<line class="axis" x1="44" y1="' + baseY + '" x2="585" y2="' + baseY + '" stroke-dasharray="4,4" opacity="0.6"></line>';
+
+        for (var k = 0; k < 6; k++) {
+          var xMid = 50 + k * 102;
+          var diff = buyArr[k] - soldArr[k];
+          var hDiff = (Math.abs(diff) / maxDiff) * 65;
+          var yDiff = diff >= 0 ? (baseY - hDiff) : baseY;
+          var barColor = diff >= 0 ? "#4f6d36" : "#d0672f";
+
+          balanceHtml +=
+            '<rect class="chart-bar-rect" x="' + (xMid - 11) + '" y="' + yDiff + '" width="22" height="' + Math.max(4, hDiff) + '" fill="' + barColor + '" rx="3">' +
+              '<title>' + months[k] + ' Net Balance: ' + (diff >= 0 ? '+' : '') + diff + '</title>' +
+            '</rect>' +
+            '<text x="' + xMid + '" y="' + (diff >= 0 ? yDiff - 5 : yDiff + hDiff + 14) + '" font-size="12" fill="' + barColor + '" font-weight="bold" text-anchor="middle">' +
+              (diff >= 0 ? '+' : '') + diff +
+            '</text>';
+        }
+        mainContentHtml = balanceHtml;
+        legendHtml = '<div class="legend" style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">' +
+          '<div><span class="green">&bull; Net Surplus (+)</span> &nbsp;&nbsp; <span class="ember">&bull; Net Deficit (−)</span></div>' +
+          '<span style="font-size:12.5px; color:#8f7256; font-style:italic;">Baseline at zero equilibrium</span>' +
+        '</div>';
+      } else {
+        // "line" (Classic Stepped Dual Polyline)
+        var ptsStr = function(arr) {
+          return arr.map(function(v, k) {
+            return (50 + k * 102) + "," + (165 - (v / max) * 140);
+          }).join(" ");
+        };
+        var lineNodes = "";
+        for (var k = 0; k < 6; k++) {
+          if (chartStream !== "sold") {
+            lineNodes += '<circle cx="' + buyPts[k].x + '" cy="' + buyPts[k].y + '" r="4.5" fill="#4f6d36" stroke="#f8efd9" stroke-width="1.8" class="chart-node"></circle>';
+          }
+          if (chartStream !== "buy") {
+            lineNodes += '<circle cx="' + soldPts[k].x + '" cy="' + soldPts[k].y + '" r="4.5" fill="#d0672f" stroke="#f8efd9" stroke-width="1.8" class="chart-node"></circle>';
+          }
+        }
+
+        mainContentHtml =
+          (chartStream !== "sold" ? '<polyline pathLength="1" class="line-buy" points="' + ptsStr(buyArr) + '"></polyline>' : '') +
+          (chartStream !== "buy" ? '<polyline pathLength="1" class="line-sold" points="' + ptsStr(soldArr) + '"></polyline>' : '') +
+          lineNodes;
+      }
+
+      return (
+        '<svg id="invTrendSvg" class="trend" viewBox="0 0 600 200" role="img" aria-label="Bought and sold, last 6 months">' +
+          defsHtml +
+          gridHtml +
+          '<line class="axis" x1="44" y1="165" x2="585" y2="165"></line>' +
+          mainContentHtml +
+          '<line id="trendGuide" x1="0" y1="20" x2="0" y2="165" stroke="#d0672f" stroke-width="1.4" stroke-dasharray="3,3" style="display:none;"></line>' +
+          '<circle id="guideBuyPt" cx="0" cy="0" r="5.5" fill="#4f6d36" stroke="#f8efd9" stroke-width="2" style="display:none; pointer-events:none;"></circle>' +
+          '<circle id="guideSoldPt" cx="0" cy="0" r="5.5" fill="#d0672f" stroke="#f8efd9" stroke-width="2" style="display:none; pointer-events:none;"></circle>' +
+          labelsHtml +
+        '</svg>' +
+        legendHtml
+      );
+    }
+
+    function attachTrendHover(item) {
+      var svg = document.getElementById("invTrendSvg");
+      var tooltip = document.getElementById("trendTooltip");
+      var guide = document.getElementById("trendGuide");
+      var guideBuy = document.getElementById("guideBuyPt");
+      var guideSold = document.getElementById("guideSoldPt");
+      if (!svg || !tooltip) return;
+
+      var months = getMonthLabels();
+      var buyArr = item.buy || [0, 0, 0, 0, 0, 0];
+      var soldArr = item.sold || [0, 0, 0, 0, 0, 0];
+      var max = Math.max(1, Math.max.apply(null, buyArr), Math.max.apply(null, soldArr));
+
+      svg.addEventListener("mousemove", function(e) {
+        var rect = svg.getBoundingClientRect();
+        var svgX = ((e.clientX - rect.left) / rect.width) * 600;
+
+        // Find closest month index (columns at x = 50 + k*102)
+        var closestIdx = 0;
+        var minDist = 9999;
+        for (var k = 0; k < 6; k++) {
+          var colX = 50 + k * 102;
+          var dist = Math.abs(svgX - colX);
+          if (dist < minDist) {
+            minDist = dist;
+            closestIdx = k;
+          }
+        }
+
+        var colX = 50 + closestIdx * 102;
+        var bVal = buyArr[closestIdx];
+        var sVal = soldArr[closestIdx];
+        var yBuy = 165 - (bVal / max) * 140;
+        var ySold = 165 - (sVal / max) * 140;
+
+        if (guide) {
+          guide.setAttribute("x1", colX);
+          guide.setAttribute("x2", colX);
+          guide.style.display = "block";
+        }
+
+        if (guideBuy && chartStream !== "sold") {
+          guideBuy.setAttribute("cx", colX);
+          guideBuy.setAttribute("cy", yBuy);
+          guideBuy.style.display = "block";
+        } else if (guideBuy) {
+          guideBuy.style.display = "none";
+        }
+
+        if (guideSold && chartStream !== "buy") {
+          guideSold.setAttribute("cx", colX);
+          guideSold.setAttribute("cy", ySold);
+          guideSold.style.display = "block";
+        } else if (guideSold) {
+          guideSold.style.display = "none";
+        }
+
+        var diff = bVal - sVal;
+        var statusText = diff >= 0
+          ? '<span style="color:#7fff5a;">● Inflow Surplus</span>'
+          : '<span style="color:#ff7518;">● Outflow Deficit</span>';
+
+        tooltip.innerHTML =
+          '<div style="font-size:11px; text-transform:uppercase; letter-spacing:0.8px; color:#c7a26f; margin-bottom:3px; display:flex; justify-content:space-between; gap:12px;">' +
+            '<span>Cycle: ' + months[closestIdx] + '</span>' +
+            '<span>' + statusText + '</span>' +
+          '</div>' +
+          '<div style="display:flex; gap:14px; font-size:14px; margin-top:2px;">' +
+            '<span>Inflow: <b style="color:#7fff5a;">+' + bVal + '</b></span>' +
+            '<span>Outflow: <b style="color:#ff7518;">−' + sVal + '</b></span>' +
+            '<span>Flux: <b style="color:' + (diff >= 0 ? '#7fff5a' : '#ff7518') + ';">' + (diff >= 0 ? '+' : '') + diff + '</b></span>' +
+          '</div>';
+
+        tooltip.style.left = ((colX / 600) * rect.width) + "px";
+        tooltip.style.top = "45px";
+        tooltip.classList.add("show");
+      });
+
+      svg.addEventListener("mouseleave", function() {
+        if (guide) guide.style.display = "none";
+        if (guideBuy) guideBuy.style.display = "none";
+        if (guideSold) guideSold.style.display = "none";
+        tooltip.classList.remove("show");
+      });
+    }
+
+    function drawDeck() {
+      var trackEl = document.getElementById("track");
+      if (!trackEl) return;
+      trackEl.innerHTML = items.map(function(i, n) {
+        var minVal = i.minStock !== undefined ? i.minStock : (i.min || 15);
+        var low = i.stock < minVal;
+        var pct = Math.min(100, Math.round(i.stock / minVal * 100));
+        var stamp = i.stock === 0 ? '<span class="stamp">Sold out</span>'
+                    : (low ? '<span class="stamp">Low stock</span>' : '');
+        return (
+          '<button class="deck-card" data-n="' + n + '">' +
+            stamp +
+            '<h3>' + i.name + '</h3>' +
+            '<div class="note">' + i.stock + ' ' + i.unit + ' in vault</div>' +
+            '<div class="bar"><i class="' + (low ? 'low' : '') + '" style="--w:' + pct + '%;"></i></div>' +
+            '<div class="note">¢' + i.price.toFixed(2) + ' / ' + i.unit + '</div>' +
+          '</button>'
+        );
+      }).join("");
+      placeDeck();
+    }
+
+    var CARD = 310, STEP = 336;
+    var dragStart = null, dragDx = 0, moved = false;
+
+    function slideX(n) {
+      var deck = document.getElementById("deck");
+      if (!deck) return 0;
+      return deck.clientWidth / 2 - 155 - n * STEP;
+    }
+
+    function placeDeck() {
+      var track = document.getElementById("track");
+      if (!track) return;
+      track.style.transform = "translateX(" + slideX(cur) + "px)";
+      var cards = document.querySelectorAll("#inventory .deck-card");
+      cards.forEach(function(c, n) {
+        var d = n - cur;
+        c.classList.toggle("on", d === 0);
+        c.style.zIndex = 100 - Math.abs(d);
+        var T = Math.max(-50, Math.min(50, d * 30));
+        c.style.setProperty("--tilt", T + "deg");
+        if (d === 0) {
+          c.style.transform = "perspective(700px) rotateY(0deg) scale(1)";
+        } else {
+          c.style.transform = "perspective(700px) rotateY(" + T + "deg) scale(0.94)";
+        }
+      });
+    }
+
+    function endDrag() {
+      if (dragStart === null) return;
+      dragStart = null;
+      var steps = Math.round(-dragDx / STEP);
+      if (steps === 0 && Math.abs(dragDx) > 40) steps = dragDx < 0 ? 1 : -1;
+      var old = cur;
+      cur = Math.min(items.length - 1, Math.max(0, cur + steps));
+      var track = document.getElementById("track");
+      if (track) track.classList.remove("drag");
+      if (cur !== old) drawDetail();
+      placeDeck();
+    }
+
+    function go(step) {
+      cur = Math.min(items.length - 1, Math.max(0, cur + step));
+      drawDetail();
+      placeDeck();
+    }
+
+    var toastTimer;
+    function toast(msg) {
+      var t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(function() { t.classList.remove("show"); }, 2500);
+    }
+
+    // Initialize Inventory deck & detail interactions
+    function initInventoryDeckInteractions() {
+      var deck = document.getElementById("deck");
+      var track = document.getElementById("track");
+      var detail = document.getElementById("detail");
+
+      if (deck) {
+        deck.addEventListener("pointerdown", function(e) {
+          if (e.button !== 0) return;
+          dragStart = e.clientX;
+          dragDx = 0;
+          moved = false;
+          if (track) track.classList.add("drag");
+        });
+
+        deck.addEventListener("click", function(e) {
+          var c = e.target.closest("[data-n]");
+          if (moved) return;
+          if (!c) return;
+          cur = Number(c.dataset.n);
+          drawDetail();
+          placeDeck();
+        });
+
+        var wheelLock = false;
+        deck.addEventListener("wheel", function(e) {
+          if (Math.abs(e.deltaX) < 10 || Math.abs(e.deltaX) < Math.abs(e.deltaY) || wheelLock) return;
+          e.preventDefault();
+          wheelLock = true;
+          go(e.deltaX > 0 ? 1 : -1);
+          setTimeout(function() { wheelLock = false; }, 450);
+        }, { passive: false });
+      }
+
+      document.addEventListener("pointermove", function(e) {
+        if (dragStart === null) return;
+        dragDx = e.clientX - dragStart;
+        if (Math.abs(dragDx) > 5) moved = true;
+        if (track) track.style.transform = "translateX(" + (slideX(cur) + dragDx) + "px)";
+      });
+
+      document.addEventListener("pointerup", endDrag);
+      document.addEventListener("pointercancel", endDrag);
+
+      document.addEventListener("keydown", function(e) {
+        if (e.target.tagName === "INPUT") return;
+        var invSec = document.getElementById("inventory") || document.getElementById("view-inventory");
+        if (!invSec || !invSec.classList.contains("active")) return;
+        if (e.key === "ArrowRight") go(1);
+        if (e.key === "ArrowLeft") go(-1);
+      });
+
+      if (detail) {
+        detail.addEventListener("click", function(e) {
+          var b = e.target.closest("button");
+          if (!b) return;
+          var item = items[cur];
+          var box = document.getElementById("in-cur");
+          if (!box) return;
+
+          if (b.dataset.act === "minus") box.value = Math.max(0, Number(box.value) - 1);
+          if (b.dataset.act === "plus") box.value = Number(box.value) + 1;
+
+          if (b.dataset.act === "update") {
+            var next = Math.max(0, Math.floor(Number(box.value) || 0));
+            var diff = next - item.stock;
+            if (diff === 0) {
+              toast(item.name + " is already at " + next + ".");
+              return;
+            }
+            if (diff > 0) {
+              if (!item.buy) item.buy = [0, 0, 0, 0, 0, 0];
+              item.buy[5] += diff;
+            }
+            item.stock = next;
+            movements.unshift({
+              time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", month: "short", day: "numeric" }),
+              type: diff > 0 ? "Restock" : "Sale",
+              text: item.name + " " + (diff > 0 ? "+" : "−") + Math.abs(diff) + " " + item.unit,
+              note: ""
+            });
+            saveState();
+            drawDetail();
+            drawDeck();
+            renderDashboard();
+            renderActivityTable();
+            if (document.getElementById("view-forecast") && document.getElementById("view-forecast").classList.contains("active")) {
+              renderForecastPage();
+            }
+            updateSaleItems();
+            toast(item.name + " updated.");
+          }
+        });
+      }
+    }
+
+    function stepStockInput(inputId, delta) {
+      var el = document.getElementById(inputId);
+      if (!el) return;
+      var val = parseInt(el.value, 10);
+      if (isNaN(val)) val = 0;
+      val = Math.max(0, val + delta);
+      el.value = val;
+    }
+
+    function setDirectStock(index, newQtyStr, evt) {
+      var newQty = parseInt(newQtyStr, 10);
+      if (isNaN(newQty) || newQty < 0) {
+        alert("Please enter a valid stock number.");
+        return;
+      }
+      var oldQty = items[index].stock;
+      var delta = newQty - oldQty;
+      items[index].stock = newQty;
+
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: delta >= 0 ? "Restock" : "Sale",
+        text: items[index].name + " " + (delta >= 0 ? "+" : "") + delta + " " + items[index].unit + " (Set to " + newQty + ")",
+        note: "Direct ledger update via apothecary input box"
+      });
+
+      spawnParticle((delta >= 0 ? "+" : "") + delta + " " + items[index].icon, delta >= 0 ? "var(--slime)" : "#ff7518", evt);
+      saveState();
+      drawInv();
+      renderDashboard();
+      if (document.getElementById("view-forecast").classList.contains("active")) {
+        renderForecastPage();
+      }
+      updateSaleItems();
+    }
+
+    function adjustInventory(index, delta, evt) {
+      if (items[index].stock + delta < 0) return;
+      items[index].stock += delta;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: delta > 0 ? "Restock" : "Sale",
+        text: items[index].name + " " + (delta > 0 ? "+" : "") + delta + " " + items[index].unit,
+        note: "Manual ledger adjustment in inventory vault"
+      });
+      spawnParticle((delta > 0 ? "+" : "") + delta + " " + items[index].icon, delta > 0 ? "var(--slime)" : "#ff7518", evt);
+      saveState();
+      drawInv();
+      renderDashboard();
+      if (document.getElementById("view-forecast").classList.contains("active")) {
+        renderForecastPage();
+      }
+      updateSaleItems();
+    }
+
+    // ==================== FORECAST & RESTOCK (PAGE 3) ====================
+    // Historical sales data matching the reference screenshot
+    var historicSalesSeries = {
+      "item-1": [
+        { label: "Mon, 10/26", actual: 8 },
+        { label: "Tue, 10/27", actual: 9 },
+        { label: "Wed, 10/28", actual: 7 },
+        { label: "Thu, 10/29", actual: 10 },
+        { label: "Fri, 10/30", actual: 8 },
+        { label: "Sat, 10/31", actual: 9 },
+        { label: "Sun, 11/1", actual: 28 }
+      ],
+      "item-2": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 2 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 3 },
+        { label: "Fri, 10/30", actual: 2 },
+        { label: "Sat, 10/31", actual: 3 },
+        { label: "Sun, 11/1", actual: 7 }
+      ],
+      "item-3": [
+        { label: "Mon, 10/26", actual: 3 },
+        { label: "Tue, 10/27", actual: 3 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 4 },
+        { label: "Fri, 10/30", actual: 3 },
+        { label: "Sat, 10/31", actual: 3 },
+        { label: "Sun, 11/1", actual: 3 }
+      ],
+      "item-4": [
+        { label: "Mon, 10/26", actual: 4 },
+        { label: "Tue, 10/27", actual: 4 },
+        { label: "Wed, 10/28", actual: 4 },
+        { label: "Thu, 10/29", actual: 4 },
+        { label: "Fri, 10/30", actual: 4 },
+        { label: "Sat, 10/31", actual: 4 },
+        { label: "Sun, 11/1", actual: 4 }
+      ],
+      "item-5": [
+        { label: "Mon, 10/26", actual: 1 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 1 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 1 },
+        { label: "Sun, 11/1", actual: 4 }
+      ],
+      "item-6": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 2 },
+        { label: "Wed, 10/28", actual: 2 },
+        { label: "Thu, 10/29", actual: 2 },
+        { label: "Fri, 10/30", actual: 2 },
+        { label: "Sat, 10/31", actual: 2 },
+        { label: "Sun, 11/1", actual: 2 }
+      ],
+      "item-7": [
+        { label: "Mon, 10/26", actual: 1 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 1 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 1 },
+        { label: "Sun, 11/1", actual: 2 }
+      ],
+      "item-8": [
+        { label: "Mon, 10/26", actual: 2 },
+        { label: "Tue, 10/27", actual: 1 },
+        { label: "Wed, 10/28", actual: 1 },
+        { label: "Thu, 10/29", actual: 2 },
+        { label: "Fri, 10/30", actual: 1 },
+        { label: "Sat, 10/31", actual: 2 },
+        { label: "Sun, 11/1", actual: 5 }
+      ]
+    };
+
+    function calculateForecast(item) {
+      var series = historicSalesSeries[item.id] || historicSalesSeries["item-1"];
+      var totalHistoric = series.reduce(function(acc, s) { return acc + s.actual; }, 0);
+      var avgDaily = totalHistoric / series.length;
+      var multiplier = item.festival ? (item.festivalMul || 3) : 1;
+      var dailyForecast = Math.round(avgDaily * multiplier * 10) / 10;
+      var forecast7d = Math.round(dailyForecast * 7);
+      var safetyStock = item.minStock;
+      var currentStock = item.stock;
+      var reorderQty = Math.max(0, forecast7d + safetyStock - currentStock);
+
+      return {
+        series: series,
+        avgDaily: avgDaily,
+        dailyForecast: dailyForecast,
+        forecast7d: forecast7d,
+        safetyStock: safetyStock,
+        currentStock: currentStock,
+        reorderQty: reorderQty
+      };
+    }
+
+    function renderForecastPage() {
+      var sel = document.getElementById("forecastReagentSelect");
+      var prevVal = sel.value;
+      sel.innerHTML = "";
+      for (var i = 0; i < items.length; i++) {
+        sel.innerHTML += '<option value="' + i + '">' + items[i].name + ' (' + items[i].stock + ' ' + items[i].unit + ' in stock)</option>';
+      }
+      if (prevVal !== "" && parseInt(prevVal, 10) < items.length) {
+        sel.value = prevVal;
+        selectedForecastIndex = parseInt(prevVal, 10);
+      } else {
+        sel.value = "0";
+        selectedForecastIndex = 0;
+      }
+
+      renderSelectedForecast();
+      renderAllRestockTable();
+    }
+
+    function renderSelectedForecast() {
+      var sel = document.getElementById("forecastReagentSelect");
+      selectedForecastIndex = parseInt(sel.value, 10);
+      var item = items[selectedForecastIndex];
+      var fc = calculateForecast(item);
+
+      // Render Featured Reagent Ledger Card matching screenshot exactly
+      var card = document.getElementById("fcFeaturedCard");
+      if (card) {
+        var festTag = item.festival ? ' <span style="color:#ff7518; font-size:16px; font-weight:normal;">[🌕 ' + item.festivalMul + 'x Festival]</span>' : '';
+        var pct = Math.min(100, Math.round((item.stock / Math.max(item.minStock * 2, 40)) * 100));
+        var gaugeColor = item.stock <= 0 ? "#9b1c1c" : item.stock <= item.minStock ? "#ff7518" : "#2f5e2a";
+        var statusLabel = item.stock <= 0 ? "Depleted" : item.stock <= item.minStock ? "Critical Threshold" : "Abundant";
+
+        card.innerHTML =
+          '<div style="font-family:\'IM Fell English\', serif; font-size:24px; color:var(--ink); margin-bottom:4px;">' +
+          item.icon + ' ' + item.name + festTag +
+          '</div>' +
+          '<div style="color:#2f5e2a; font-weight:600; font-size:18px; margin-bottom:4px;">' +
+          'Vault Stock: <span style="color:var(--ink); font-size:20px;">' + item.stock + '</span> ' + item.unit + ' <span style="font-size:14px; color:#6b5440;">(Min: ' + item.minStock + ' &bull; ' + statusLabel + ')</span>' +
+          '</div>' +
+          '<div style="color:#8a4a1c; font-size:16px; margin-bottom:10px;">' +
+          '¢' + item.price.toFixed(2) + ' / ' + item.unit + ' &bull; ' + item.supplier +
+          '</div>' +
+          '<div class="potion-gauge" title="Potion Level: ' + pct + '%" style="margin-bottom:14px;">' +
+          '<div class="potion-fill" style="width:' + pct + '%; background:' + gaugeColor + ';"></div>' +
+          '</div>' +
+          '<div class="stock-control" style="margin-top:4px;">' +
+          '<div class="stock-input-wrap">' +
+          '<button type="button" class="stock-btn-stepper" onclick="stepStockInput(\'fcStockInput\', -1)" title="Decrease stock by 1">&minus;</button>' +
+          '<input type="number" id="fcStockInput" class="stock-num-input" value="' + item.stock + '" min="0" max="9999" onkeydown="if(event.key===\'Enter\'){setDirectStock(' + selectedForecastIndex + ', this.value, event); renderForecastPage();}" title="Enter custom stock quantity and press Enter or Update">' +
+          '<button type="button" class="stock-btn-stepper" onclick="stepStockInput(\'fcStockInput\', 1)" title="Increase stock by 1">+</button>' +
+          '</div>' +
+          '<button type="button" class="stock-apply-btn" onclick="setDirectStock(' + selectedForecastIndex + ', document.getElementById(\'fcStockInput\').value, event); renderForecastPage();" title="Commit stock adjustment">Update</button>' +
+          '</div>';
+      }
+
+      renderForecastSvgChart(item, fc);
+    }
+
+    function renderForecastSvgChart(item, fc) {
+      var container = document.getElementById("chartSvgWrapper");
+      var svgW = 860;
+      var svgH = 200;
+      var padLeft = 40;
+      var padRight = 36;
+      var padTop = 32;
+      var padBottom = 32;
+      var plotW = svgW - padLeft - padRight;
+      var plotH = svgH - padTop - padBottom;
+
+      // 7 historical points
+      var points = [];
+      for (var s = 0; s < fc.series.length; s++) {
+        points.push({
+          label: fc.series[s].label,
+          actual: fc.series[s].actual,
+          forecast: null,
+          isFuture: false
+        });
+      }
+
+      // 7 future points matching +1d (Mon) to +7d (Sun)
+      var futureDays = ["+1d (Mon)", "+2d (Tue)", "+3d (Wed)", "+4d (Thu)", "+5d (Fri)", "+6d (Sat)", "+7d (Sun)"];
+      for (var f = 0; f < futureDays.length; f++) {
+        points.push({
+          label: futureDays[f],
+          actual: null,
+          forecast: fc.dailyForecast,
+          isFuture: true
+        });
+      }
+
+      // Max value for scaling
+      var maxVal = Math.max(15, fc.dailyForecast * 1.35, 38);
+      var stepX = plotW / (points.length - 1);
+      var barsHtml = "";
+      var pathD = "";
+
+      for (var idx = 0; idx < points.length; idx++) {
+        var pt = points[idx];
+        var x = padLeft + idx * stepX;
+        var val = pt.actual !== null ? pt.actual : pt.forecast;
+        var y = padTop + plotH - (val / maxVal) * plotH;
+
+        if (!pt.isFuture) {
+          // Historical Bar (dark ink with pumpkin border matching screenshot)
+          var barH = Math.max(6, (pt.actual / maxVal) * plotH);
+          var barY = padTop + plotH - barH;
+          barsHtml +=
+            '<rect x="' + (x - 12) + '" y="' + barY + '" width="24" height="' + barH + '" fill="#181122" stroke="#ff7518" stroke-width="1.8" rx="2">' +
+            '<title>' + pt.label + ': ' + pt.actual + ' actual sales</title>' +
+            '</rect>' +
+            '<text x="' + x + '" y="' + (barY - 6) + '" font-size="12" fill="#2b1d14" font-weight="bold" font-family="Crimson Text, Georgia, serif" text-anchor="middle">' + pt.actual + '</text>';
+        } else {
+          // Forecast Curve connection
+          if (!pathD) {
+            var prevPt = points[idx - 1];
+            var prevX = padLeft + (idx - 1) * stepX;
+            var prevVal = prevPt.actual !== null ? prevPt.actual : prevPt.forecast;
+            var prevY = padTop + plotH - (prevVal / maxVal) * plotH;
+            pathD = "M " + prevX + " " + prevY + " L " + x + " " + y;
+          } else {
+            pathD += " L " + x + " " + y;
+          }
+          barsHtml +=
+            '<circle cx="' + x + '" cy="' + y + '" r="5" fill="#ff7518" stroke="#181122" stroke-width="1.5">' +
+            '<title>' + pt.label + ': ' + pt.forecast + ' projected</title>' +
+            '</circle>' +
+            '<text x="' + x + '" y="' + (y - 8) + '" font-size="12" fill="#8a4a1c" font-weight="bold" font-family="Crimson Text, Georgia, serif" text-anchor="middle">' + pt.forecast + '</text>';
+        }
+
+        // X-axis label
+        barsHtml += '<text x="' + x + '" y="' + (svgH - 10) + '" font-size="11" fill="#6b5440" font-family="Crimson Text, Georgia, serif" text-anchor="middle">' + pt.label + '</text>';
+      }
+
+      container.innerHTML =
+        '<svg viewBox="0 0 ' + svgW + ' ' + svgH + '" style="width:100%; height:auto; display:block;">' +
+        '<line x1="' + padLeft + '" y1="' + (padTop + plotH) + '" x2="' + (svgW - padRight) + '" y2="' + (padTop + plotH) + '" stroke="#ff7518" stroke-width="1.2" opacity="0.6"/>' +
+        (pathD ? '<path d="' + pathD + '" fill="none" stroke="#ff7518" stroke-width="2.5" stroke-dasharray="5,4"/>' : '') +
+        barsHtml +
+        '</svg>' +
+        '<div style="display:flex; justify-content:center; align-items:center; gap:26px; font-size:14px; margin-top:14px; color:#2b1d14; font-family:\'Crimson Text\', Georgia, serif;">' +
+        '<span style="display:flex; align-items:center; gap:8px;"><span style="display:inline-block; width:14px; height:12px; background:#181122; border:2px solid #ff7518; border-radius:2px;"></span> <strong>Actual Sales</strong></span>' +
+        '<span style="display:flex; align-items:center; gap:8px;"><span style="display:inline-block; width:18px; height:2px; background:#ff7518; border-bottom:2px dashed #ff7518;"></span> <strong>7-Day Forecast Curve</strong></span>' +
+        '</div>';
+    }
+
+    // Render All Pantry Restock Recommendations Table matching Reference Screenshot
+    function renderAllRestockTable() {
+      var tbody = document.getElementById("allRestockTbody");
+      tbody.innerHTML = "";
+
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var fc = calculateForecast(item);
+        var subText = item.unit + (item.festival ? ' &bull; 🌕 ' + item.festivalMul + 'x Cursed' : ' &bull; Normal');
+        if (item.stock <= 0) subText = item.unit + ' &bull; Depleted';
+
+        var reorderHtml = fc.reorderQty > 0
+          ? '<span class="fc-reorder-val">+' + fc.reorderQty + ' ' + item.unit + '</span>'
+          : '<span class="fc-reorder-sufficient">Sufficient</span>';
+
+        tbody.innerHTML +=
+          '<tr>' +
+          '<td>' +
+          '<div class="fc-item-title">' + item.icon + ' ' + item.name + '</div>' +
+          '<div class="fc-item-sub">' + subText + '</div>' +
+          '</td>' +
+          '<td><strong style="color:var(--ink); font-size:17px;">' + item.stock + '</strong> <span style="font-size:14px; color:#6b5440;">' + item.unit + '</span></td>' +
+          '<td><span style="color:#2f5e2a; font-weight:600;">' + item.minStock + '</span> <span style="font-size:14px; color:#6b5440;">' + item.unit + '</span></td>' +
+          '<td><strong>' + fc.forecast7d + '</strong> <span style="font-size:14px; color:#6b5440;">' + item.unit + '</span></td>' +
+          '<td>' + reorderHtml + '</td>' +
+          '<td>' + item.supplier + ' (' + item.leadDays + 'd)</td>' +
+          '<td>' +
+          '<button class="fc-btn-restock" onclick="quickRestockItem(' + i + ', ' + (fc.reorderQty > 0 ? fc.reorderQty : 20) + ', event)">Order Restock</button>' +
+          '</td>' +
+          '</tr>';
+      }
+    }
+
+    function orderAllShortages() {
+      var count = 0;
+      for (var i = 0; i < items.length; i++) {
+        var fc = calculateForecast(items[i]);
+        if (fc.reorderQty > 0) {
+          items[i].stock += fc.reorderQty;
+          count++;
+          movements.unshift({
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+            type: "Restock",
+            text: items[i].name + " +" + fc.reorderQty + " " + items[i].unit,
+            note: "Algorithmic bulk reorder dispatch to " + items[i].supplier
+          });
+        }
+      }
+      saveState();
+      renderForecastPage();
+      alert("Dispatched raven restock orders for " + count + " shortage reagents!");
+    }
+
+    function confirmRestock() {
+      var idx = parseInt(document.getElementById("restockItem").value, 10);
+      var qty = parseInt(document.getElementById("restockQty").value, 10);
+      var supplier = document.getElementById("restockSupplier").value;
+      var note = document.getElementById("restockNotes").value.trim() || ("Shipment delivered via " + supplier);
+
+      if (isNaN(qty) || qty <= 0) return;
+
+      items[idx].stock += qty;
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Restock",
+        text: items[idx].name + " +" + qty + " " + items[idx].unit,
+        note: note
+      });
+
+      saveState();
+      document.getElementById("restockNotes").value = "";
+      document.getElementById("restockMsg").textContent = "Deposited " + qty + " units of " + items[idx].name + " into vault.";
+
+      var rBox = document.getElementById("restockBox");
+      rBox.classList.add("flash");
+      setTimeout(function() { rBox.classList.remove("flash"); }, 900);
+
+      renderForecastPage();
+    }
+
+    // ==================== RECORD SALE ====================
+    function buildSaleItems() {
+      var box = document.getElementById("saleItems");
+      box.innerHTML = "";
+      sale = [];
+      for (var i = 0; i < items.length; i++) {
+        sale.push(0);
+        box.innerHTML +=
+          '<button class="item" id="saleItem' + i + '" onclick="addItemToSale(' + i + ', event)">' +
+          '<strong>' + items[i].icon + ' ' + items[i].name + '</strong>' +
+          '<span class="stamp">Sold out</span>' +
+          '<span class="stock" id="saleStock' + i + '"></span>' +
+          '<span class="price">¢' + items[i].price.toFixed(2) + ' / ' + items[i].unit + '</span>' +
+          '</button>';
+      }
+      updateSaleItems();
+    }
+
+    function updateSaleItems() {
+      for (var i = 0; i < items.length; i++) {
+        var elStock = document.getElementById("saleStock" + i);
+        var elBtn = document.getElementById("saleItem" + i);
+        if (!elStock || !elBtn) continue;
+        var left = items[i].stock - (sale[i] || 0);
+        elStock.textContent = "Available: " + left + " " + items[i].unit;
+        elBtn.disabled = left <= 0;
+      }
+    }
+
+    function addItemToSale(i) {
+      if (items[i].stock - (sale[i] || 0) <= 0) return;
+      sale[i] = (sale[i] || 0) + 1;
+      lastAdded = i;
+      document.getElementById("msg").textContent = "";
+      updateSaleItems();
+      showTicket();
+    }
+
+    function showTicket() {
+      var lines = document.getElementById("lines");
+      var units = 0;
+      var cost = 0;
+      lines.innerHTML = "";
+      for (var i = 0; i < items.length; i++) {
+        if (sale[i] > 0) {
+          var cls = (i === lastAdded) ? "line new" : "line";
+          lines.innerHTML +=
+            '<div class="' + cls + '"><span>' + items[i].name + ' x ' + sale[i] + '</span>' +
+            '<span>¢' + (sale[i] * items[i].price).toFixed(2) + '</span></div>';
+          units += sale[i];
+          cost += (sale[i] * items[i].price);
+        }
+      }
+      if (units === 0) {
+        lines.innerHTML = '<p class="note">No items yet. Click an ingredient on the left.</p>';
+      }
+      document.getElementById("units").textContent = units;
+      document.getElementById("cost").textContent = "¢" + cost.toFixed(2);
+      document.getElementById("confirm").disabled = (units === 0);
+    }
+
+    function confirmSale() {
+      var count = 0;
+      var soldDescriptions = [];
+      for (var i = 0; i < items.length; i++) {
+        if (sale[i] > 0) {
+          items[i].stock -= sale[i];
+          if (!items[i].sold) items[i].sold = [0, 0, 0, 0, 0, 0];
+          items[i].sold[5] += sale[i];
+          count += sale[i];
+          soldDescriptions.push(items[i].name + " x " + sale[i]);
+          sale[i] = 0;
+        }
+      }
+
+      var customerNote = document.getElementById("note").value.trim() || "Midnight traveler walk-in";
+      document.getElementById("note").value = "";
+      document.getElementById("msg").textContent = "Sale recorded. " + count + " items taken from stock.";
+
+      movements.unshift({
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+        type: "Sale",
+        text: soldDescriptions.join(", "),
+        note: customerNote
+      });
+
+      var ticket = document.getElementById("saleTicket");
+      ticket.classList.add("flash");
+      setTimeout(function () { ticket.classList.remove("flash"); }, 900);
+
+      lastAdded = -1;
+      saveState();
+      var invSec = document.getElementById("inventory") || document.getElementById("view-inventory");
+      if (invSec && invSec.classList.contains("active")) {
+        drawInv();
+      }
+      updateSaleItems();
+      showTicket();
+    }
+
+    // ==================== ACTIVITY TABLE ====================
+    function renderActivityTable() {
+      var tbody = document.getElementById("activityTbody");
+      tbody.innerHTML = "";
+      if (movements.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#6b5440; padding:20px;">No apothecary movements recorded yet.</td></tr>';
+        return;
+      }
+      for (var i = 0; i < movements.length; i++) {
+        var m = movements[i];
+        var tagClass = m.type === "Sale" ? "tag-sale" : (m.type === "Restock" ? "tag-restock" : "tag-alert");
+        tbody.innerHTML +=
+          '<tr>' +
+          '<td>' + m.time + '</td>' +
+          '<td><span class="' + tagClass + '">' + m.type + '</span></td>' +
+          '<td><strong>' + m.text + '</strong></td>' +
+          '<td>' + m.note + '</td>' +
+          '</tr>';
+      }
+    }
+
+    function clearActivityLogs() {
+      if (confirm("Clear all archived movement ledger records?")) {
+        movements = [];
+        saveState();
+        renderActivityTable();
+      }
+    }
+
+    // ==================== SETTINGS ====================
+    function saveSettings() {
+      document.getElementById("settingsMsg").textContent = "Configuration saved to local apothecary parchment.";
+      setTimeout(function() { document.getElementById("settingsMsg").textContent = ""; }, 3000);
+    }
+
+    function resetDemoVault() {
+      if (confirm("Reset apothecary vault to default sample catalog?")) {
+        localStorage.removeItem("hexley_items_v2");
+        localStorage.removeItem("hexley_movements_v2");
+        loadState();
+        buildSaleItems();
+        navigateTo("dashboard");
+      }
+    }
+
+    // ==================== MAGICAL ANIMATIONS & FEATURES ====================
+    function toggleBloodMoon() {
+      document.body.classList.toggle("blood-moon");
+      var isBlood = document.body.classList.contains("blood-moon");
+      spawnParticle(isBlood ? "🌕 ECLIPSE SUMMONED" : "🌑 LUNAR CALM", isBlood ? "#ff3344" : "#f2b25c");
+    }
+
+    function spawnParticle(text, color, evt) {
+      var p = document.createElement("div");
+      p.className = "float-particle";
+      p.textContent = text;
+      p.style.color = color || "var(--gold)";
+      var x = evt && evt.clientX ? evt.clientX : (window.innerWidth / 2);
+      var y = evt && evt.clientY ? evt.clientY : (window.innerHeight / 2);
+      p.style.left = x + "px";
+      p.style.top = y + "px";
+      document.body.appendChild(p);
+      setTimeout(function() { p.remove(); }, 850);
+    }
+
+    function initEmbers() {
+      var fx = document.getElementById("fxScene");
+      if (!fx) return;
+      var colors = ["#ff7518", "#8a4fd1", "#7fff5a", "#f2b25c", "#f6e7c1"];
+      for (var i = 0; i < 20; i++) {
+        var ember = document.createElement("div");
+        ember.className = "ember";
+        var size = Math.floor(Math.random() * 4) + 2;
+        var color = colors[Math.floor(Math.random() * colors.length)];
+        ember.style.width = size + "px";
+        ember.style.height = size + "px";
+        ember.style.background = color;
+        ember.style.boxShadow = "0 0 " + (size * 2) + "px " + color;
+        ember.style.left = (Math.random() * 100) + "vw";
+        ember.style.animationDuration = (Math.random() * 12 + 10) + "s";
+        ember.style.animationDelay = (Math.random() * 10) + "s";
+        fx.appendChild(ember);
+      }
+    }
+
+    // Hook particle effect into addItemToSale
+    var originalAddItemToSale = addItemToSale;
+    addItemToSale = function(i, evt) {
+      if (items[i].stock - (sale[i] || 0) > 0) {
+        spawnParticle("+1 " + items[i].icon, "var(--slime)", evt);
+      }
+      originalAddItemToSale(i);
+    };
+
+    // Ambient Magic Sparkle Trail on Mousemove (artisan Victorian touch)
+    var lastSparkle = 0;
+    window.addEventListener("mousemove", function(e) {
+      var now = Date.now();
+      if (now - lastSparkle > 160) {
+        lastSparkle = now;
+        var s = document.createElement("span");
+        s.className = "float-particle";
+        var runes = ["✦", "✧", "⋆", "✨", "🦇", "🧪", "🎃"];
+        s.textContent = runes[Math.floor(Math.random() * runes.length)];
+        var colors = ["#ff7518", "#f2b25c", "#8a4fd1", "#7fff5a", "#ecdcbc"];
+        s.style.color = colors[Math.floor(Math.random() * colors.length)];
+        s.style.fontSize = (Math.random() * 8 + 12) + "px";
+        s.style.left = (e.clientX + (Math.random() * 14 - 7)) + "px";
+        s.style.top = (e.clientY + (Math.random() * 14 - 7)) + "px";
+        s.style.zIndex = "999";
+        s.style.animation = "sparkleFade 0.75s forwards ease-out";
+        document.body.appendChild(s);
+        setTimeout(function() { s.remove(); }, 750);
+      }
+    });
+
+    // ==================== ANTIGRAVITY ENGINE ====================
+    // 1. Antigravity Floating Runes & Particle Physics Canvas
+    (function initAntigravityPhysics() {
+      var canvas = document.getElementById("antigravityCanvas");
+      if (!canvas) return;
+      var ctx = canvas.getContext("2d");
+      var w = canvas.width = window.innerWidth;
+      var h = canvas.height = window.innerHeight;
+
+      window.addEventListener("resize", function() {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      var mousePos = { x: w / 2, y: h / 2, radius: 170 };
+      window.addEventListener("mousemove", function(e) {
+        mousePos.x = e.clientX;
+        mousePos.y = e.clientY;
+      });
+
+      var runes = ["✧", "✦", "✶", "☾", "⚝", "☿", "🜂", "🜄"];
+      var particleList = [];
+      var count = Math.min(65, Math.floor(w / 22));
+
+      for (var i = 0; i < count; i++) {
+        particleList.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: Math.random() * 2.2 + 1,
+          rune: Math.random() > 0.65 ? runes[Math.floor(Math.random() * runes.length)] : null,
+          runeSize: Math.floor(Math.random() * 11 + 9),
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: -(Math.random() * 0.55 + 0.15), // upward antigravity drift
+          baseAlpha: Math.random() * 0.4 + 0.12,
+          color: Math.random() > 0.6 ? "#ff7518" : (Math.random() > 0.5 ? "#f2b25c" : "#8a4fd1")
+        });
+      }
+
+      function loopAntigravity() {
+        ctx.clearRect(0, 0, w, h);
+
+        for (var idx = 0; idx < particleList.length; idx++) {
+          var p = particleList[idx];
+
+          // Mouse Antigravity Repulsion
+          var dx = mousePos.x - p.x;
+          var dy = mousePos.y - p.y;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < mousePos.radius) {
+            var force = (1 - dist / mousePos.radius) * 2.5;
+            p.x -= (dx / dist) * force;
+            p.y -= (dy / dist) * force;
+          }
+
+          p.x += p.vx;
+          p.y += p.vy;
+
+          if (p.y < -20) {
+            p.y = h + 10;
+            p.x = Math.random() * w;
+          }
+          if (p.x < -20) p.x = w + 10;
+          if (p.x > w + 20) p.x = -10;
+
+          ctx.save();
+          if (p.rune) {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.baseAlpha;
+            ctx.font = p.runeSize + "px serif";
+            ctx.fillText(p.rune, p.x, p.y);
+          } else {
+            ctx.fillStyle = p.color;
+            ctx.globalAlpha = p.baseAlpha;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        requestAnimationFrame(loopAntigravity);
+      }
+      loopAntigravity();
+    })();
+
+    // 2. Custom Magnetic Dual-Ring Celestial Cursor
+    (function initCustomCursor() {
+      var dot = document.getElementById("cursorDot");
+      var ring = document.getElementById("cursorRing");
+      if (!dot || !ring) return;
+
+      var curX = window.innerWidth / 2, curY = window.innerHeight / 2;
+      var ringX = curX, ringY = curY;
+
+      window.addEventListener("mousemove", function(e) {
+        curX = e.clientX;
+        curY = e.clientY;
+      });
+
+      // Click Shockwave
+      window.addEventListener("click", function(e) {
+        var wave = document.createElement("div");
+        wave.className = "click-shockwave";
+        wave.style.left = e.clientX + "px";
+        wave.style.top = e.clientY + "px";
+        document.body.appendChild(wave);
+        setTimeout(function() { wave.remove(); }, 650);
+      });
+
+      function loopCursor() {
+        dot.style.left = curX + "px";
+        dot.style.top = curY + "px";
+
+        ringX += (curX - ringX) * 0.18;
+        ringY += (curY - ringY) * 0.18;
+        ring.style.left = ringX + "px";
+        ring.style.top = ringY + "px";
+
+        requestAnimationFrame(loopCursor);
+      }
+      loopCursor();
+
+      // Magnetic Button Snap
+      window.addEventListener("mousemove", function(e) {
+        var magBtns = document.querySelectorAll(".btn, .btn-sm, .stock-apply-btn, .filter-btn");
+        magBtns.forEach(function(btn) {
+          var rect = btn.getBoundingClientRect();
+          var btnCenterX = rect.left + rect.width / 2;
+          var btnCenterY = rect.top + rect.height / 2;
+          var distX = e.clientX - btnCenterX;
+          var distY = e.clientY - btnCenterY;
+          var dist = Math.sqrt(distX * distX + distY * distY);
+
+          if (dist < 55) {
+            var pullX = distX * 0.22;
+            var pullY = distY * 0.22;
+            btn.style.transform = "translate(" + pullX.toFixed(1) + "px, " + pullY.toFixed(1) + "px)";
+          } else {
+            btn.style.transform = "";
+          }
+        });
+      });
+
+      function bindHoverTargets() {
+        var targets = document.querySelectorAll("a, button, input, select, .item, .stat-card, .ticket, .filter-btn, .moon");
+        targets.forEach(function(el) {
+          el.addEventListener("mouseenter", function() { document.body.classList.add("cursor-hover"); });
+          el.addEventListener("mouseleave", function() { document.body.classList.remove("cursor-hover"); });
+        });
+      }
+      bindHoverTargets();
+      window.bindHoverTargets = bindHoverTargets;
+    })();
+
+    // 3. 3D Gyroscopic Tilt & Dynamic Spotlight Reflector
+    (function init3DTiltAndSpotlights() {
+      function attachTilt(card) {
+        if (card.dataset.tiltAttached) return;
+        card.dataset.tiltAttached = "true";
+
+        card.addEventListener("mousemove", function(e) {
+          var rect = card.getBoundingClientRect();
+          var x = e.clientX - rect.left;
+          var y = e.clientY - rect.top;
+          var centerX = rect.width / 2;
+          var centerY = rect.height / 2;
+
+          var rotX = ((y - centerY) / centerY) * -6;
+          var rotY = ((x - centerX) / centerX) * 6;
+
+          card.style.transform = "perspective(900px) rotateX(" + rotX.toFixed(2) + "deg) rotateY(" + rotY.toFixed(2) + "deg) translateY(-2px)";
+          card.style.setProperty("--spotlight-x", x + "px");
+          card.style.setProperty("--spotlight-y", y + "px");
+        });
+
+        card.addEventListener("mouseleave", function() {
+          card.style.transform = "perspective(900px) rotateX(0deg) rotateY(0deg) translateY(0px)";
+        });
+      }
+
+      function updateCardTilts() {
+        var cards = document.querySelectorAll(".item, .stat-card, .ticket, .fc-card, .panel");
+        cards.forEach(attachTilt);
+      }
+      setInterval(updateCardTilts, 1000);
+      window.updateCardTilts = updateCardTilts;
+    })();
+
+    // Boot
+    loadState();
+    buildSaleItems();
+    initEmbers();
+    initInventoryTrends();
+    initInventoryDeckInteractions();
+
+    window.addEventListener("resize", function() {
+      placeDeck();
+    });
+
+    var hash = (window.location.hash || "").replace("#", "");
+    if (hash && (document.getElementById(hash) || document.getElementById("view-" + hash))) {
+      navigateTo(hash);
+    } else {
+      navigateTo("dashboard");
+    }
+    if (window.bindHoverTargets) window.bindHoverTargets();
+    if (window.updateCardTilts) window.updateCardTilts();
+  </script>
+  <div class="toast" id="toast"></div>
+</body>
+</html>
