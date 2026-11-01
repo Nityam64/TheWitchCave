@@ -1,0 +1,8 @@
+{
+  "version": 2,
+  "builds": [],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "https://hexleys-pantry-api.onrender.com/api/$1" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
