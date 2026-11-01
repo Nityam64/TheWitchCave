@@ -3,21 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 // ============================================================================
-// HEXLEY'S POTION PANTRY — VICTORIAN HALLOWEEN & APOTHECARY DESIGN SYSTEM
+// HEXLEY'S POTION PANTRY — BALANCED VICTORIAN APOTHECARY DESIGN SYSTEM
 // ============================================================================
 const Color kNight = Color(0xFF140A1D);      // Deep midnight page background
-const Color kPanel = Color(0xFF2A1A36);      // Dark violet apothecary panel
-const Color kCard = Color(0xFF21132B);       // Card background
+const Color kPanel = Color(0xFF22132E);      // Dark violet apothecary panel
+const Color kCard = Color(0xFF1C1126);       // Card background
 const Color kParchment = Color(0xFFECDCCC);  // Antique paper cream
 const Color kInk = Color(0xFF2B1D14);        // Text on paper
 const Color kPumpkin = Color(0xFFFF7518);    // Signature pumpkin copper
+const Color kPumpkinDim = Color(0xFF8B3C08); // Subtle copper border
 const Color kGold = Color(0xFFF2B25C);       // Antique potion gold
 const Color kSlime = Color(0xFF7FFF5A);      // Poison / Emerald glow
 const Color kViolet = Color(0xFF8A4FD1);     // Witch violet
 const Color kCrimson = Color(0xFF9B1C1C);    // Urgent shortage crimson
 const Color kCrimsonBg = Color(0xFF2A0C14);  // Critical card backdrop
-const Color kBorderSubtle = Color(0xFF3E2850);
-const Color kBorderCopperDim = Color(0xFF6D3A1D);
+const Color kBorderSubtle = Color(0xFF362247);
+const Color kBorderCard = Color(0xFF452B59);
 
 void main() => runApp(const HexleyPantryApp());
 
@@ -68,6 +69,10 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
   bool isConnected = false;
   String connectionMessage = "Connecting...";
 
+  // Inventory Filter State
+  String searchQuery = "";
+  String activeCategoryFilter = "all";
+
   // Quick Restock Stepper State: itemId -> qty
   final Map<dynamic, int> restockQuantities = {};
 
@@ -100,7 +105,6 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
           connectionMessage = "Vault Synchronized";
           isLoading = false;
 
-          // Default selected items if not set
           if (pantry.isNotEmpty) {
             if (selectedSaleItemId == null || !pantry.any((i) => i['id'] == selectedSaleItemId)) {
               selectedSaleItemId = pantry.first['id'];
@@ -132,7 +136,6 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
     }
   }
 
-  // Restock or Sale stock transaction
   Future<void> adjustStock(dynamic itemId, int changeAmount, {String? successMsg}) async {
     try {
       final sanitizedBase = serverBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
@@ -145,13 +148,12 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
       if (res.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(successMsg ?? (changeAmount > 0 ? "✨ Restocked +$changeAmount units" : "✦ Recorded sale of ${-changeAmount} units")),
+            content: Text(successMsg ?? (changeAmount > 0 ? "✨ Restocked +$changeAmount units" : "✦ Recorded sale")),
             backgroundColor: changeAmount > 0 ? const Color(0xFF2E6A45) : kViolet,
+            duration: const Duration(seconds: 2),
           ),
         );
         await testAndFetchPantry();
-      } else {
-        throw Exception("Server returned ${res.statusCode}");
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -172,6 +174,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
         const SnackBar(
           content: Text("🚨 Shelf audit reported: 5 units missing recorded"),
           backgroundColor: kCrimson,
+          duration: Duration(seconds: 2),
         ),
       );
       await testAndFetchPantry();
@@ -201,13 +204,8 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
           children: const [
             Text("✦ ", style: TextStyle(color: kPumpkin, fontSize: 18)),
             Text(
-              "Add New Reagent",
-              style: TextStyle(
-                fontFamily: 'serif',
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: kParchment,
-              ),
+              "Register New Reagent",
+              style: TextStyle(fontFamily: 'serif', fontSize: 17, fontWeight: FontWeight.bold, color: kParchment),
             ),
           ],
         ),
@@ -227,33 +225,41 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                   isDense: true,
                 ),
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: stockCtrl,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: kParchment, fontSize: 13),
-                decoration: const InputDecoration(
-                  labelText: "Current Stock",
-                  labelStyle: TextStyle(color: kGold, fontSize: 12),
-                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: kBorderSubtle)),
-                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kPumpkin)),
-                  isDense: true,
-                ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: stockCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: kParchment, fontSize: 13),
+                      decoration: const InputDecoration(
+                        labelText: "Current Stock",
+                        labelStyle: TextStyle(color: kGold, fontSize: 11),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: kBorderSubtle)),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kPumpkin)),
+                        isDense: true,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: safetyCtrl,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: kParchment, fontSize: 13),
+                      decoration: const InputDecoration(
+                        labelText: "Safety Threshold",
+                        labelStyle: TextStyle(color: kGold, fontSize: 11),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: kBorderSubtle)),
+                        focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kPumpkin)),
+                        isDense: true,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: safetyCtrl,
-                keyboardType: TextInputType.number,
-                style: const TextStyle(color: kParchment, fontSize: 13),
-                decoration: const InputDecoration(
-                  labelText: "Safety Stock Threshold",
-                  labelStyle: TextStyle(color: kGold, fontSize: 12),
-                  enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: kBorderSubtle)),
-                  focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: kPumpkin)),
-                  isDense: true,
-                ),
-              ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: supplierCtrl,
                 style: const TextStyle(color: kParchment, fontSize: 13),
@@ -265,7 +271,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                   isDense: true,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               TextField(
                 controller: leadTimeCtrl,
                 keyboardType: TextInputType.number,
@@ -294,12 +300,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
             ),
             onPressed: () async {
               final name = nameCtrl.text.trim();
-              if (name.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Please enter reagent name")),
-                );
-                return;
-              }
+              if (name.isEmpty) return;
               Navigator.pop(ctx);
               await addNewIngredient({
                 "name": name,
@@ -320,24 +321,13 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
     setState(() => isLoading = true);
     try {
       final sanitizedBase = serverBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
-      final res = await http.post(
+      await http.post(
         Uri.parse("$sanitizedBase/api/pantry"),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode(payload),
       );
-      if (res.statusCode == 200 || res.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("✦ Registered ${payload['name']} into vault!"),
-            backgroundColor: const Color(0xFF2E6A45),
-          ),
-        );
-      }
       await testAndFetchPantry();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error adding reagent: $e")),
-      );
+    } catch (_) {
       setState(() => isLoading = false);
     }
   }
@@ -381,30 +371,22 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                 isDense: true,
               ),
             ),
-            const SizedBox(height: 14),
-            const Text(
-              "Quick Presets:",
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kGold),
-            ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 6,
               children: [
                 ActionChip(
                   backgroundColor: kNight,
-                  side: const BorderSide(color: kBorderSubtle),
                   label: const Text("Wi-Fi LAN", style: TextStyle(fontSize: 11, color: kParchment)),
                   onPressed: () => controller.text = "http://$detectedLanIp:8000",
                 ),
                 ActionChip(
                   backgroundColor: kNight,
-                  side: const BorderSide(color: kBorderSubtle),
                   label: const Text("Emulator", style: TextStyle(fontSize: 11, color: kParchment)),
                   onPressed: () => controller.text = "http://10.0.2.2:8000",
                 ),
                 ActionChip(
                   backgroundColor: kNight,
-                  side: const BorderSide(color: kBorderSubtle),
                   label: const Text("Localhost", style: TextStyle(fontSize: 11, color: kParchment)),
                   onPressed: () => controller.text = "http://127.0.0.1:8000",
                 ),
@@ -448,7 +430,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
       final safety = (item['safety_stock'] as num?)?.toInt() ?? 0;
       totalUnits += stock;
       if (stock < safety) shortageCount++;
-      totalWorth += stock * 6.5; // Estimated nominal reagent value
+      totalWorth += stock * 6.5;
     }
 
     final lowStockItems = pantry.where((i) {
@@ -464,41 +446,20 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
         children: [
-          // 4 Stat Cards Matching Merged Web UI
+          // 4 Metric Tiles
           Row(
             children: [
-              _buildStatCard(
-                label: "Total Reagents",
-                val: "${pantry.length} Items",
-                subtext: "$totalUnits units tracked",
-                valColor: kGold,
-              ),
+              _buildStatTile("Total Reagents", "${pantry.length} Items", "$totalUnits tracked", kGold),
               const SizedBox(width: 8),
-              _buildStatCard(
-                label: "Urgent Shortages",
-                val: "$shortageCount Reagents",
-                subtext: "Below min threshold",
-                valColor: kCrimson,
-                isShortage: true,
-              ),
+              _buildStatTile("Urgent Shortages", "$shortageCount Reagents", "Below safety threshold", kCrimson, isShortage: true),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             children: [
-              _buildStatCard(
-                label: "Full Moon Surge",
-                val: "3.0x Surge",
-                subtext: "Lunar peak approaching",
-                valColor: kPumpkin,
-              ),
+              _buildStatTile("Full Moon Surge", "3.0x Surge", "Peak in 2 days", kPumpkin),
               const SizedBox(width: 8),
-              _buildStatCard(
-                label: "Vault Value",
-                val: "¢${totalWorth.toStringAsFixed(2)}",
-                subtext: "Inventory worth",
-                valColor: kGold,
-              ),
+              _buildStatTile("Vault Value", "¢${totalWorth.toStringAsFixed(2)}", "Inventory worth", kGold),
             ],
           ),
 
@@ -506,7 +467,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
 
           // Blood Moon Festival Banner Plate
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [Color(0xFF331524), Color(0xFF1B0E1E)],
@@ -514,7 +475,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kPumpkin, width: 1.2),
+              border: Border.all(color: kPumpkin, width: 1.1),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -524,39 +485,31 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                   children: [
                     Row(
                       children: const [
-                        Text("🌕 ", style: TextStyle(fontSize: 16)),
+                        Text("🌕 ", style: TextStyle(fontSize: 15)),
                         Text(
                           "Blood Moon Peak Approaching",
-                          style: TextStyle(
-                            fontFamily: 'serif',
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.bold,
-                            color: kParchment,
-                          ),
+                          style: TextStyle(fontFamily: 'serif', fontSize: 13.5, fontWeight: FontWeight.bold, color: kParchment),
                         ),
                       ],
                     ),
                     InkWell(
                       onTap: () => setState(() => currentTab = 2),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                         decoration: BoxDecoration(
                           color: kPumpkin.withOpacity(0.2),
-                          border: Border.all(color: kPumpkin, width: 0.9),
+                          border: Border.all(color: kPumpkin, width: 0.8),
                           borderRadius: BorderRadius.circular(4),
                         ),
-                        child: const Text(
-                          "Scry Restock →",
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: kGold),
-                        ),
+                        child: const Text("Scry Restock →", style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: kGold)),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 4),
                 const Text(
                   "Demand for Bat Wings and Mandrake Root surges up to 300%. Check Scrying Forecast to prevent stockouts.",
-                  style: TextStyle(fontSize: 11, color: Colors.white70, height: 1.3),
+                  style: TextStyle(fontSize: 10.5, color: Colors.white70, height: 1.3),
                 ),
               ],
             ),
@@ -564,18 +517,18 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
 
           const SizedBox(height: 14),
 
-          // Depleted & Low Stock Ledger Header
+          // Depleted Ledger Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text(
-                "Depleted & Low Stock Ledger",
-                style: TextStyle(fontFamily: 'serif', fontSize: 15, fontWeight: FontWeight.bold, color: kParchment),
+                "Urgent Stock Depletions",
+                style: TextStyle(fontFamily: 'serif', fontSize: 14.5, fontWeight: FontWeight.bold, color: kParchment),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: lowStockItems.isEmpty ? Colors.green.withOpacity(0.2) : kCrimson.withOpacity(0.2),
+                  color: lowStockItems.isEmpty ? Colors.green.withOpacity(0.18) : kCrimson.withOpacity(0.18),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -593,7 +546,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
 
           if (lowStockItems.isEmpty)
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: kCard,
                 borderRadius: BorderRadius.circular(8),
@@ -602,114 +555,41 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
               child: const Center(
                 child: Text(
                   "✦ All pantry reagents are sufficiently stocked above minimum thresholds.",
-                  style: TextStyle(fontSize: 12, color: kSlime, fontStyle: FontStyle.italic),
+                  style: TextStyle(fontSize: 11.5, color: kSlime, fontStyle: FontStyle.italic),
                   textAlign: TextAlign.center,
                 ),
               ),
             )
           else
-            for (var item in lowStockItems) _buildLowStockRow(item),
-
-          const SizedBox(height: 16),
-
-          // Quick Action Navigation Card
-          Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: kPanel,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: kBorderSubtle),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Quick Apothecary Actions",
-                  style: TextStyle(fontFamily: 'serif', fontSize: 14, fontWeight: FontWeight.bold, color: kGold),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: kPumpkin,
-                          foregroundColor: kParchment,
-                          padding: const EdgeInsets.symmetric(vertical: 9),
-                        ),
-                        onPressed: () => setState(() => currentTab = 2),
-                        icon: const Icon(Icons.auto_graph_rounded, size: 15),
-                        label: const Text("Scrying Forecast", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF38224A),
-                          foregroundColor: kParchment,
-                          side: const BorderSide(color: kViolet),
-                          padding: const EdgeInsets.symmetric(vertical: 9),
-                        ),
-                        onPressed: () => setState(() => currentTab = 3),
-                        icon: const Icon(Icons.point_of_sale_rounded, size: 15),
-                        label: const Text("Record Sale", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+            for (var item in lowStockItems) _buildDashLowStockTile(item),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard({
-    required String label,
-    required String val,
-    required String subtext,
-    required Color valColor,
-    bool isShortage = false,
-  }) {
+  Widget _buildStatTile(String label, String val, String subtext, Color valColor, {bool isShortage = false}) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
         decoration: BoxDecoration(
           color: isShortage ? kCrimsonBg : kPanel,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: isShortage ? kCrimson : kBorderSubtle, width: 1),
+          border: Border.all(color: isShortage ? kCrimson : kBorderSubtle),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white60, letterSpacing: 0.4),
-            ),
-            const SizedBox(height: 3),
-            Text(
-              val,
-              style: TextStyle(
-                fontFamily: 'serif',
-                fontSize: 16,
-                fontWeight: FontWeight.w900,
-                color: valColor,
-              ),
-            ),
+            Text(label, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.white60)),
             const SizedBox(height: 2),
-            Text(
-              subtext,
-              style: TextStyle(fontSize: 9.5, color: isShortage ? const Color(0xFFFCA5A5) : Colors.white54),
-            ),
+            Text(val, style: TextStyle(fontFamily: 'serif', fontSize: 15, fontWeight: FontWeight.w900, color: valColor)),
+            Text(subtext, style: TextStyle(fontSize: 9, color: isShortage ? const Color(0xFFFCA5A5) : Colors.white54)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildLowStockRow(dynamic item) {
+  Widget _buildDashLowStockTile(dynamic item) {
     final id = item['id'];
     final name = item['name'] ?? "Unknown";
     final stock = item['current_stock'] ?? 0;
@@ -717,8 +597,8 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
     final qty = restockQuantities[id] ?? 20;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(10),
+      margin: const EdgeInsets.only(bottom: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
         color: kCard,
         borderRadius: BorderRadius.circular(8),
@@ -730,54 +610,26 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontFamily: 'serif', fontSize: 13.5, fontWeight: FontWeight.bold, color: kParchment),
-                ),
-                const SizedBox(height: 2),
-                Row(
-                  children: [
-                    Text("Stock: $stock", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFF87171))),
-                    Text(" / Min: $safety", style: const TextStyle(fontSize: 10.5, color: Colors.white54)),
-                  ],
-                ),
+                Text(name, style: const TextStyle(fontFamily: 'serif', fontSize: 13, fontWeight: FontWeight.bold, color: kParchment)),
+                Text("Stock: $stock / Min: $safety", style: const TextStyle(fontSize: 10, color: Color(0xFFF87171))),
               ],
             ),
           ),
-          // Interactive Custom Restock Stepper
           Container(
-            decoration: BoxDecoration(
-              color: kNight,
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(color: kBorderSubtle),
-            ),
+            width: 76,
+            height: 28,
+            decoration: BoxDecoration(color: kNight, borderRadius: BorderRadius.circular(5), border: Border.all(color: kBorderSubtle)),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      restockQuantities[id] = (qty - 5).clamp(5, 500);
-                    });
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                    child: Text("−", style: TextStyle(fontSize: 14, color: kGold, fontWeight: FontWeight.bold)),
-                  ),
+                  onTap: () => setState(() => restockQuantities[id] = (qty - 5).clamp(5, 500)),
+                  child: const Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text("−", style: TextStyle(color: kGold, fontWeight: FontWeight.bold))),
                 ),
-                Text(
-                  "$qty",
-                  style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: kParchment),
-                ),
+                Text("$qty", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kParchment)),
                 InkWell(
-                  onTap: () {
-                    setState(() {
-                      restockQuantities[id] = qty + 5;
-                    });
-                  },
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 7, vertical: 4),
-                    child: Text("+", style: TextStyle(fontSize: 14, color: kGold, fontWeight: FontWeight.bold)),
-                  ),
+                  onTap: () => setState(() => restockQuantities[id] = qty + 5),
+                  child: const Padding(padding: EdgeInsets.symmetric(horizontal: 6), child: Text("+", style: TextStyle(color: kGold, fontWeight: FontWeight.bold))),
                 ),
               ],
             ),
@@ -787,9 +639,9 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
             style: ElevatedButton.styleFrom(
               backgroundColor: kPumpkin,
               foregroundColor: kParchment,
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              minimumSize: const Size(0, 32),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              minimumSize: const Size(0, 28),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
             ),
             onPressed: () => adjustStock(id, qty, successMsg: "Restocked +$qty $name"),
             child: const Text("+ Restock", style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold)),
@@ -800,319 +652,331 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
   }
 
   // =========================================================================
-  // VIEW 2: INVENTORY (VAULT CATALOG WITH GAUGES & STEPPERS)
+  // VIEW 2: INVENTORY (BALANCED CARDS WITH SEARCH & FILTER CHIPS)
   // =========================================================================
   Widget _buildInventoryView() {
-    return RefreshIndicator(
-      color: kPumpkin,
-      backgroundColor: kPanel,
-      onRefresh: testAndFetchPantry,
-      child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
-        itemCount: pantry.length,
-        itemBuilder: (ctx, i) {
-          final item = pantry[i];
-          final id = item['id'];
-          final name = item['name'] ?? "Unknown";
-          final currentStock = (item['current_stock'] as num?)?.toInt() ?? 0;
-          final expectedStock = (item['expected_stock'] as num?)?.toInt() ?? currentStock;
-          final safetyStock = (item['safety_stock'] as num?)?.toInt() ?? 10;
-          final isCursed = item['is_cursed'] == true;
-          final prophecy = item['prophecy'] ?? {};
-          final burn = prophecy['daily_burn_rate'] ?? 0;
-          final runOut = prophecy['days_until_run_out'] ?? 'N/A';
-          final reorder = prophecy['recommended_reorder'] ?? 0;
-          final anomalies = (item['anomalies'] as List?) ?? [];
-          final qty = restockQuantities[id] ?? 20;
+    final filtered = pantry.where((item) {
+      final name = (item['name'] ?? "").toString().toLowerCase();
+      final cat = (item['category'] ?? "").toString().toLowerCase();
+      final sup = (item['supplier'] ?? "").toString().toLowerCase();
+      final q = searchQuery.toLowerCase().trim();
 
-          // Potion gauge ratio
-          final gaugeTarget = safetyStock * 2 > 0 ? safetyStock * 2 : 50;
-          final stockRatio = (currentStock / gaugeTarget).clamp(0.0, 1.0);
-          final isLow = currentStock < safetyStock;
+      if (q.isNotEmpty && !name.contains(q) && !cat.contains(q) && !sup.contains(q)) {
+        return false;
+      }
 
-          final missingAlerts = anomalies.where((a) => a is Map && a['type'] == 'MISSING_STOCK').toList();
-          final spikeAlerts = anomalies.where((a) => a is Map && a['type'] != 'MISSING_STOCK').toList();
+      if (activeCategoryFilter == "low") {
+        return (item['current_stock'] ?? 0) < (item['safety_stock'] ?? 0);
+      }
+      if (activeCategoryFilter == "cursed") {
+        return item['is_cursed'] == true;
+      }
+      if (activeCategoryFilter == "animal") {
+        return cat.contains("animal") || cat.contains("fauna") || cat.contains("parts");
+      }
+      if (activeCategoryFilter == "plant") {
+        return cat.contains("plant") || cat.contains("flora") || cat.contains("roots") || cat.contains("herb");
+      }
+      return true;
+    }).toList();
 
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            color: kCard,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-              side: BorderSide(
-                color: isCursed ? kPumpkin : kBorderSubtle,
-                width: isCursed ? 1.4 : 1.0,
+    return Column(
+      children: [
+        // Search & Filter Bar
+        Container(
+          padding: const EdgeInsets.fromLTRB(12, 10, 12, 6),
+          color: kPanel,
+          child: Column(
+            children: [
+              SizedBox(
+                height: 36,
+                child: TextField(
+                  style: const TextStyle(color: kParchment, fontSize: 12),
+                  onChanged: (val) => setState(() => searchQuery = val),
+                  decoration: InputDecoration(
+                    hintText: "Search reagents, parts, roots...",
+                    hintStyle: const TextStyle(color: Colors.white38, fontSize: 11.5),
+                    prefixIcon: const Icon(Icons.search, size: 16, color: Colors.white38),
+                    filled: true,
+                    fillColor: kNight,
+                    contentPadding: EdgeInsets.zero,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: kBorderSubtle)),
+                    enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(6), borderSide: const BorderSide(color: kBorderSubtle)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildFilterChip("All", "all"),
+                    _buildFilterChip("⚠️ Low Stock", "low"),
+                    _buildFilterChip("🌕 3x Surge", "cursed"),
+                    _buildFilterChip("Fauna", "animal"),
+                    _buildFilterChip("Flora", "plant"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // List View
+        Expanded(
+          child: RefreshIndicator(
+            color: kPumpkin,
+            backgroundColor: kPanel,
+            onRefresh: testAndFetchPantry,
+            child: filtered.isEmpty
+                ? const Center(
+                    child: Text("No matching reagents found", style: TextStyle(color: Colors.white54, fontSize: 13)),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 90),
+                    itemCount: filtered.length,
+                    itemBuilder: (ctx, i) {
+                      final item = filtered[i];
+                      return _buildBalancedInventoryCard(item);
+                    },
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChip(String label, String key) {
+    final active = activeCategoryFilter == key;
+    return Padding(
+      padding: const EdgeInsets.only(right: 6),
+      child: InkWell(
+        onTap: () => setState(() => activeCategoryFilter = key),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+          decoration: BoxDecoration(
+            color: active ? kPumpkin.withOpacity(0.2) : kCard,
+            border: Border.all(color: active ? kPumpkin : kBorderSubtle),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: active ? kGold : Colors.white60,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBalancedInventoryCard(dynamic item) {
+    final id = item['id'];
+    final name = item['name'] ?? "Unknown";
+    final currentStock = (item['current_stock'] as num?)?.toInt() ?? 0;
+    final expectedStock = (item['expected_stock'] as num?)?.toInt() ?? currentStock;
+    final safetyStock = (item['safety_stock'] as num?)?.toInt() ?? 10;
+    final isCursed = item['is_cursed'] == true;
+    final prophecy = item['prophecy'] ?? {};
+    final burn = prophecy['daily_burn_rate'] ?? 0;
+    final runOut = prophecy['days_until_run_out'] ?? 'N/A';
+    final reorder = prophecy['recommended_reorder'] ?? 0;
+    final category = item['category'] ?? "Apothecary Reagent";
+    final anomalies = (item['anomalies'] as List?) ?? [];
+    final qty = restockQuantities[id] ?? 20;
+
+    final isLow = currentStock < safetyStock;
+    final gaugeTarget = safetyStock * 2 > 0 ? safetyStock * 2 : 50;
+    final stockRatio = (currentStock / gaugeTarget).clamp(0.0, 1.0);
+
+    final missingAlerts = anomalies.where((a) => a is Map && a['type'] == 'MISSING_STOCK').toList();
+    final spikeAlerts = anomalies.where((a) => a is Map && a['type'] != 'MISSING_STOCK').toList();
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 9),
+      color: kCard,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(9),
+        side: BorderSide(color: isCursed ? kPumpkin : kBorderSubtle, width: isCursed ? 1.3 : 1.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(11),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    name,
+                    style: const TextStyle(fontFamily: 'serif', fontSize: 15.5, fontWeight: FontWeight.bold, color: kParchment),
+                  ),
+                ),
+                if (isCursed)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: kPumpkin.withOpacity(0.2),
+                      border: Border.all(color: kPumpkin, width: 0.8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Text("🌕 3.0x SURGE", style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: kGold)),
+                  )
+                else
+                  Text(category, style: const TextStyle(fontSize: 9.5, color: Colors.white54)),
+              ],
+            ),
+
+            // Soft Botanical Potion Gauge
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: SizedBox(
+                  height: 4,
+                  child: LinearProgressIndicator(
+                    value: stockRatio,
+                    backgroundColor: Colors.black45,
+                    valueColor: AlwaysStoppedAnimation<Color>(isLow ? const Color(0xFFF87171) : kSlime),
+                  ),
+                ),
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(13),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+
+            // 3-Column Metrics Grid
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+              decoration: BoxDecoration(color: kNight, borderRadius: BorderRadius.circular(5), border: Border.all(color: kBorderSubtle)),
+              child: Row(
                 children: [
-                  // Title Row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: const TextStyle(
-                            fontFamily: 'serif',
-                            fontSize: 16.5,
-                            fontWeight: FontWeight.bold,
-                            color: kParchment,
-                          ),
-                        ),
-                      ),
-                      if (isCursed)
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                          decoration: BoxDecoration(
-                            color: kPumpkin.withOpacity(0.2),
-                            border: Border.all(color: kPumpkin, width: 0.9),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Text(
-                            "🌕 3.0x SURGE",
-                            style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: kGold),
-                          ),
-                        )
-                      else
-                        Text(
-                          item['category'] ?? "Apothecary Reagent",
-                          style: const TextStyle(fontSize: 10, color: Colors.white54),
-                        ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // Potion Stock Level Gauge
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: SizedBox(
-                      height: 5,
-                      child: LinearProgressIndicator(
-                        value: stockRatio,
-                        backgroundColor: Colors.black45,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          isLow ? const Color(0xFFF87171) : kSlime,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // 3-Column Metrics Grid
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: kNight,
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: kBorderSubtle),
-                    ),
-                    child: Row(
+                  Expanded(
+                    child: Column(
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("STOCK ON HAND", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white54)),
-                              const SizedBox(height: 2),
-                              Text(
-                                "$currentStock",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w900,
-                                  color: isLow ? const Color(0xFFF87171) : kSlime,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("EXPECTED", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white54)),
-                              const SizedBox(height: 2),
-                              Text("$expectedStock", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kParchment)),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text("BURN RATE", style: TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white54)),
-                              const SizedBox(height: 2),
-                              Text("${burn}/day", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: kPumpkin)),
-                            ],
-                          ),
-                        ),
+                        const Text("STOCK ON HAND", style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.bold, color: Colors.white54)),
+                        Text("$currentStock", style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w900, color: isLow ? const Color(0xFFF87171) : kSlime)),
                       ],
                     ),
                   ),
-
-                  const SizedBox(height: 8),
-
-                  // Run Out & Reorder Prescription
-                  Row(
-                    children: [
-                      Text("Run out: ${runOut}d", style: const TextStyle(fontSize: 11, color: Colors.white70)),
-                      const SizedBox(width: 6),
-                      const Text("•", style: TextStyle(color: Colors.white38)),
-                      const SizedBox(width: 6),
-                      const Text("Reorder: ", style: TextStyle(fontSize: 11, color: Colors.white70)),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: kPumpkin.withOpacity(0.18),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          "$reorder units",
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kGold),
-                        ),
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const Text("EXPECTED", style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.bold, color: Colors.white54)),
+                        Text("$expectedStock", style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w900, color: kParchment)),
+                      ],
+                    ),
                   ),
-
-                  // Missing Stock Alert Box
-                  if (missingAlerts.isNotEmpty) ...[
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: kCrimsonBg,
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: kCrimson, width: 1),
-                      ),
-                      child: Row(
-                        children: [
-                          const Text("🚨 ", style: TextStyle(fontSize: 14)),
-                          Expanded(
-                            child: Text(
-                              "${(missingAlerts.first['missing_units'] ?? (expectedStock - currentStock).clamp(1, 9999))} units missing from shelf audit!",
-                              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFFCA5A5)),
-                            ),
-                          ),
-                        ],
-                      ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        const Text("BURN RATE", style: TextStyle(fontSize: 7.5, fontWeight: FontWeight.bold, color: Colors.white54)),
+                        Text("${burn}/day", style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w900, color: kPumpkin)),
+                      ],
                     ),
-                  ],
-
-                  // Demand Spikes Collapsible Drawer
-                  if (spikeAlerts.isNotEmpty) ...[
-                    const SizedBox(height: 7),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF2B1428),
-                        borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: kBorderCopperDim, width: 0.9),
-                      ),
-                      child: Theme(
-                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                        child: ExpansionTile(
-                          dense: true,
-                          visualDensity: VisualDensity.compact,
-                          tilePadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
-                          childrenPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          leading: const Text("⚡", style: TextStyle(fontSize: 13, color: kPumpkin)),
-                          title: Text(
-                            "${spikeAlerts.length} Historical Spikes Detected",
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFFFECACA)),
-                          ),
-                          subtitle: Text(
-                            "Peak: +" +
-                                spikeAlerts
-                                    .map((s) => (s['z_score'] as num?)?.toDouble() ?? 0.0)
-                                    .reduce((a, b) => a > b ? a : b)
-                                    .toString() +
-                                "σ",
-                            style: const TextStyle(fontSize: 9.5, color: kGold),
-                          ),
-                          children: [
-                            for (var s in spikeAlerts)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 2),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.between,
-                                  children: [
-                                    Text(s['date'].toString(), style: const TextStyle(fontSize: 10.5, fontFamily: 'monospace', color: Colors.white70)),
-                                    Text("${s['qty']} units (+${s['z_score']}σ)", style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: Color(0xFFFCA5A5))),
-                                  ],
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-
-                  const SizedBox(height: 10),
-
-                  // Actions: Quick Restock Stepper + Audit Button
-                  Row(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: kNight,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: kBorderSubtle),
-                        ),
-                        child: Row(
-                          children: [
-                            InkWell(
-                              onTap: () => setState(() => restockQuantities[id] = (qty - 5).clamp(5, 500)),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                child: Text("−", style: TextStyle(color: kGold, fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                            Text("$qty", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: kParchment)),
-                            InkWell(
-                              onTap: () => setState(() => restockQuantities[id] = qty + 5),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                                child: Text("+", style: TextStyle(color: kGold, fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: kPumpkin,
-                            foregroundColor: kParchment,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                            padding: const EdgeInsets.symmetric(vertical: 8),
-                          ),
-                          onPressed: () => adjustStock(id, qty, successMsg: "Restocked +$qty $name"),
-                          child: const Text("+ Quick Restock", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      IconButton(
-                        tooltip: "Report Shrinkage",
-                        icon: const Icon(Icons.warning_amber_rounded, size: 20, color: Color(0xFFF87171)),
-                        onPressed: () => reportMissingStock(id),
-                      ),
-                    ],
                   ),
                 ],
               ),
             ),
-          );
-        },
+
+            // Prescription Strip
+            Padding(
+              padding: const EdgeInsets.only(top: 6, bottom: 6),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Run out: ${runOut}d", style: const TextStyle(fontSize: 10.5, color: Colors.white70)),
+                  Text("Reorder prescription: $reorder units", style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: kGold)),
+                ],
+              ),
+            ),
+
+            // Anomaly Tags
+            if (missingAlerts.isNotEmpty || spikeAlerts.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: [
+                    if (missingAlerts.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: kCrimsonBg, border: Border.all(color: kCrimson), borderRadius: BorderRadius.circular(4)),
+                        child: Text("🚨 5 Units Missing", style: const TextStyle(fontSize: 9.5, color: Color(0xFFFCA5A5), fontWeight: FontWeight.bold)),
+                      ),
+                    if (spikeAlerts.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(color: const Color(0xFF251229), border: Border.all(color: kPumpkinDim), borderRadius: BorderRadius.circular(4)),
+                        child: Text("⚡ ${spikeAlerts.length} Surges Recorded", style: const TextStyle(fontSize: 9.5, color: kGold, fontWeight: FontWeight.bold)),
+                      ),
+                  ],
+                ),
+              ),
+
+            // Balanced Action Bar: Stepper + Restock Button + Audit Icon
+            Row(
+              children: [
+                Container(
+                  width: 82,
+                  height: 32,
+                  decoration: BoxDecoration(color: kNight, borderRadius: BorderRadius.circular(6), border: Border.all(color: kBorderSubtle)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+                        onTap: () => setState(() => restockQuantities[id] = (qty - 5).clamp(5, 500)),
+                        child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text("−", style: TextStyle(color: kGold, fontWeight: FontWeight.bold, fontSize: 13))),
+                      ),
+                      Text("$qty", style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: kParchment)),
+                      InkWell(
+                        onTap: () => setState(() => restockQuantities[id] = qty + 5),
+                        child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Text("+", style: TextStyle(color: kGold, fontWeight: FontWeight.bold, fontSize: 13))),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SizedBox(
+                    height: 32,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: kPumpkin,
+                        foregroundColor: kParchment,
+                        padding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                      onPressed: () => adjustStock(id, qty, successMsg: "Restocked +$qty $name"),
+                      child: const Text("+ Restock", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+                SizedBox(
+                  height: 32,
+                  width: 34,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    style: IconButton.styleFrom(backgroundColor: kCrimsonBg, side: const BorderSide(color: kCrimson)),
+                    icon: const Icon(Icons.warning_amber_rounded, size: 16, color: Color(0xFFFCA5A5)),
+                    onPressed: () => reportMissingStock(id),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   // =========================================================================
-  // VIEW 3: FORECAST & RESTOCK (PAGE 3 OF DESKTOP DASHBOARD)
+  // VIEW 3: FORECAST & RESTOCK
   // =========================================================================
   Widget _buildForecastView() {
     final selectedItem = pantry.firstWhere(
@@ -1133,149 +997,90 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(12, 12, 12, 90),
         children: [
-          // Reagent Selector Dropdown
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: kPanel,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: kBorderSubtle),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorderSubtle)),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<dynamic>(
                 value: selectedForecastItemId,
                 dropdownColor: kPanel,
                 isExpanded: true,
-                hint: const Text("Select Reagent to Scry", style: TextStyle(color: kGold)),
                 items: [
                   for (var item in pantry)
                     DropdownMenuItem(
                       value: item['id'],
-                      child: Text(
-                        "${item['name']} (${item['current_stock']} on hand)",
-                        style: const TextStyle(color: kParchment, fontSize: 13),
-                      ),
+                      child: Text("${item['name']} (${item['current_stock']} on hand)", style: const TextStyle(color: kParchment, fontSize: 13)),
                     ),
                 ],
-                onChanged: (val) {
-                  setState(() => selectedForecastItemId = val);
-                },
+                onChanged: (val) => setState(() => selectedForecastItemId = val),
               ),
             ),
           ),
-
           const SizedBox(height: 12),
-
-          // Prophecy Card for Selected Reagent
           if (selectedItem.isNotEmpty)
             Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: kCard,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: kPumpkin, width: 1.2),
-              ),
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(10), border: Border.all(color: kPumpkin)),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "${selectedItem['name']}",
-                        style: const TextStyle(fontFamily: 'serif', fontSize: 18, fontWeight: FontWeight.bold, color: kGold),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: kPumpkin.withOpacity(0.18),
-                          border: Border.all(color: kPumpkin, width: 0.8),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          "Runout: ${runOutDays}d",
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kParchment),
-                        ),
-                      ),
+                      Text("${selectedItem['name']}", style: const TextStyle(fontFamily: 'serif', fontSize: 16, fontWeight: FontWeight.bold, color: kGold)),
+                      Text("Runout: ${runOutDays}d", style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kParchment)),
                     ],
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    "Supplier: ${selectedItem['supplier'] ?? 'Apothecary Wholesaler'} (${selectedItem['lead_time_days'] ?? 3}d Lead)",
-                    style: const TextStyle(fontSize: 11, color: Colors.white60),
-                  ),
-                  const SizedBox(height: 12),
-
-                  // 3 Prophecy Metrics
+                  Text("Supplier: ${selectedItem['supplier'] ?? 'Apothecary Wholesaler'} (${selectedItem['lead_time_days'] ?? 3}d Lead)", style: const TextStyle(fontSize: 10.5, color: Colors.white54)),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
-                      Expanded(
-                        child: _buildProphecyMetricBox("7-DAY DEMAND", "$sevenDayDemand units", kGold),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildProphecyMetricBox("BURN RATE", "$burnRate / day", kPumpkin),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildProphecyMetricBox("REORDER REQ", "$recommendedReorder units", kSlime),
-                      ),
+                      Expanded(child: _buildProphecyTile("7-DAY DEMAND", "$sevenDayDemand units", kGold)),
+                      const SizedBox(width: 6),
+                      Expanded(child: _buildProphecyTile("BURN RATE", "$burnRate / day", kPumpkin)),
+                      const SizedBox(width: 6),
+                      Expanded(child: _buildProphecyTile("REORDER REQ", "$recommendedReorder units", kSlime)),
                     ],
                   ),
                 ],
               ),
             ),
-
-          const SizedBox(height: 16),
-
-          // All Pantry Restock Recommendations Table
-          const Text(
-            "All Pantry Restock Recommendations",
-            style: TextStyle(fontFamily: 'serif', fontSize: 15, fontWeight: FontWeight.bold, color: kParchment),
-          ),
+          const SizedBox(height: 14),
+          const Text("All Pantry Restock Recommendations", style: TextStyle(fontFamily: 'serif', fontSize: 14, fontWeight: FontWeight.bold, color: kParchment)),
           const SizedBox(height: 8),
-
-          for (var item in pantry) _buildRestockRecommendationRow(item),
+          for (var item in pantry) _buildRestockRow(item),
         ],
       ),
     );
   }
 
-  Widget _buildProphecyMetricBox(String label, String val, Color color) {
+  Widget _buildProphecyTile(String label, String val, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 6),
-      decoration: BoxDecoration(
-        color: kNight,
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: kBorderSubtle),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+      decoration: BoxDecoration(color: kNight, borderRadius: BorderRadius.circular(5), border: Border.all(color: kBorderSubtle)),
       child: Column(
         children: [
-          Text(label, style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white54)),
+          Text(label, style: const TextStyle(fontSize: 7.5, fontWeight: FontWeight.bold, color: Colors.white54)),
           const SizedBox(height: 2),
-          Text(val, style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color)),
+          Text(val, style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
         ],
       ),
     );
   }
 
-  Widget _buildRestockRecommendationRow(dynamic item) {
+  Widget _buildRestockRow(dynamic item) {
     final id = item['id'];
     final name = item['name'] ?? "Unknown";
     final stock = item['current_stock'] ?? 0;
     final safety = item['safety_stock'] ?? 10;
     final prophecy = item['prophecy'] ?? {};
     final reorder = prophecy['recommended_reorder'] ?? 0;
-    final leadTime = item['lead_time_days'] ?? 3;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: kCard,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: reorder > 0 ? kPumpkin.withOpacity(0.5) : kBorderSubtle),
-      ),
+      margin: const EdgeInsets.only(bottom: 7),
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: kCard, borderRadius: BorderRadius.circular(8), border: Border.all(color: reorder > 0 ? kPumpkin : kBorderSubtle)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1283,41 +1088,20 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  name,
-                  style: const TextStyle(fontFamily: 'serif', fontSize: 13.5, fontWeight: FontWeight.bold, color: kParchment),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  "Stock: $stock | Min: $safety | Lead: ${leadTime}d",
-                  style: const TextStyle(fontSize: 10.5, color: Colors.white60),
-                ),
+                Text(name, style: const TextStyle(fontFamily: 'serif', fontSize: 13, fontWeight: FontWeight.bold, color: kParchment)),
+                Text("Stock: $stock | Min: $safety", style: const TextStyle(fontSize: 10, color: Colors.white54)),
               ],
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                reorder > 0 ? "+$reorder units suggested" : "Stock Healthy",
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: reorder > 0 ? kPumpkin : kSlime,
-                ),
-              ),
-              const SizedBox(height: 4),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: reorder > 0 ? kPumpkin : kPanel,
-                  foregroundColor: kParchment,
-                  minimumSize: const Size(0, 28),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                ),
-                onPressed: () => adjustStock(id, reorder > 0 ? reorder : 10, successMsg: "Restock order placed for $name!"),
-                child: Text(reorder > 0 ? "Dispatch Raven" : "+ Order 10", style: const TextStyle(fontSize: 10)),
-              ),
-            ],
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: reorder > 0 ? kPumpkin : kPanel,
+              foregroundColor: kParchment,
+              minimumSize: const Size(0, 28),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+            ),
+            onPressed: () => adjustStock(id, reorder > 0 ? reorder : 10, successMsg: "Restock order placed for $name!"),
+            child: Text(reorder > 0 ? "+ Order $reorder" : "+ Order 10", style: const TextStyle(fontSize: 10)),
           ),
         ],
       ),
@@ -1332,36 +1116,23 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
       (i) => i['id'] == selectedSaleItemId,
       orElse: () => pantry.isNotEmpty ? pantry.first : {},
     );
-
     final currentStock = selectedItem['current_stock'] ?? 0;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 90),
       children: [
-        const Text(
-          "Record Customer Sale",
-          style: TextStyle(fontFamily: 'serif', fontSize: 17, fontWeight: FontWeight.bold, color: kParchment),
-        ),
-        const SizedBox(height: 4),
-        const Text(
-          "Atomic ledger deduction with real-time stock balance audit.",
-          style: TextStyle(fontSize: 11.5, color: Colors.white60),
-        ),
+        const Text("Record Customer Sale", style: TextStyle(fontFamily: 'serif', fontSize: 16.5, fontWeight: FontWeight.bold, color: kParchment)),
+        const SizedBox(height: 3),
+        const Text("Atomic ledger deduction with real-time stock balance audit.", style: TextStyle(fontSize: 11, color: Colors.white60)),
         const SizedBox(height: 14),
-
-        // Item Picker Card
         Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: kPanel,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: kBorderSubtle),
-          ),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorderSubtle)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Select Reagent Sold:", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kGold)),
-              const SizedBox(height: 8),
+              const Text("Select Reagent Sold:", style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: kGold)),
+              const SizedBox(height: 6),
               DropdownButtonHideUnderline(
                 child: DropdownButton<dynamic>(
                   value: selectedSaleItemId,
@@ -1371,36 +1142,24 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                     for (var item in pantry)
                       DropdownMenuItem(
                         value: item['id'],
-                        child: Text(
-                          "${item['name']} (${item['current_stock']} in vault)",
-                          style: const TextStyle(color: kParchment, fontSize: 13),
-                        ),
+                        child: Text("${item['name']} (${item['current_stock']} in vault)", style: const TextStyle(color: kParchment, fontSize: 13)),
                       ),
                   ],
-                  onChanged: (val) {
-                    setState(() => selectedSaleItemId = val);
-                  },
+                  onChanged: (val) => setState(() => selectedSaleItemId = val),
                 ),
               ),
             ],
           ),
         ),
-
-        const SizedBox(height: 14),
-
-        // Quantity Selector
+        const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: kPanel,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: kBorderSubtle),
-          ),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(8), border: Border.all(color: kBorderSubtle)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Sale Quantity:", style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: kGold)),
-              const SizedBox(height: 10),
+              const Text("Sale Quantity:", style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold, color: kGold)),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -1408,25 +1167,18 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                     style: IconButton.styleFrom(backgroundColor: kNight),
                     icon: const Icon(Icons.remove, color: kGold),
                     onPressed: () {
-                      if (saleQuantity > 1) {
-                        setState(() => saleQuantity--);
-                      }
+                      if (saleQuantity > 1) setState(() => saleQuantity--);
                     },
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(
-                      "$saleQuantity",
-                      style: const TextStyle(fontFamily: 'serif', fontSize: 24, fontWeight: FontWeight.bold, color: kParchment),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text("$saleQuantity", style: const TextStyle(fontFamily: 'serif', fontSize: 22, fontWeight: FontWeight.bold, color: kParchment)),
                   ),
                   IconButton.filled(
                     style: IconButton.styleFrom(backgroundColor: kNight),
                     icon: const Icon(Icons.add, color: kGold),
                     onPressed: () {
-                      if (saleQuantity < currentStock) {
-                        setState(() => saleQuantity++);
-                      }
+                      if (saleQuantity < currentStock) setState(() => saleQuantity++);
                     },
                   ),
                 ],
@@ -1434,13 +1186,10 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
             ],
           ),
         ),
-
-        const SizedBox(height: 18),
-
-        // Confirm Button
+        const SizedBox(height: 16),
         SizedBox(
           width: double.infinity,
-          height: 46,
+          height: 44,
           child: ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: kPumpkin,
@@ -1455,11 +1204,8 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
                     await adjustStock(itemId, -qty, successMsg: "✦ Sale recorded: -$qty ${selectedItem['name']}");
                     setState(() => saleQuantity = 1);
                   },
-            icon: const Icon(Icons.check_circle_outline, size: 18),
-            label: Text(
-              currentStock <= 0 ? "Depleted - Cannot Sell" : "Authorize & Deduct Stock",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            ),
+            icon: const Icon(Icons.check_circle_outline, size: 17),
+            label: Text(currentStock <= 0 ? "Depleted - Cannot Sell" : "Authorize & Deduct Stock", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5)),
           ),
         ),
       ],
@@ -1467,7 +1213,7 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
   }
 
   // =========================================================================
-  // MAIN SCAFFOLD & APPBAR
+  // MAIN SCAFFOLD WITH WELL-POSITIONED FAB
   // =========================================================================
   @override
   Widget build(BuildContext context) {
@@ -1476,116 +1222,55 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
         title: Row(
           children: [
             Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: const Color(0xFF3B1D4F),
-                shape: BoxShape.circle,
-                border: Border.all(color: kPumpkin, width: 1.2),
-              ),
-              child: const Center(
-                child: Text("⚗️", style: TextStyle(fontSize: 16)),
-              ),
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(color: const Color(0xFF3B1D4F), shape: BoxShape.circle, border: Border.all(color: kPumpkin, width: 1.1)),
+              child: const Center(child: Text("⚗️", style: TextStyle(fontSize: 15))),
             ),
-            const SizedBox(width: 9),
+            const SizedBox(width: 8),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Text(
-                  "HEXLEY'S PANTRY",
-                  style: TextStyle(
-                    fontFamily: 'serif',
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w900,
-                    color: kParchment,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                Text(
-                  "EST. 1888 • VAULT LEDGER",
-                  style: TextStyle(
-                    fontSize: 8.5,
-                    fontWeight: FontWeight.w700,
-                    color: kGold,
-                    letterSpacing: 1.0,
-                  ),
-                ),
+                Text("HEXLEY'S PANTRY", style: TextStyle(fontFamily: 'serif', fontSize: 14, fontWeight: FontWeight.w900, color: kParchment, letterSpacing: 1.1)),
+                Text("EST. 1888 • VAULT LEDGER", style: TextStyle(fontSize: 8, fontWeight: FontWeight.w700, color: kGold, letterSpacing: 0.9)),
               ],
             ),
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.tune_rounded, size: 20, color: kParchment),
-            tooltip: "Server Host Settings",
-            onPressed: openSettingsDialog,
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh_rounded, size: 20, color: kParchment),
-            tooltip: "Refresh Ledger",
-            onPressed: testAndFetchPantry,
-          ),
+          IconButton(icon: const Icon(Icons.tune_rounded, size: 19, color: kParchment), tooltip: "Host Settings", onPressed: openSettingsDialog),
+          IconButton(icon: const Icon(Icons.refresh_rounded, size: 19, color: kParchment), tooltip: "Sync Ledger", onPressed: testAndFetchPantry),
         ],
       ),
       body: Column(
         children: [
-          // Victorian Telemetry Strip
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-            decoration: const BoxDecoration(
-              color: Color(0xFF1B0F26),
-              border: Border(bottom: BorderSide(color: kBorderSubtle, width: 1)),
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 5),
+            decoration: const BoxDecoration(color: Color(0xFF190C24), border: Border(bottom: BorderSide(color: kBorderSubtle))),
             child: Row(
               children: [
-                Icon(
-                  Icons.circle,
-                  size: 8,
-                  color: isConnected ? kSlime : kCrimson,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  isConnected ? "Vault Ledger Synchronized" : "Vault Disconnected",
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: isConnected ? kParchment : const Color(0xFFFCA5A5),
-                  ),
-                ),
+                Icon(Icons.circle, size: 8, color: isConnected ? kSlime : kCrimson),
+                const SizedBox(width: 7),
+                Text(isConnected ? "Vault Ledger Synchronized" : "Vault Disconnected", style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: isConnected ? kParchment : const Color(0xFFFCA5A5))),
                 const SizedBox(width: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                  decoration: BoxDecoration(
-                    color: Colors.black45,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: kBorderSubtle, width: 0.8),
-                  ),
-                  child: Text(
-                    ":" + (serverBaseUrl.split(":").last),
-                    style: const TextStyle(fontSize: 9, fontFamily: 'monospace', color: kSlime),
-                  ),
+                  decoration: BoxDecoration(color: Colors.black45, borderRadius: BorderRadius.circular(4), border: Border.all(color: kBorderSubtle, width: 0.8)),
+                  child: Text(":" + (serverBaseUrl.split(":").last), style: const TextStyle(fontSize: 8.5, fontFamily: 'monospace', color: kSlime)),
                 ),
                 const Spacer(),
                 InkWell(
                   onTap: openSettingsDialog,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: kPumpkin, width: 0.8),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      "SWITCH IP",
-                      style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: kPumpkin),
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(border: Border.all(color: kPumpkinDim), borderRadius: BorderRadius.circular(4)),
+                    child: const Text("SWITCH", style: TextStyle(fontSize: 8.5, fontWeight: FontWeight.w800, color: kPumpkin)),
                   ),
                 ),
               ],
             ),
           ),
-
-          // Active Tab Content
           Expanded(
             child: isLoading && pantry.isEmpty
                 ? const Center(child: CircularProgressIndicator(color: kPumpkin))
@@ -1611,38 +1296,18 @@ class _PantryMasterScreenState extends State<PantryMasterScreen> {
         selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 11),
         unselectedLabelStyle: const TextStyle(fontSize: 10.5),
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded),
-            label: "Dashboard",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_rounded),
-            label: "Inventory",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.auto_graph_rounded),
-            label: "Forecast",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.point_of_sale_rounded),
-            label: "Record Sale",
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: "Dashboard"),
+          BottomNavigationBarItem(icon: Icon(Icons.inventory_2_rounded), label: "Inventory"),
+          BottomNavigationBarItem(icon: Icon(Icons.auto_graph_rounded), label: "Forecast"),
+          BottomNavigationBarItem(icon: Icon(Icons.point_of_sale_rounded), label: "Sale"),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: kPumpkin,
         foregroundColor: kParchment,
         elevation: 4,
-        icon: const Icon(Icons.add, color: kGold, size: 18),
-        label: const Text(
-          "Add Reagent",
-          style: TextStyle(
-            fontFamily: 'serif',
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.6,
-            fontSize: 12.5,
-          ),
-        ),
+        icon: const Icon(Icons.add, color: kGold, size: 17),
+        label: const Text("Add Reagent", style: TextStyle(fontFamily: 'serif', fontWeight: FontWeight.w800, letterSpacing: 0.5, fontSize: 12)),
         onPressed: openAddIngredientDialog,
       ),
     );
