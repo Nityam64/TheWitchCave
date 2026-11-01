@@ -233,6 +233,25 @@
       z-index: 10;
     }
 
+    /* MicroSlats Container */
+    .micro-slats {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #microSlatsHeroBg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      overflow: hidden;
+    }
+
     /* Hero Section */
     .hero-section {
       min-height: 100vh;
@@ -980,9 +999,9 @@
     <!-- Hero Section -->
     <section class="hero-section" style="padding-top: 110px; min-height: auto;">
       <!-- 600px MicroSlats Hero Head Backdrop -->
-      <div style="width: 100%; height: 600px; position: relative; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255, 117, 24, 0.35); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #120f17; display: flex; align-items: center; justify-content: center; margin-bottom: 36px;">
+      <div style="width: 100%; height: 600px; min-height: 600px; position: relative; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255, 117, 24, 0.35); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #120f17; display: flex; align-items: center; justify-content: center; margin-bottom: 36px;">
         <!-- MicroSlats WebGL Shader Canvas -->
-        <div id="microSlatsHeroBg" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;"></div>
+        <div id="microSlatsHeroBg" style="position: absolute; top: 0; left: 0; width: 100%; height: 600px; min-height: 600px; z-index: 1; overflow: hidden;"></div>
         
         <!-- Hero Head Content Floating Above MicroSlats -->
         <div style="position: relative; z-index: 2; pointer-events: none; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px;">
@@ -1634,39 +1653,59 @@
   </script>
 
   <!-- MicroSlats WebGL Background Engine -->
-  <script src="microslats.bundle.js"></script>
+  <script src="microslats.bundle.js?v=3"></script>
   <script>
     (function initMicroSlatsHero() {
-      var bg = document.getElementById('microSlatsHeroBg');
-      if (bg && window.initMicroSlats) {
-        window.initMicroSlats(bg, {
-          preset: 'swell',
-          color: '#f97316',
-          glintColor: '#803edc',
-          backgroundColor: '#120f17',
-          slatWidth: 10,
-          slatHeight: 25,
-          gap: 3,
-          roundness: 0.75,
-          interactive: true,
-          cursorStrength: 1,
-          cursorSize: 40,
-          swirl: 0,
-          trail: 1.4,
-          lean: 0,
-          intro: true,
-          scale: 1.5,
-          speed: 0.6,
-          direction: 250,
-          chop: 0.55,
-          stretch: 0,
-          glint: 0.7,
-          contrast: 1.25,
-          perspective: 0.55,
-          fog: 0.55,
-          introDuration: 1.5,
-          paused: false
-        });
+      let attempts = 0;
+      function start() {
+        var bg = document.getElementById('microSlatsHeroBg');
+        var launcher = window.renderMicroSlats || window.initMicroSlats;
+        if (!bg || !launcher) {
+          if (++attempts < 50) {
+            setTimeout(start, 60);
+          } else {
+            console.warn('🔮 MicroSlats engine timed out waiting for bundle.');
+          }
+          return;
+        }
+        try {
+          launcher(bg, {
+            preset: 'swell',
+            color: '#f97316',
+            glintColor: '#803edc',
+            backgroundColor: '#120f17',
+            slatWidth: 10,
+            slatHeight: 25,
+            gap: 3,
+            roundness: 0.75,
+            interactive: true,
+            cursorStrength: 1,
+            cursorSize: 40,
+            swirl: 0,
+            trail: 1.4,
+            lean: 0,
+            intro: true,
+            scale: 1.5,
+            speed: 0.6,
+            direction: 250,
+            chop: 0.55,
+            stretch: 0,
+            glint: 0.7,
+            contrast: 1.25,
+            perspective: 0.55,
+            fog: 0.55,
+            introDuration: 1.5,
+            paused: false
+          });
+          console.log('🔮 MicroSlats swell wave background initialized successfully!');
+        } catch (err) {
+          console.error('🔮 MicroSlats initialization error:', err);
+        }
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', start);
+      } else {
+        start();
       }
     })();
   </script>

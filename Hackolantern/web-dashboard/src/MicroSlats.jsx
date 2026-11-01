@@ -627,8 +627,10 @@ const MicroSlats = ({
     };
 
     const resize = () => {
-      width = Math.max(1, container.clientWidth);
-      height = Math.max(1, container.clientHeight);
+      const clientW = container.clientWidth || container.parentElement?.clientWidth || window.innerWidth;
+      const clientH = container.clientHeight || container.parentElement?.clientHeight || 600;
+      width = Math.max(300, clientW);
+      height = Math.max(300, clientH);
       renderer.dpr = Math.min(window.devicePixelRatio || 1, 2, Math.sqrt(PIXEL_BUDGET / (width * height)));
       renderer.setSize(width, height);
       buildFluid();
@@ -893,6 +895,8 @@ const MicroSlats = ({
 
     wakeRef.current = start;
     resize();
+    const t1 = setTimeout(resize, 60);
+    const t2 = setTimeout(resize, 300);
 
     return () => {
       alive = false;
