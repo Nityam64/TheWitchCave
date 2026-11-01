@@ -7,6 +7,7 @@
     "build": "vite build"
   },
   "dependencies": {
+    "ogl": "^1.0.11",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "recharts": "^2.12.7"

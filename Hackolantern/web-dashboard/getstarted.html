@@ -978,25 +978,34 @@
 
   <main class="container">
     <!-- Hero Section -->
-    <section class="hero-section">
-      <div class="pill-badge">
-        <span class="dot"></span>
-        <span>EST. 1888 &bull; APOTHECARY VAULT SUITE</span>
-      </div>
+    <section class="hero-section" style="padding-top: 110px; min-height: auto;">
+      <!-- 600px MicroSlats Hero Head Backdrop -->
+      <div style="width: 100%; height: 600px; position: relative; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255, 117, 24, 0.35); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #120f17; display: flex; align-items: center; justify-content: center; margin-bottom: 36px;">
+        <!-- MicroSlats WebGL Shader Canvas -->
+        <div id="microSlatsHeroBg" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;"></div>
+        
+        <!-- Hero Head Content Floating Above MicroSlats -->
+        <div style="position: relative; z-index: 2; pointer-events: none; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px;">
+          <div class="pill-badge" style="pointer-events: auto;">
+            <span class="dot"></span>
+            <span>EST. 1888 &bull; APOTHECARY VAULT SUITE</span>
+          </div>
 
-      <h1 class="hero-title">Hexley's Potion Pantry</h1>
-      <p class="hero-subtitle">
-        Atomic stock deduction, real-time lunar scrying algorithms, and automated raven-dispatch restocking for the modern Victorian alchemist.
-      </p>
+          <h1 class="hero-title" style="pointer-events: auto; margin-top: 10px;">Hexley's Potion Pantry</h1>
+          <p class="hero-subtitle" style="pointer-events: auto;">
+            Atomic stock deduction, real-time lunar scrying algorithms, and automated raven-dispatch restocking for the modern Victorian alchemist.
+          </p>
 
-      <div class="hero-cta-group">
-        <button type="button" onclick="openAuthModal('signin')" class="btn-primary-antigravity" id="getStartedBtn" style="cursor:pointer; border:none; text-decoration:none;">
-          <span>Get Started &bull; Launch App</span>
-          <span style="font-size: 26px;">&rarr;</span>
-        </button>
-        <a href="#features" class="btn-secondary-ghost">
-          <span>Explore Capabilities &darr;</span>
-        </a>
+          <div class="hero-cta-group" style="pointer-events: auto; margin-top: 24px; margin-bottom: 0;">
+            <button type="button" onclick="openAuthModal('signin')" class="btn-primary-antigravity" id="getStartedBtn" style="cursor:pointer; border:none; text-decoration:none;">
+              <span>Get Started &bull; Launch App</span>
+              <span style="font-size: 26px;">&rarr;</span>
+            </button>
+            <a href="#features" class="btn-secondary-ghost">
+              <span>Explore Capabilities &darr;</span>
+            </a>
+          </div>
+        </div>
       </div>
 
       <!-- Live Stats Ticker -->
@@ -1621,6 +1630,44 @@
         }
       }
       checkCurrentAuth();
+    })();
+  </script>
+
+  <!-- MicroSlats WebGL Background Engine -->
+  <script src="microslats.bundle.js"></script>
+  <script>
+    (function initMicroSlatsHero() {
+      var bg = document.getElementById('microSlatsHeroBg');
+      if (bg && window.initMicroSlats) {
+        window.initMicroSlats(bg, {
+          preset: 'swell',
+          color: '#f97316',
+          glintColor: '#803edc',
+          backgroundColor: '#120f17',
+          slatWidth: 10,
+          slatHeight: 25,
+          gap: 3,
+          roundness: 0.75,
+          interactive: true,
+          cursorStrength: 1,
+          cursorSize: 40,
+          swirl: 0,
+          trail: 1.4,
+          lean: 0,
+          intro: true,
+          scale: 1.5,
+          speed: 0.6,
+          direction: 250,
+          chop: 0.55,
+          stretch: 0,
+          glint: 0.7,
+          contrast: 1.25,
+          perspective: 0.55,
+          fog: 0.55,
+          introDuration: 1.5,
+          paused: false
+        });
+      }
     })();
   </script>
 </body>

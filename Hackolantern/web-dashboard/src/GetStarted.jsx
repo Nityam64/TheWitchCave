@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
+import MicroSlats from "./MicroSlats";
 
 export default function GetStarted({ onEnterConsole }) {
   const scrollRef = useRef(null);
@@ -183,106 +184,190 @@ export default function GetStarted({ onEnterConsole }) {
 
   return (
     <div style={{ maxWidth: "1140px", margin: "0 auto", padding: "20px 12px 60px" }}>
-      {/* Hero Showcase Section */}
+      {/* Hero Showcase Section with MicroSlats Background */}
       <div style={{
-        position: "relative",
-        background: "radial-gradient(ellipse at 50% -20%, #3b1d6e 0%, #170d28 65%, #0f0817 100%)",
-        border: "1px solid #381e61",
-        borderRadius: "24px",
-        padding: "54px 36px 44px",
-        textAlign: "center",
-        boxShadow: "0 20px 50px rgba(0, 0, 0, 0.5)",
-        overflow: "hidden",
-        marginBottom: "40px"
+        width: '100%',
+        minHeight: '600px',
+        position: 'relative',
+        borderRadius: '24px',
+        overflow: 'hidden',
+        border: '1px solid rgba(255, 117, 24, 0.35)',
+        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
+        backgroundColor: '#120f17',
+        marginBottom: '40px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
-        <div style={{
-          display: "inline-flex",
-          alignItems: "center",
-          gap: "8px",
-          background: "rgba(168, 85, 247, 0.12)",
-          border: "1px solid rgba(168, 85, 247, 0.35)",
-          color: "#d8b4fe",
-          padding: "6px 14px",
-          borderRadius: "999px",
-          fontSize: "12px",
-          fontWeight: 700,
-          letterSpacing: "0.08em",
-          marginBottom: "20px"
-        }}>
-          <span>⚡</span>
-          <span>INTERNAL OPS PLATFORM • TRACK 01</span>
+        {/* MicroSlats Ambient Wave Field */}
+        <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}>
+          <MicroSlats
+            preset="swell"
+            color="#f97316"
+            glintColor="#803edc"
+            backgroundColor="#120f17"
+            slatWidth={10}
+            slatHeight={25}
+            gap={3}
+            roundness={0.75}
+            interactive
+            cursorStrength={1}
+            cursorSize={40}
+            swirl={0}
+            trail={1.4}
+            lean={0}
+            intro
+            scale={1.5}
+            speed={0.6}
+            direction={250}
+            chop={0.55}
+            stretch={0}
+            glint={0.7}
+            contrast={1.25}
+            perspective={0.55}
+            fog={0.55}
+            introDuration={1.5}
+            paused={false}
+          />
         </div>
 
-        <h1 style={{
-          fontSize: "44px",
-          fontWeight: 900,
-          letterSpacing: "-0.03em",
-          lineHeight: 1.15,
-          margin: "0 auto 16px",
-          maxWidth: "760px",
-          background: "linear-gradient(180deg, #ffffff 30%, #c084fc 100%)",
-          WebkitBackgroundClip: "text",
-          WebkitTextFillColor: "transparent"
-        }}>
-          Madam Hexley’s Smart Dark Store Command Center
-        </h1>
-
-        <p style={{
-          fontSize: "17px",
-          lineHeight: 1.6,
-          color: "#cbd5e1",
-          maxWidth: "680px",
-          margin: "0 auto 32px"
-        }}>
-          Next-generation pantry telemetry powered by FastAPI AI and real-time shelf sync. Eliminate stockouts, predict festival surges, and automate replenishment spells.
-        </p>
-
-        <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
-          <button
-            onClick={() => handleOpenAuth("signin")}
-            style={{
-              background: "linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)",
-              color: "#ffffff",
-              border: "none",
-              borderRadius: "12px",
-              padding: "14px 32px",
-              fontSize: "16px",
-              fontWeight: 800,
-              letterSpacing: "0.02em",
-              cursor: "pointer",
-              boxShadow: "0 10px 25px rgba(147, 51, 234, 0.45)",
-              display: "flex",
-              alignItems: "center",
-              gap: "10px",
-              transition: "transform 0.15s ease"
-            }}
-          >
-            <span>{currentUser ? `Enter Vault as ${currentUser.alchemist_name}` : "Get Started • Enter Vault"}</span>
-            <span style={{ fontSize: "18px" }}>→</span>
-          </button>
-        </div>
-
-        {/* Live Subsystem Indicators */}
+        {/* Hero Head Content Floating Above MicroSlats */}
         <div style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "24px",
-          flexWrap: "wrap",
-          marginTop: "36px",
-          paddingTop: "24px",
-          borderTop: "1px solid rgba(255, 255, 255, 0.08)"
+          position: 'relative',
+          zIndex: 2,
+          padding: '54px 36px 44px',
+          textAlign: 'center',
+          pointerEvents: 'none',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center'
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#94a3b8" }}>
-            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#10b981", display: "inline-block" }}></span>
-            <span>FastAPI AI Engine: <strong style={{ color: "#f8fafc" }}>Online</strong></span>
+          <div style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "8px",
+            background: "rgba(255, 117, 24, 0.12)",
+            border: "1px solid rgba(255, 117, 24, 0.4)",
+            color: "#f2b25c",
+            padding: "6px 18px",
+            borderRadius: "999px",
+            fontSize: "13px",
+            fontWeight: 700,
+            letterSpacing: "0.1em",
+            marginBottom: "20px",
+            fontFamily: "'IM Fell English', serif",
+            textTransform: "uppercase",
+            pointerEvents: "auto"
+          }}>
+            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#7fff5a", display: "inline-block", boxShadow: "0 0 8px #7fff5a" }}></span>
+            <span>EST. 1888 • APOTHECARY VAULT SUITE</span>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#94a3b8" }}>
-            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#38bdf8", display: "inline-block" }}></span>
-            <span>Firestore Sync: <strong style={{ color: "#f8fafc" }}>Persistent</strong></span>
+
+          <h1 style={{
+            fontSize: "clamp(38px, 6vw, 68px)",
+            fontFamily: "'IM Fell English', Georgia, serif",
+            fontWeight: 900,
+            letterSpacing: "0.02em",
+            lineHeight: 1.1,
+            margin: "0 auto 16px",
+            maxWidth: "880px",
+            color: "#ff8b3d",
+            textTransform: "uppercase",
+            textShadow: "0 0 35px rgba(255, 117, 24, 0.45), 0 4px 18px rgba(0, 0, 0, 0.8)",
+            pointerEvents: "auto"
+          }}>
+            Hexley's Potion Pantry
+          </h1>
+
+          <p style={{
+            fontSize: "19px",
+            fontStyle: "italic",
+            fontFamily: "'Crimson Text', Georgia, serif",
+            lineHeight: 1.6,
+            color: "#ecdcbc",
+            maxWidth: "720px",
+            margin: "0 auto 34px",
+            textShadow: "0 2px 10px rgba(0,0,0,0.8)",
+            pointerEvents: "auto"
+          }}>
+            Atomic stock deduction, real-time lunar scrying algorithms, and automated raven-dispatch restocking for the modern Victorian alchemist.
+          </p>
+
+          <div style={{ display: "flex", justifyContent: "center", gap: "16px", flexWrap: "wrap", pointerEvents: "auto" }}>
+            <button
+              onClick={() => handleOpenAuth("signin")}
+              style={{
+                background: "linear-gradient(135deg, #ff7518 0%, #d85600 100%)",
+                color: "#140a1d",
+                border: "1px solid rgba(255, 200, 120, 0.4)",
+                borderRadius: "100px",
+                padding: "16px 36px",
+                fontSize: "17px",
+                fontWeight: 800,
+                letterSpacing: "0.02em",
+                cursor: "pointer",
+                boxShadow: "0 10px 30px rgba(255, 117, 24, 0.4), inset 0 1px 0 rgba(255,255,255,0.4)",
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                transition: "transform 0.15s ease, box-shadow 0.15s ease",
+                fontFamily: "'IM Fell English', serif"
+              }}
+            >
+              <span>{currentUser ? `Launch App as ${currentUser.alchemist_name}` : "Get Started • Launch App"}</span>
+              <span style={{ fontSize: "20px" }}>→</span>
+            </button>
+
+            <a
+              href="#features"
+              style={{
+                background: "rgba(20, 10, 29, 0.75)",
+                color: "#f2b25c",
+                border: "1px solid rgba(242, 178, 92, 0.35)",
+                borderRadius: "100px",
+                padding: "16px 32px",
+                fontSize: "17px",
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                textDecoration: "none",
+                fontFamily: "'IM Fell English', serif",
+                backdropFilter: "blur(8px)"
+              }}
+            >
+              <span>Explore Capabilities ↓</span>
+            </a>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", color: "#94a3b8" }}>
-            <span style={{ height: "8px", width: "8px", borderRadius: "50%", background: "#a855f7", display: "inline-block" }}></span>
-            <span>Android Scanner: <strong style={{ color: "#f8fafc" }}>Ready</strong></span>
+
+          {/* 4 Stats Boxes */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))",
+            gap: "16px",
+            width: "100%",
+            maxWidth: "760px",
+            marginTop: "38px",
+            pointerEvents: "auto"
+          }}>
+            <div style={{ background: "rgba(20, 10, 29, 0.8)", border: "1px solid rgba(242, 178, 92, 0.2)", borderRadius: "12px", padding: "14px", backdropFilter: "blur(8px)" }}>
+              <div style={{ fontSize: "28px", fontWeight: "bold", color: "#f2b25c", fontFamily: "'IM Fell English', serif" }}>6</div>
+              <div style={{ fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#a89b88" }}>Vault Reagents</div>
+            </div>
+            <div style={{ background: "rgba(20, 10, 29, 0.8)", border: "1px solid rgba(242, 178, 92, 0.2)", borderRadius: "12px", padding: "14px", backdropFilter: "blur(8px)" }}>
+              <div style={{ fontSize: "28px", fontWeight: "bold", color: "#f2b25c", fontFamily: "'IM Fell English', serif" }}>160+</div>
+              <div style={{ fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#a89b88" }}>Tracked Units</div>
+            </div>
+            <div style={{ background: "rgba(20, 10, 29, 0.8)", border: "1px solid rgba(242, 178, 92, 0.2)", borderRadius: "12px", padding: "14px", backdropFilter: "blur(8px)" }}>
+              <div style={{ fontSize: "28px", fontWeight: "bold", color: "#ff7518", fontFamily: "'IM Fell English', serif" }}>3.0×</div>
+              <div style={{ fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#a89b88" }}>Blood Moon Surge</div>
+            </div>
+            <div style={{ background: "rgba(20, 10, 29, 0.8)", border: "1px solid rgba(242, 178, 92, 0.2)", borderRadius: "12px", padding: "14px", backdropFilter: "blur(8px)" }}>
+              <div style={{ fontSize: "28px", fontWeight: "bold", color: "#7fff5a", fontFamily: "'IM Fell English', serif" }}>&lt; 1 ms</div>
+              <div style={{ fontSize: "11px", letterSpacing: "0.1em", textTransform: "uppercase", color: "#a89b88" }}>Atomic Deduction</div>
+            </div>
           </div>
         </div>
       </div>
