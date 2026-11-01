@@ -23,6 +23,34 @@
       cursor: none; /* Antigravity custom cursor */
     }
 
+    /* Restore native visible cursors and glowing caret on all inputs */
+    input, textarea, select {
+      cursor: text !important;
+      caret-color: var(--pumpkin, #ff7518) !important;
+    }
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    input[type="checkbox"],
+    input[type="radio"],
+    button,
+    a,
+    [role="button"],
+    select {
+      cursor: pointer !important;
+    }
+
+    /* Hide custom glowing cursor dot and ring when hovering over or focusing input fields */
+    body.cursor-input .cursor-dot,
+    body.cursor-input .cursor-ring,
+    body:has(input:hover, textarea:hover, select:hover, input:focus, textarea:focus, [contenteditable="true"]:hover) .cursor-dot,
+    body:has(input:hover, textarea:hover, select:hover, input:focus, textarea:focus, [contenteditable="true"]:hover) .cursor-ring {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transform: translate(-50%, -50%) scale(0.1) !important;
+      transition: opacity 0.1s ease, transform 0.1s ease;
+    }
+
     /* Fine paper texture */
     .noise-overlay {
       position: fixed;
@@ -3317,7 +3345,7 @@
       });
 
       function bindHoverTargets() {
-        var targets = document.querySelectorAll("a, button, input, select, .item, .stat-card, .ticket, .filter-btn, .moon");
+        var targets = document.querySelectorAll("a, button, .item, .stat-card, .ticket, .filter-btn, .moon");
         targets.forEach(function(el) {
           el.addEventListener("mouseenter", function() { document.body.classList.add("cursor-hover"); });
           el.addEventListener("mouseleave", function() { document.body.classList.remove("cursor-hover"); });
@@ -3325,6 +3353,28 @@
       }
       bindHoverTargets();
       window.bindHoverTargets = bindHoverTargets;
+
+      // Text input triggers to hide custom cursor and show crisp native text I-beam & caret
+      document.addEventListener('mouseover', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]')) {
+          document.body.classList.add('cursor-input');
+        }
+      });
+      document.addEventListener('mouseout', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable="true"]')) {
+          document.body.classList.remove('cursor-input');
+        }
+      });
+      document.addEventListener('focusin', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable="true"]')) {
+          document.body.classList.add('cursor-input');
+        }
+      });
+      document.addEventListener('focusout', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable="true"]')) {
+          document.body.classList.remove('cursor-input');
+        }
+      });
     })();
 
     // 3. 3D Gyroscopic Tilt & Dynamic Spotlight Reflector

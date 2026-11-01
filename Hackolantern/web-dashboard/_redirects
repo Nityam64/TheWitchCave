@@ -3,3 +3,4 @@
   to = "https://hexleys-pantry-api.onrender.com/api/:splat"
   status = 200
   force = true
+

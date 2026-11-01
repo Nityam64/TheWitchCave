@@ -32,6 +32,34 @@
       cursor: none; /* Custom antigravity cursor */
     }
 
+    /* Restore native visible cursors and glowing caret on all inputs */
+    input, textarea, select {
+      cursor: text !important;
+      caret-color: var(--pumpkin, #ff7518) !important;
+    }
+    input[type="button"],
+    input[type="submit"],
+    input[type="reset"],
+    input[type="checkbox"],
+    input[type="radio"],
+    button,
+    a,
+    [role="button"],
+    select {
+      cursor: pointer !important;
+    }
+
+    /* Hide custom glowing cursor dot and ring when hovering over or focusing input fields */
+    body.cursor-input .cursor-dot,
+    body.cursor-input .cursor-ring,
+    body:has(input:hover, textarea:hover, select:hover, input:focus, textarea:focus, [contenteditable="true"]:hover) .cursor-dot,
+    body:has(input:hover, textarea:hover, select:hover, input:focus, textarea:focus, [contenteditable="true"]:hover) .cursor-ring {
+      opacity: 0 !important;
+      visibility: hidden !important;
+      transform: translate(-50%, -50%) scale(0.1) !important;
+      transition: opacity 0.1s ease, transform 0.1s ease;
+    }
+
     body {
       background-color: var(--abyss);
       color: var(--parchment);
@@ -1279,6 +1307,28 @@
       interactiveTargets.forEach(el => {
         el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      });
+
+      // Text input triggers to hide custom cursor and show crisp native text I-beam & caret
+      document.addEventListener('mouseover', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"]), textarea, select, [contenteditable="true"]')) {
+          document.body.classList.add('cursor-input');
+        }
+      });
+      document.addEventListener('mouseout', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable="true"]')) {
+          document.body.classList.remove('cursor-input');
+        }
+      });
+      document.addEventListener('focusin', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable="true"]')) {
+          document.body.classList.add('cursor-input');
+        }
+      });
+      document.addEventListener('focusout', function(e) {
+        if (e.target && e.target.matches && e.target.matches('input, textarea, select, [contenteditable="true"]')) {
+          document.body.classList.remove('cursor-input');
+        }
       });
 
       // 3. 3D Gyroscopic Tilt & Dynamic Spotlight on Feature Cards
