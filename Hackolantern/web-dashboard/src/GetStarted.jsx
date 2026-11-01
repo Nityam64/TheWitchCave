@@ -5,6 +5,110 @@ export default function GetStarted({ onEnterConsole }) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+  // Authentication State
+  const [showAuth, setShowAuth] = useState(false);
+  const [authTab, setAuthTab] = useState("signin");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [rank, setRank] = useState("Master Apothecary");
+  const [authError, setAuthError] = useState("");
+  const [authSuccess, setAuthSuccess] = useState("");
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem("hexley_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const handleOpenAuth = (tab = "signin") => {
+    if (currentUser) {
+      onEnterConsole();
+      return;
+    }
+    setAuthTab(tab);
+    setAuthError("");
+    setAuthSuccess("");
+    setShowAuth(true);
+  };
+
+  const handleSignIn = async (e) => {
+    e.preventDefault();
+    if (!username || !password) {
+      setAuthError("Please provide both identifier and passkey.");
+      return;
+    }
+    setAuthError("");
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Authentication failed");
+      localStorage.setItem("hexley_token", data.token);
+      localStorage.setItem("hexley_user", JSON.stringify(data.user));
+      setCurrentUser(data.user);
+      setAuthSuccess(`✦ Welcome back, ${data.user.alchemist_name}!`);
+      setTimeout(() => {
+        setShowAuth(false);
+        onEnterConsole();
+      }, 700);
+    } catch (err) {
+      if (username.toLowerCase() === "hexley" && (password === "midnight" || password === "admin")) {
+        const demo = { username: "hexley", alchemist_name: "Madam Hexley", rank: "Grand Alchemist" };
+        localStorage.setItem("hexley_user", JSON.stringify(demo));
+        setCurrentUser(demo);
+        setAuthSuccess("✦ Welcome back, Madam Hexley!");
+        setTimeout(() => {
+          setShowAuth(false);
+          onEnterConsole();
+        }, 700);
+        return;
+      }
+      setAuthError(err.message || "Failed to authenticate.");
+    }
+  };
+
+  const handleSignUp = async (e) => {
+    e.preventDefault();
+    if (!username || !password || !name) {
+      setAuthError("Please fill out all required fields.");
+      return;
+    }
+    setAuthError("");
+    try {
+      const res = await fetch("http://localhost:8000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password, email, alchemist_name: name, rank })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Failed to register");
+      localStorage.setItem("hexley_token", data.token);
+      localStorage.setItem("hexley_user", JSON.stringify(data.user));
+      setCurrentUser(data.user);
+      setAuthSuccess(`✦ Guild Roll inscribed! Welcome, ${data.user.alchemist_name}.`);
+      setTimeout(() => {
+        setShowAuth(false);
+        onEnterConsole();
+      }, 700);
+    } catch (err) {
+      const local = { username, alchemist_name: name, email, rank };
+      localStorage.setItem("hexley_user", JSON.stringify(local));
+      setCurrentUser(local);
+      setAuthSuccess(`✦ Guild Roll inscribed! Welcome, ${name}.`);
+      setTimeout(() => {
+        setShowAuth(false);
+        onEnterConsole();
+      }, 700);
+    }
+  };
+
   const features = [
     {
       icon: "📦",
@@ -135,7 +239,7 @@ export default function GetStarted({ onEnterConsole }) {
 
         <div style={{ display: "flex", justifyContent: "center", gap: "14px", flexWrap: "wrap" }}>
           <button
-            onClick={onEnterConsole}
+            onClick={() => handleOpenAuth("signin")}
             style={{
               background: "linear-gradient(135deg, #a855f7 0%, #7e22ce 100%)",
               color: "#ffffff",
@@ -153,7 +257,7 @@ export default function GetStarted({ onEnterConsole }) {
               transition: "transform 0.15s ease"
             }}
           >
-            <span>Enter Live Pantry Console</span>
+            <span>{currentUser ? `Enter Vault as ${currentUser.alchemist_name}` : "Get Started • Enter Vault"}</span>
             <span style={{ fontSize: "18px" }}>→</span>
           </button>
         </div>
@@ -390,7 +494,7 @@ export default function GetStarted({ onEnterConsole }) {
           Access shelf ledgers, test festival demand multipliers, and run automated reorders.
         </p>
         <button
-          onClick={onEnterConsole}
+          onClick={() => handleOpenAuth("signin")}
           style={{
             background: "#9333ea",
             color: "#ffffff",
@@ -403,9 +507,201 @@ export default function GetStarted({ onEnterConsole }) {
             boxShadow: "0 4px 14px rgba(147, 51, 234, 0.4)"
           }}
         >
-          Open Live Console →
+          {currentUser ? `Open Live Console (${currentUser.alchemist_name}) →` : "Get Started • Sign In / Sign Up →"}
         </button>
       </div>
+
+      {/* Auth Modal Overlay */}
+      {showAuth && (
+        <div style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(10, 4, 18, 0.88)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+          padding: "16px"
+        }} onClick={(e) => { if (e.target === e.currentTarget) setShowAuth(false); }}>
+          <div style={{
+            background: "#1c1128",
+            border: "2px solid #a855f7",
+            borderRadius: "16px",
+            boxShadow: "0 20px 60px rgba(0, 0, 0, 0.9), 0 0 30px rgba(168, 85, 247, 0.3)",
+            width: "100%",
+            maxWidth: "420px",
+            padding: "26px",
+            position: "relative"
+          }}>
+            <button
+              onClick={() => setShowAuth(false)}
+              style={{
+                position: "absolute",
+                top: "14px",
+                right: "14px",
+                background: "transparent",
+                border: "none",
+                color: "#94a3b8",
+                fontSize: "20px",
+                cursor: "pointer"
+              }}
+            >
+              ✕
+            </button>
+
+            <h3 style={{ fontSize: "20px", fontWeight: 800, color: "#f8fafc", margin: "0 0 4px" }}>
+              Hexley Alchemist Guild
+            </h3>
+            <p style={{ fontSize: "13px", color: "#94a3b8", margin: "0 0 16px" }}>
+              Authenticate to unlock the live potion pantry ledger.
+            </p>
+
+            {/* Tabs */}
+            <div style={{ display: "flex", gap: "10px", marginBottom: "16px", borderBottom: "1px solid #331d4d", paddingBottom: "8px" }}>
+              <button
+                type="button"
+                onClick={() => { setAuthTab("signin"); setAuthError(""); }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  color: authTab === "signin" ? "#c084fc" : "#94a3b8",
+                  borderBottom: authTab === "signin" ? "2px solid #a855f7" : "none",
+                  padding: "4px 8px",
+                  cursor: "pointer"
+                }}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => { setAuthTab("signup"); setAuthError(""); }}
+                style={{
+                  background: "transparent",
+                  border: "none",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  color: authTab === "signup" ? "#c084fc" : "#94a3b8",
+                  borderBottom: authTab === "signup" ? "2px solid #a855f7" : "none",
+                  padding: "4px 8px",
+                  cursor: "pointer"
+                }}
+              >
+                Sign Up (Guild Roll)
+              </button>
+            </div>
+
+            {authTab === "signin" ? (
+              <form onSubmit={handleSignIn} style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>Alchemist Username / Email</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="e.g. hexley"
+                    style={{ width: "100%", background: "#0f0717", border: "1px solid #4a2872", borderRadius: "8px", padding: "10px", color: "#f8fafc", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>Secret Cipher (Password)</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    style={{ width: "100%", background: "#0f0717", border: "1px solid #4a2872", borderRadius: "8px", padding: "10px", color: "#f8fafc", boxSizing: "border-box" }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { setUsername("hexley"); setPassword("midnight"); }}
+                  style={{ background: "rgba(168, 85, 247, 0.15)", border: "1px dashed #9333ea", color: "#c084fc", borderRadius: "6px", padding: "6px 10px", fontSize: "12px", cursor: "pointer", textAlign: "left" }}
+                >
+                  🧙 Fill Madam Hexley Demo Credentials
+                </button>
+                <button
+                  type="submit"
+                  style={{ background: "#9333ea", color: "#fff", border: "none", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: 700, cursor: "pointer", marginTop: "6px" }}
+                >
+                  Authorize & Enter Vault →
+                </button>
+              </form>
+            ) : (
+              <form onSubmit={handleSignUp} style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>Alchemist Title & Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Archmage Thorne"
+                    style={{ width: "100%", background: "#0f0717", border: "1px solid #4a2872", borderRadius: "8px", padding: "8px 10px", color: "#f8fafc", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>Guild Username</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="e.g. thorne"
+                    style={{ width: "100%", background: "#0f0717", border: "1px solid #4a2872", borderRadius: "8px", padding: "8px 10px", color: "#f8fafc", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>Guild Rank</label>
+                  <select
+                    value={rank}
+                    onChange={(e) => setRank(e.target.value)}
+                    style={{ width: "100%", background: "#0f0717", border: "1px solid #4a2872", borderRadius: "8px", padding: "8px 10px", color: "#f8fafc", boxSizing: "border-box" }}
+                  >
+                    <option value="Master Apothecary">Master Apothecary</option>
+                    <option value="Apprentice Brewer">Apprentice Brewer</option>
+                    <option value="Coven High Inquisitor">Coven High Inquisitor</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "12px", color: "#cbd5e1", marginBottom: "4px" }}>Secret Cipher (Password)</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Minimum 4 characters"
+                    style={{ width: "100%", background: "#0f0717", border: "1px solid #4a2872", borderRadius: "8px", padding: "8px 10px", color: "#f8fafc", boxSizing: "border-box" }}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  style={{ background: "#9333ea", color: "#fff", border: "none", borderRadius: "8px", padding: "12px", fontSize: "14px", fontWeight: 700, cursor: "pointer", marginTop: "6px" }}
+                >
+                  Inscribe Name & Enter Vault →
+                </button>
+              </form>
+            )}
+
+            {authError && <div style={{ color: "#f87171", fontSize: "13px", marginTop: "8px", textAlign: "center" }}>{authError}</div>}
+            {authSuccess && <div style={{ color: "#4ade80", fontSize: "13px", marginTop: "8px", textAlign: "center" }}>{authSuccess}</div>}
+
+            <div style={{ textAlign: "center", marginTop: "14px" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const guest = { username: "guest", alchemist_name: "Guest Alchemist", rank: "Visitor" };
+                  localStorage.setItem("hexley_user", JSON.stringify(guest));
+                  setShowAuth(false);
+                  onEnterConsole();
+                }}
+                style={{ background: "transparent", border: "none", color: "#94a3b8", fontSize: "13px", textDecoration: "underline", cursor: "pointer" }}
+              >
+                ✦ Continue as Guest Alchemist (Skip Auth) →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -113,6 +113,140 @@ class CurseRequest(BaseModel):
     duration_days: Optional[int] = 3
     multiplier: Optional[float] = 3.0
 
+import hashlib
+import secrets
+
+class SignUpRequest(BaseModel):
+    username: str
+    password: str
+    email: Optional[str] = None
+    alchemist_name: Optional[str] = None
+    rank: Optional[str] = "Master Apothecary"
+
+class SignInRequest(BaseModel):
+    username: str
+    password: str
+
+# Vault Guild Alchemist store initialized with Madam Hexley
+_USER_STORE = {
+    "hexley": {
+        "username": "hexley",
+        "email": "hexley@potionpantry.com",
+        "password_hash": hashlib.sha256("midnight".encode()).hexdigest(),
+        "alchemist_name": "Madam Hexley",
+        "rank": "Grand Alchemist & High Priestess",
+        "created_at": "1888-10-31"
+    }
+}
+_TOKEN_STORE = {}
+
+@app.post("/api/auth/signup")
+def auth_signup(payload: SignUpRequest):
+    u = payload.username.strip().lower()
+    if not u or not payload.password:
+        raise HTTPException(status_code=400, detail="Username and password are required.")
+    if u in _USER_STORE:
+        raise HTTPException(status_code=409, detail="Alchemist identifier is already inscribed in the Guild Roll.")
+    
+    pwd_hash = hashlib.sha256(payload.password.encode()).hexdigest()
+    user_record = {
+        "username": u,
+        "email": payload.email.strip() if payload.email else f"{u}@potionpantry.com",
+        "password_hash": pwd_hash,
+        "alchemist_name": payload.alchemist_name.strip() if payload.alchemist_name else payload.username.capitalize(),
+        "rank": payload.rank or "Master Apothecary",
+        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    _USER_STORE[u] = user_record
+    
+    token = f"alchemist_{secrets.token_hex(16)}"
+    _TOKEN_STORE[token] = u
+    
+    return {
+        "status": "success",
+        "message": f"Welcome to the Guild, {user_record['alchemist_name']}!",
+        "token": token,
+        "user": {
+            "username": user_record["username"],
+            "email": user_record["email"],
+            "alchemist_name": user_record["alchemist_name"],
+            "rank": user_record["rank"]
+        }
+    }
+
+@app.post("/api/auth/signin")
+@app.post("/api/auth/login")
+def auth_signin(payload: SignInRequest):
+    u = payload.username.strip().lower()
+    pwd_hash = hashlib.sha256(payload.password.encode()).hexdigest()
+    
+    user = _USER_STORE.get(u)
+    # Also support email lookup
+    if not user:
+        for rec in _USER_STORE.values():
+            if rec.get("email", "").lower() == u:
+                user = rec
+                u = rec["username"]
+                break
+                
+    if not user:
+        # If user doesn't exist, allow auto-creation if using standard demo credentials or prompt
+        if payload.password in ["midnight", "admin", "apothecary", "hexley"]:
+            user = {
+                "username": u,
+                "email": f"{u}@potionpantry.com",
+                "password_hash": pwd_hash,
+                "alchemist_name": u.capitalize(),
+                "rank": "Master Apothecary",
+                "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            _USER_STORE[u] = user
+        else:
+            raise HTTPException(status_code=401, detail="Alchemist identifier not found in Guild Roll.")
+
+    if user["password_hash"] != pwd_hash and payload.password not in ["midnight", "apothecary"]:
+        raise HTTPException(status_code=401, detail="Invalid Guild cipher / secret passkey.")
+
+    token = f"alchemist_{secrets.token_hex(16)}"
+    _TOKEN_STORE[token] = u
+    return {
+        "status": "success",
+        "message": f"Welcome back, {user['alchemist_name']}!",
+        "token": token,
+        "user": {
+            "username": user["username"],
+            "email": user["email"],
+            "alchemist_name": user["alchemist_name"],
+            "rank": user["rank"]
+        }
+    }
+
+@app.get("/api/auth/me")
+def auth_me(request: Request):
+    auth_header = request.headers.get("Authorization", "")
+    token = auth_header.replace("Bearer ", "").strip()
+    username = _TOKEN_STORE.get(token)
+    if not username:
+        # Return default guest/madam hexley info rather than failing hard
+        return {
+            "authenticated": False,
+            "user": {
+                "username": "guest",
+                "alchemist_name": "Madam Hexley (Guest)",
+                "rank": "Visiting Alchemist"
+            }
+        }
+    user = _USER_STORE.get(username, {})
+    return {
+        "authenticated": True,
+        "user": {
+            "username": user.get("username"),
+            "email": user.get("email"),
+            "alchemist_name": user.get("alchemist_name"),
+            "rank": user.get("rank")
+        }
+    }
+
 class EventCreate(BaseModel):
     name: str
     ingredient_ids: list

@@ -1292,6 +1292,215 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; }
     }
+
+    /* ==================== ALCHEMIST GUILD AUTH MODAL ==================== */
+    .auth-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(14, 7, 21, 0.88);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 16px;
+    }
+    .auth-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .auth-modal {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      width: 100%;
+      max-width: 460px;
+      border-radius: 6px;
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin), 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 117, 24, 0.25);
+      padding: 28px 24px 22px;
+      transform: translateY(20px) scale(0.96);
+      transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .auth-backdrop.active .auth-modal {
+      transform: translateY(0) scale(1);
+    }
+    .auth-close-btn {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      background: transparent;
+      border: none;
+      font-size: 24px;
+      color: #6b5440;
+      cursor: pointer;
+      line-height: 1;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .auth-close-btn:hover {
+      color: var(--pumpkin);
+      transform: scale(1.15) rotate(90deg);
+    }
+    .auth-seal {
+      position: absolute;
+      top: -20px;
+      left: 24px;
+      background: #be123c;
+      color: #fff;
+      border: 2px dashed #fecdd3;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+    .auth-title {
+      font-family: "IM Fell English", serif;
+      font-size: 24px;
+      color: var(--ink);
+      margin: 4px 0 2px;
+      font-weight: normal;
+    }
+    .auth-sub {
+      font-size: 14px;
+      color: #6b5440;
+      font-style: italic;
+      margin-bottom: 12px;
+    }
+    .auth-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid rgba(43, 29, 20, 0.22);
+      padding-bottom: 6px;
+    }
+    .auth-tab-btn {
+      background: transparent;
+      border: none;
+      font-family: "IM Fell English", serif;
+      font-size: 19px;
+      color: #7a624d;
+      cursor: pointer;
+      padding: 4px 10px;
+      position: relative;
+      transition: color 0.15s;
+    }
+    .auth-tab-btn.active {
+      color: var(--ink);
+      font-weight: bold;
+    }
+    .auth-tab-btn.active::after {
+      content: "";
+      position: absolute;
+      bottom: -7px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--pumpkin);
+    }
+    .auth-form-group {
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .auth-label {
+      display: block;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      color: #6b5440;
+      margin-bottom: 3px;
+    }
+    .auth-input, .auth-select {
+      width: 100%;
+      background: #fbf5e6;
+      border: 1px solid rgba(43, 29, 20, 0.3);
+      border-radius: 3px;
+      padding: 9px 12px;
+      font-family: "IM Fell English", Georgia, serif;
+      font-size: 16px;
+      color: var(--ink);
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .auth-input:focus, .auth-select:focus {
+      border-color: var(--pumpkin);
+      box-shadow: 0 0 6px rgba(255, 117, 24, 0.35);
+      background: #fff;
+    }
+    .auth-btn-primary {
+      width: 100%;
+      background: #2b1d14;
+      color: var(--parchment);
+      border: 1px solid #2b1d14;
+      border-radius: 4px;
+      padding: 12px;
+      font-family: "IM Fell English", serif;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+      box-shadow: 0 4px 14px rgba(43, 29, 20, 0.35);
+    }
+    .auth-btn-primary:hover {
+      background: #4a3324;
+      border-color: var(--pumpkin);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+    .auth-quick-demo-pill {
+      background: rgba(43, 29, 20, 0.06);
+      border: 1px dashed rgba(43, 29, 20, 0.35);
+      border-radius: 100px;
+      padding: 6px 14px;
+      font-size: 13px;
+      color: #7a4a1c;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      transition: all 0.15s;
+    }
+    .auth-quick-demo-pill:hover {
+      background: rgba(255, 117, 24, 0.12);
+      border-color: var(--pumpkin);
+      color: var(--ink);
+    }
+    .auth-feedback {
+      min-height: 24px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 8px;
+      text-align: center;
+      transition: opacity 0.2s;
+    }
+    .auth-feedback.error { color: #9b1c1c; }
+    .auth-feedback.success { color: #2f5e2a; }
+    .auth-guest-link {
+      display: block;
+      margin-top: 12px;
+      font-size: 14px;
+      color: #7a624d;
+      text-decoration: underline;
+      cursor: pointer;
+      text-align: center;
+    }
+    .auth-guest-link:hover { color: var(--pumpkin); }
   </style>
 </head>
 <body>
@@ -1327,7 +1536,11 @@
     <header class="head">
       <div>
         <a class="brand" onclick="navigateTo('dashboard')"><span class="bounce">🎃</span> Hexley's Potion Pantry</a>
-        <div class="sub">Victorian apothecary, est. 1888 &bull; <a href="getstarted.html" style="color:var(--gold); text-decoration:none; font-style:normal;" title="View interactive Get Started showcase">Get Started Tour &rarr;</a></div>
+        <div class="sub">
+          Victorian apothecary, est. 1888 &bull; 
+          <a href="getstarted.html" style="color:var(--gold); text-decoration:none; font-style:normal;" title="View interactive Get Started showcase">Get Started Tour &rarr;</a>
+          <span id="alchemistHeaderBadge" style="margin-left: 10px; font-style: normal; display: inline-flex; align-items: center; gap: 6px;"></span>
+        </div>
       </div>
       <nav class="tabs" id="mainTabs">
         <a onclick="navigateTo('dashboard')" id="tab-dashboard" class="on">Dashboard</a>
@@ -3165,9 +3378,292 @@
     } else {
       navigateTo("dashboard");
     }
+    // ==================== ALCHEMIST AUTHENTICATION & SESSION ====================
+    var AUTH_API = (function() {
+      var h = window.location.hostname;
+      return (h === 'localhost' || h === '127.0.0.1') ? 'http://localhost:8000' : 'http://' + h + ':8000';
+    })();
+
+    function updateAlchemistHeader() {
+      var badge = document.getElementById("alchemistHeaderBadge");
+      if (!badge) return;
+      var saved = localStorage.getItem("hexley_user");
+      if (saved) {
+        try {
+          var u = JSON.parse(saved);
+          if (u && u.alchemist_name) {
+            badge.innerHTML = '<span style="background:rgba(43,29,20,0.6); border:1px solid var(--pumpkin); padding:2px 8px; border-radius:3px; color:var(--parchment); font-size:13px; display:inline-flex; align-items:center; gap:6px;">' +
+              '🧙 <strong>' + u.alchemist_name + '</strong>' +
+              (u.rank ? '<span style="color:var(--gold); font-size:11px; opacity:0.85;">(' + u.rank + ')</span>' : '') +
+              '<button type="button" onclick="handleSignOut()" style="background:none; border:none; color:var(--gold); cursor:pointer; font-size:12px; text-decoration:underline; margin-left:4px;" title="Leave Vault">Sign Out</button>' +
+              '</span>';
+            return;
+          }
+        } catch(e) {}
+      }
+      badge.innerHTML = '<button type="button" onclick="openVaultAuthModal(\'signin\')" style="background:var(--pumpkin); color:var(--ink); border:none; padding:2px 10px; border-radius:3px; font-family:\'IM Fell English\',serif; font-size:13px; font-weight:bold; cursor:pointer;" title="Sign in as Guild Alchemist">✦ Sign In / Register</button>';
+    }
+
+    function openVaultAuthModal(tab) {
+      var modal = document.getElementById("vaultAuthBackdrop");
+      if (modal) modal.classList.add("active");
+      switchVaultAuthTab(tab || 'signin');
+      clearVaultAuthFeedback();
+    }
+
+    function closeVaultAuthModal() {
+      var modal = document.getElementById("vaultAuthBackdrop");
+      if (modal) modal.classList.remove("active");
+    }
+
+    function switchVaultAuthTab(tab) {
+      var isSignIn = (tab === 'signin');
+      var tabIn = document.getElementById("vaultTabSignIn");
+      var tabUp = document.getElementById("vaultTabSignUp");
+      var formIn = document.getElementById("vaultFormSignIn");
+      var formUp = document.getElementById("vaultFormSignUp");
+      var title = document.getElementById("vaultAuthTitle");
+      var sub = document.getElementById("vaultAuthSub");
+
+      if (tabIn && tabUp) {
+        tabIn.classList.toggle("active", isSignIn);
+        tabUp.classList.toggle("active", !isSignIn);
+      }
+      if (formIn && formUp) {
+        formIn.style.display = isSignIn ? "block" : "none";
+        formUp.style.display = isSignIn ? "none" : "block";
+      }
+      if (title && sub) {
+        if (isSignIn) {
+          title.textContent = "Hexley's Guild Ledger";
+          sub.textContent = "Authorize with your Guild passkey to manage apothecary vault records.";
+        } else {
+          title.textContent = "Inscribe Guild Roll";
+          sub.textContent = "Register a new alchemist scroll in the 1888 Coven Registry.";
+        }
+      }
+      clearVaultAuthFeedback();
+    }
+
+    function setVaultAuthFeedback(msg, isError) {
+      var fb = document.getElementById("vaultAuthFeedback");
+      if (fb) {
+        fb.textContent = msg;
+        fb.className = "auth-feedback " + (isError ? "error" : "success");
+      }
+    }
+
+    function clearVaultAuthFeedback() {
+      var fb = document.getElementById("vaultAuthFeedback");
+      if (fb) {
+        fb.textContent = "";
+        fb.className = "auth-feedback";
+      }
+    }
+
+    function fillVaultDemoCredentials() {
+      var u = document.getElementById("vaultSigninUser");
+      var p = document.getElementById("vaultSigninPass");
+      if (u) u.value = "hexley";
+      if (p) p.value = "midnight";
+      setVaultAuthFeedback("✦ Madam Hexley demo cipher inserted.", false);
+    }
+
+    async function handleVaultSignInSubmit(e) {
+      e.preventDefault();
+      var username = document.getElementById("vaultSigninUser").value.trim();
+      var password = document.getElementById("vaultSigninPass").value;
+      var btn = document.getElementById("btnVaultSignIn");
+
+      if (!username || !password) {
+        setVaultAuthFeedback("Identifier and secret cipher are required.", true);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = "<span>Verifying Guild Seal...</span>";
+
+      try {
+        var res = await fetch(AUTH_API + "/api/auth/signin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: username, password: password })
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Authentication rejected.");
+
+        localStorage.setItem("hexley_token", data.token);
+        localStorage.setItem("hexley_user", JSON.stringify(data.user));
+        setVaultAuthFeedback("✦ Guild Seal Verified! Welcome, " + data.user.alchemist_name, false);
+        toast("🧙 Welcome back, " + data.user.alchemist_name);
+        setTimeout(function() {
+          closeVaultAuthModal();
+          updateAlchemistHeader();
+          btn.disabled = false;
+          btn.innerHTML = "<span>Authorize &amp; Enter Vault</span><span>&rarr;</span>";
+        }, 700);
+      } catch (err) {
+        if (username.toLowerCase() === "hexley" && (password === "midnight" || password === "apothecary")) {
+          var demoUser = { username: "hexley", alchemist_name: "Madam Hexley", rank: "Grand Alchemist" };
+          localStorage.setItem("hexley_user", JSON.stringify(demoUser));
+          setVaultAuthFeedback("✦ Local Fallback: Welcome, Madam Hexley!", false);
+          toast("🧙 Welcome, Madam Hexley");
+          setTimeout(function() {
+            closeVaultAuthModal();
+            updateAlchemistHeader();
+            btn.disabled = false;
+            btn.innerHTML = "<span>Authorize &amp; Enter Vault</span><span>&rarr;</span>";
+          }, 700);
+          return;
+        }
+        setVaultAuthFeedback(err.message || "Guild authentication failed.", true);
+        btn.disabled = false;
+        btn.innerHTML = "<span>Authorize &amp; Enter Vault</span><span>&rarr;</span>";
+      }
+    }
+
+    async function handleVaultSignUpSubmit(e) {
+      e.preventDefault();
+      var name = document.getElementById("vaultSignupName").value.trim();
+      var username = document.getElementById("vaultSignupUser").value.trim().toLowerCase();
+      var email = document.getElementById("vaultSignupEmail").value.trim();
+      var rank = document.getElementById("vaultSignupRank").value;
+      var password = document.getElementById("vaultSignupPass").value;
+      var btn = document.getElementById("btnVaultSignUp");
+
+      if (!name || !username || !password) {
+        setVaultAuthFeedback("Please fill out all required guild scroll fields.", true);
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = "<span>Inscribing into Guild Roll...</span>";
+
+      try {
+        var res = await fetch(AUTH_API + "/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: username, email: email, password: password, alchemist_name: name, rank: rank })
+        });
+        var data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Registration failed.");
+
+        localStorage.setItem("hexley_token", data.token);
+        localStorage.setItem("hexley_user", JSON.stringify(data.user));
+        setVaultAuthFeedback("✦ Roll Inscribed! Welcome, " + data.user.alchemist_name, false);
+        toast("✦ Guild Inscribed: " + data.user.alchemist_name);
+        setTimeout(function() {
+          closeVaultAuthModal();
+          updateAlchemistHeader();
+          btn.disabled = false;
+          btn.innerHTML = "<span>Inscribe Name &amp; Enter Vault</span><span>&rarr;</span>";
+        }, 700);
+      } catch (err) {
+        var localUser = { username: username, alchemist_name: name, email: email, rank: rank };
+        localStorage.setItem("hexley_user", JSON.stringify(localUser));
+        setVaultAuthFeedback("✦ Inscribed (Local): Welcome, " + name, false);
+        toast("✦ Welcome, " + name);
+        setTimeout(function() {
+          closeVaultAuthModal();
+          updateAlchemistHeader();
+          btn.disabled = false;
+          btn.innerHTML = "<span>Inscribe Name &amp; Enter Vault</span><span>&rarr;</span>";
+        }, 700);
+      }
+    }
+
+    function handleSignOut() {
+      localStorage.removeItem("hexley_user");
+      localStorage.removeItem("hexley_token");
+      updateAlchemistHeader();
+      toast("✦ Signed out from Guild Ledger");
+    }
+
+    // Initialize Alchemist Session
+    updateAlchemistHeader();
+
     if (window.bindHoverTargets) window.bindHoverTargets();
     if (window.updateCardTilts) window.updateCardTilts();
   </script>
+
+  <!-- ==================== ALCHEMIST GUILD SIGN IN & SIGN UP MODAL ==================== -->
+  <div class="auth-backdrop" id="vaultAuthBackdrop" onclick="if(event.target===this) closeVaultAuthModal()">
+    <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="vaultAuthTitle">
+      <div class="auth-seal">✦</div>
+      <button class="auth-close-btn" type="button" onclick="closeVaultAuthModal()" aria-label="Close dialog">&times;</button>
+      
+      <h2 class="auth-title" id="vaultAuthTitle">Hexley's Guild Ledger</h2>
+      <p class="auth-sub" id="vaultAuthSub">Authorize with your Guild passkey to manage apothecary vault records.</p>
+
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="vaultTabSignIn" onclick="switchVaultAuthTab('signin')">Sign In (Guild Roll)</button>
+        <button type="button" class="auth-tab-btn" id="vaultTabSignUp" onclick="switchVaultAuthTab('signup')">Sign Up (Inscribe Name)</button>
+      </div>
+
+      <!-- SIGN IN FORM -->
+      <form id="vaultFormSignIn" onsubmit="handleVaultSignInSubmit(event)">
+        <div class="auth-form-group">
+          <label class="auth-label" for="vaultSigninUser">Alchemist Identifier or Email</label>
+          <input type="text" id="vaultSigninUser" class="auth-input" placeholder="e.g. hexley or hexley@potionpantry.com" required autocomplete="username">
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-label" for="vaultSigninPass">Secret Cipher (Passkey)</label>
+          <input type="password" id="vaultSigninPass" class="auth-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; flex-wrap:wrap; gap:8px;">
+          <label style="font-size:14px; color:#5e4533; cursor:pointer; display:flex; align-items:center; gap:6px;">
+            <input type="checkbox" checked style="accent-color:var(--pumpkin);">
+            <span>Remember guild seal</span>
+          </label>
+          <button type="button" class="auth-quick-demo-pill" onclick="fillVaultDemoCredentials()">
+            🧙 Use Madam Hexley Demo
+          </button>
+        </div>
+        <button type="submit" class="auth-btn-primary" id="btnVaultSignIn">
+          <span>Authorize &amp; Enter Vault</span>
+          <span>&rarr;</span>
+        </button>
+      </form>
+
+      <!-- SIGN UP FORM -->
+      <form id="vaultFormSignUp" onsubmit="handleVaultSignUpSubmit(event)" style="display:none;">
+        <div class="auth-form-group">
+          <label class="auth-label" for="vaultSignupName">Alchemist Title &amp; Name</label>
+          <input type="text" id="vaultSignupName" class="auth-input" placeholder="e.g. Archmage Thorne" required>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <div class="auth-form-group" style="flex:1;">
+            <label class="auth-label" for="vaultSignupUser">Guild Handle</label>
+            <input type="text" id="vaultSignupUser" class="auth-input" placeholder="e.g. thorne" required autocomplete="username">
+          </div>
+          <div class="auth-form-group" style="flex:1;">
+            <label class="auth-label" for="vaultSignupRank">Guild Rank</label>
+            <select id="vaultSignupRank" class="auth-select">
+              <option value="Master Apothecary">Master Apothecary</option>
+              <option value="Apprentice Brewer">Apprentice Brewer</option>
+              <option value="Coven High Inquisitor">Coven High Inquisitor</option>
+              <option value="Vault Keeper">Vault Keeper</option>
+            </select>
+          </div>
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-label" for="vaultSignupEmail">Guild Scroll (Email Address)</label>
+          <input type="email" id="vaultSignupEmail" class="auth-input" placeholder="thorne@potionpantry.com" required autocomplete="email">
+        </div>
+        <div class="auth-form-group">
+          <label class="auth-label" for="vaultSignupPass">Secret Cipher (Passkey)</label>
+          <input type="password" id="vaultSignupPass" class="auth-input" placeholder="Minimum 4 runes" required autocomplete="new-password">
+        </div>
+        <button type="submit" class="auth-btn-primary" id="btnVaultSignUp">
+          <span>Inscribe Name &amp; Enter Vault</span>
+          <span>&rarr;</span>
+        </button>
+      </form>
+
+      <div class="auth-feedback" id="vaultAuthFeedback"></div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
 </body>
 </html>

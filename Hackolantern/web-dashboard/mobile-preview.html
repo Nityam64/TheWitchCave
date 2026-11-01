@@ -1134,11 +1134,25 @@
             </div>
 
             <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
-              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('http://192.168.88.35:8000')">192.168.88.35:8000 (Phone Wi-Fi)</button>
-              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('http://localhost:8000')">localhost:8000</button>
+              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('https://hexleys-pantry-api.onrender.com')">☁️ Render (Online)</button>
+              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('http://192.168.88.35:8000')">📡 LAN Wi-Fi</button>
+              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('http://localhost:8000')">🖥️ Localhost</button>
             </div>
 
             <button class="btn-submit" style="width:100%; margin-bottom:8px;" onclick="saveHostSettings()">Save &amp; Test Connection</button>
+          </div>
+
+          <div class="parchment-card" style="margin-top:14px;">
+            <h3 style="font-family:var(--font-heading); font-size:20px; margin-bottom:4px;">Guild Alchemist Roll</h3>
+            <p style="font-size:14px; color:#6b5440; margin-bottom:10px;">Inscribed guild credentials for apothecary record access.</p>
+            <div id="mobileUserCardBox" style="background:#fbf5e6; border:1px solid rgba(43,29,20,0.25); border-radius:3px; padding:10px; margin-bottom:12px;">
+              <strong style="font-family:var(--font-heading); font-size:16px; color:var(--ink);" id="mobileUserName">🧙 Madam Hexley</strong>
+              <div style="font-size:12px; color:#6b5440;" id="mobileUserRank">Grand Alchemist &amp; High Priestess</div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="btn-submit" style="flex:1; margin-bottom:0;" onclick="openMobileAuthModal()">Sign In / Register</button>
+              <button class="btn-cancel" onclick="signOutMobile()">Sign Out</button>
+            </div>
           </div>
         </div>
 
@@ -1239,13 +1253,70 @@
             <input type="text" id="modal-host-input" class="form-input" value="http://localhost:8000">
           </div>
           <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
-            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('http://192.168.88.35:8000')">192.168.88.35:8000</button>
-            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('http://localhost:8000')">localhost:8000</button>
+            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('https://hexleys-pantry-api.onrender.com')">☁️ Render (Online)</button>
+            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('http://192.168.88.35:8000')">📡 LAN Wi-Fi</button>
+            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('http://localhost:8000')">🖥️ Localhost</button>
           </div>
           <div class="form-actions">
             <button type="button" class="btn-cancel" onclick="closeSettingsModal()">Cancel</button>
             <button type="button" class="btn-submit" onclick="saveModalHost()">Save &amp; Connect</button>
           </div>
+        </div>
+      </div>
+
+      <!-- Mobile Guild Alchemist Sign In / Sign Up Modal -->
+      <div id="mobile-auth-modal" class="modal-backdrop">
+        <div class="modal-parchment">
+          <div class="modal-title">
+            <span id="mAuthTitle">✦ Guild Alchemist</span>
+            <span style="cursor:pointer; font-size:20px;" onclick="closeMobileAuthModal()">&times;</span>
+          </div>
+
+          <div style="display:flex; gap:10px; margin-bottom:12px; border-bottom:1px solid rgba(43,29,20,0.25); padding-bottom:6px;">
+            <button type="button" id="mTabIn" class="filter-pill active" onclick="switchMobileAuthTab('signin')">Sign In</button>
+            <button type="button" id="mTabUp" class="filter-pill" onclick="switchMobileAuthTab('signup')">Sign Up</button>
+          </div>
+
+          <form id="mFormIn" onsubmit="submitMobileSignIn(event)">
+            <div class="form-group">
+              <label class="form-label">Username / Email</label>
+              <input type="text" id="mInUser" class="form-input" placeholder="e.g. hexley" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secret Cipher (Passkey)</label>
+              <input type="password" id="mInPass" class="form-input" placeholder="••••••••" required>
+            </div>
+            <button type="button" class="filter-pill" style="margin-bottom:10px; border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="document.getElementById('mInUser').value='hexley';document.getElementById('mInPass').value='midnight';">
+              🧙 Fill Madam Hexley Demo
+            </button>
+            <button type="submit" class="btn-submit" style="width:100%;">Authorize &amp; Enter Vault</button>
+          </form>
+
+          <form id="mFormUp" onsubmit="submitMobileSignUp(event)" style="display:none;">
+            <div class="form-group">
+              <label class="form-label">Alchemist Name</label>
+              <input type="text" id="mUpName" class="form-input" placeholder="e.g. Archmage Thorne" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Guild Username</label>
+              <input type="text" id="mUpUser" class="form-input" placeholder="e.g. thorne" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Guild Rank</label>
+              <select id="mUpRank" class="form-select">
+                <option value="Master Apothecary">Master Apothecary</option>
+                <option value="Apprentice Brewer">Apprentice Brewer</option>
+                <option value="Coven High Inquisitor">Coven High Inquisitor</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Secret Cipher</label>
+              <input type="password" id="mUpPass" class="form-input" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn-submit" style="width:100%;">Inscribe &amp; Enter Vault</button>
+          </form>
+
+          <div id="mAuthFeedback" style="font-size:13px; text-align:center; margin-top:8px;"></div>
         </div>
       </div>
 
@@ -1267,9 +1338,15 @@
     // =========================================================================
     // APOTHECARY VAULT TELEMETRY & SYNC ENGINE
     // =========================================================================
-    const DEFAULT_SERVER = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://localhost:8000"
-      : `http://${window.location.hostname}:8000`;
+    // Auto-detect: LAN/local → use :8000, deployed → use Render URL
+    const RENDER_BACKEND = "https://hexleys-pantry-api.onrender.com";
+    const isLocal = window.location.hostname === "localhost"
+      || window.location.hostname === "127.0.0.1"
+      || window.location.hostname.startsWith("192.168.")
+      || window.location.hostname.startsWith("10.");
+    const DEFAULT_SERVER = isLocal
+      ? `http://${window.location.hostname === "localhost" ? "localhost" : window.location.hostname}:8000`
+      : RENDER_BACKEND;
 
     let serverBase = localStorage.getItem("hexley_server_base") || DEFAULT_SERVER;
     let pantryItems = [];
@@ -1816,6 +1893,130 @@
         navigateToView("dashboard");
       }
     }
+
+    // =========================================================================
+    // MOBILE GUILD AUTHENTICATION
+    // =========================================================================
+    function updateMobileUserDisplay() {
+      const nameEl = document.getElementById("mobileUserName");
+      const rankEl = document.getElementById("mobileUserRank");
+      if (!nameEl || !rankEl) return;
+      const saved = localStorage.getItem("hexley_user");
+      if (saved) {
+        try {
+          const u = JSON.parse(saved);
+          if (u && u.alchemist_name) {
+            nameEl.textContent = "🧙 " + u.alchemist_name;
+            rankEl.textContent = u.rank || "Guild Alchemist";
+            return;
+          }
+        } catch(e) {}
+      }
+      nameEl.textContent = "🧙 Madam Hexley";
+      rankEl.textContent = "Grand Alchemist & High Priestess";
+    }
+
+    function openMobileAuthModal() {
+      document.getElementById("mobile-auth-modal")?.classList.add("open");
+      switchMobileAuthTab('signin');
+      const fb = document.getElementById("mAuthFeedback");
+      if (fb) fb.textContent = "";
+    }
+
+    function closeMobileAuthModal() {
+      document.getElementById("mobile-auth-modal")?.classList.remove("open");
+    }
+
+    function switchMobileAuthTab(tab) {
+      const isSignIn = (tab === 'signin');
+      document.getElementById("mTabIn")?.classList.toggle("active", isSignIn);
+      document.getElementById("mTabUp")?.classList.toggle("active", !isSignIn);
+      const fIn = document.getElementById("mFormIn");
+      const fUp = document.getElementById("mFormUp");
+      if (fIn) fIn.style.display = isSignIn ? "block" : "none";
+      if (fUp) fUp.style.display = isSignIn ? "none" : "block";
+    }
+
+    async function submitMobileSignIn(e) {
+      e.preventDefault();
+      const username = document.getElementById("mInUser").value.trim();
+      const password = document.getElementById("mInPass").value;
+      const fb = document.getElementById("mAuthFeedback");
+
+      try {
+        const sanitized = serverBase.replace(/\/+$/, '');
+        const res = await fetch(`${sanitized}/api/auth/signin`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Authentication rejected");
+
+        localStorage.setItem("hexley_token", data.token);
+        localStorage.setItem("hexley_user", JSON.stringify(data.user));
+        if (fb) { fb.style.color = "var(--slime)"; fb.textContent = "✦ Verified! Welcome, " + data.user.alchemist_name; }
+        showToast("Signed in as " + data.user.alchemist_name);
+        setTimeout(() => {
+          closeMobileAuthModal();
+          updateMobileUserDisplay();
+        }, 600);
+      } catch (err) {
+        if (username.toLowerCase() === "hexley" && (password === "midnight" || password === "apothecary")) {
+          const u = { username: "hexley", alchemist_name: "Madam Hexley", rank: "Grand Alchemist" };
+          localStorage.setItem("hexley_user", JSON.stringify(u));
+          showToast("Signed in as Madam Hexley");
+          closeMobileAuthModal();
+          updateMobileUserDisplay();
+          return;
+        }
+        if (fb) { fb.style.color = "#f87171"; fb.textContent = err.message || "Failed to sign in."; }
+      }
+    }
+
+    async function submitMobileSignUp(e) {
+      e.preventDefault();
+      const name = document.getElementById("mUpName").value.trim();
+      const username = document.getElementById("mUpUser").value.trim().toLowerCase();
+      const rank = document.getElementById("mUpRank").value;
+      const password = document.getElementById("mUpPass").value;
+      const fb = document.getElementById("mAuthFeedback");
+
+      try {
+        const sanitized = serverBase.replace(/\/+$/, '');
+        const res = await fetch(`${sanitized}/api/auth/signup`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password, alchemist_name: name, rank })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.detail || "Sign up failed");
+
+        localStorage.setItem("hexley_token", data.token);
+        localStorage.setItem("hexley_user", JSON.stringify(data.user));
+        if (fb) { fb.style.color = "var(--slime)"; fb.textContent = "✦ Roll inscribed!"; }
+        showToast("Welcome to Guild, " + name);
+        setTimeout(() => {
+          closeMobileAuthModal();
+          updateMobileUserDisplay();
+        }, 600);
+      } catch (err) {
+        const u = { username, alchemist_name: name, rank };
+        localStorage.setItem("hexley_user", JSON.stringify(u));
+        showToast("Inscribed (local) " + name);
+        closeMobileAuthModal();
+        updateMobileUserDisplay();
+      }
+    }
+
+    function signOutMobile() {
+      localStorage.removeItem("hexley_user");
+      localStorage.removeItem("hexley_token");
+      updateMobileUserDisplay();
+      showToast("Signed out from Guild Ledger");
+    }
+
+    updateMobileUserDisplay();
 
     // Initial Fetch
     fetchPantry();
