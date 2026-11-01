@@ -1,0 +1,99 @@
+date,ingredient_id,ingredient_name,category,current_stock,safety_stock,supplier,lead_time_days,is_cursed,units_sold
+2026-11-01,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,12
+2026-11-02,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,6
+2026-11-03,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,6
+2026-11-04,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-11-05,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,13
+2026-11-06,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,8
+2026-11-07,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,13
+2026-11-08,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,15
+2026-11-09,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-11-10,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-11-11,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,5
+2026-11-12,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,11
+2026-11-13,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,10
+2026-11-14,bat_wings,Bat Wings,Animal Parts,45,20,Crow's Corner,4,False,12
+2026-11-01,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,10
+2026-11-02,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-11-03,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,3
+2026-11-04,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-11-05,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-11-06,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-11-07,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,4
+2026-11-08,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-11-09,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,2
+2026-11-10,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,5
+2026-11-11,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-11-12,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,3
+2026-11-13,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-11-14,mandrake_root,Mandrake Root,Roots,18,15,Silver Vale,3,False,6
+2026-11-01,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,5
+2026-11-02,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-11-03,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,6
+2026-11-04,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,9
+2026-11-05,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,14
+2026-11-06,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,12
+2026-11-07,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,22
+2026-11-08,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,7
+2026-11-09,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,18
+2026-11-10,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-11-11,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,8
+2026-11-12,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,11
+2026-11-13,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,13
+2026-11-14,ghost_pepper,Ghost Pepper,Spices,60,25,Moon Market,2,True,18
+2026-11-01,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,9
+2026-11-02,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,8
+2026-11-03,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,5
+2026-11-04,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,9
+2026-11-05,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-11-06,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,4
+2026-11-07,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,8
+2026-11-08,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-11-09,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,10
+2026-11-10,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,3
+2026-11-11,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,2
+2026-11-12,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,6
+2026-11-13,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,4
+2026-11-14,newt_eyes,Newt Eyes,Animal Parts,90,30,Swamp Den,5,False,8
+2026-11-01,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,7
+2026-11-02,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,5
+2026-11-03,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,3
+2026-11-04,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,4
+2026-11-05,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,5
+2026-11-06,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,2
+2026-11-07,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,4
+2026-11-08,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,4
+2026-11-09,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,3
+2026-11-10,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,5
+2026-11-11,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,2
+2026-11-12,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,2
+2026-11-13,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,3
+2026-11-14,moonpetal_dust,Moonpetal Dust,Powders,48,15,Silver Vale,3,True,6
+2026-11-01,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,6
+2026-11-02,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,3
+2026-11-03,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,2
+2026-11-04,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,6
+2026-11-05,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,1
+2026-11-06,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,2
+2026-11-07,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,1
+2026-11-08,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,3
+2026-11-09,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,1
+2026-11-10,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,4
+2026-11-11,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,2
+2026-11-12,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,3
+2026-11-13,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,2
+2026-11-14,frost_honey,Frost Honey,Sweeteners,14,12,Hollow Hive,2,False,3
+2026-11-01,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-11-02,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-11-03,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,4
+2026-11-04,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-11-05,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-11-06,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,4
+2026-11-07,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,8
+2026-11-08,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,7
+2026-11-09,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,4
+2026-11-10,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,9
+2026-11-11,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,6
+2026-11-12,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-11-13,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,5
+2026-11-14,rose_root,Rose Root,Herbs,70,20,Greenhollow,1,False,8

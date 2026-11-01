@@ -1,27 +1,495 @@
 {
+  "evaluation_type": "rolling_origin_chronological",
+  "backtest_window_days": 28,
   "best_model_overall": "same_weekday_4w",
   "best_per_ingredient": {
     "bat_wings": "same_weekday_4w",
-    "frost_honey": "same_weekday_4w",
-    "ghost_pepper": "same_weekday_4w",
+    "frost_honey": "holt_winters",
+    "ghost_pepper": "moving_average_7d",
     "mandrake_root": "same_weekday_4w",
-    "moonpetal_dust": "same_weekday_4w",
+    "moonpetal_dust": "holt_winters",
     "newt_eyes": "same_weekday_4w",
-    "rose_root": "same_weekday_4w"
+    "rose_root": "holt_winters"
   },
-  "model_stats": {
+  "backtest_summary": {
+    "naive": {
+      "mae": 3.75,
+      "mape": 75.3,
+      "wape": 52.4,
+      "beats_naive_pct": 0.0
+    },
     "moving_average_7d": {
-      "avg_mae": 1.18,
-      "avg_mape": 16.0
+      "mae": 3.49,
+      "mape": 69.9,
+      "wape": 48.7,
+      "beats_naive_pct": 7.0
     },
     "same_weekday_4w": {
-      "avg_mae": 0.0,
-      "avg_mape": 0.0
+      "mae": 3.37,
+      "mape": 64.6,
+      "wape": 47.1,
+      "beats_naive_pct": 10.1
     },
     "holt_winters": {
-      "avg_mae": 0.0,
-      "avg_mape": 0.0
+      "mae": 3.43,
+      "mape": 67.0,
+      "wape": 47.9,
+      "beats_naive_pct": 8.6
     }
   },
-  "last_evaluated_at": "2026-11-01T03:04:47.169637"
+  "per_ingredient_backtest": {
+    "bat_wings": {
+      "name": "Bat Wings",
+      "eval_days": 28,
+      "best_model": "same_weekday_4w",
+      "metrics": {
+        "naive": {
+          "mae": 6.36,
+          "mape": 53.1,
+          "wape": 46.7,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 6.79,
+          "mape": 63.7,
+          "wape": 49.9,
+          "beats_naive_pct": -6.8
+        },
+        "same_weekday_4w": {
+          "mae": 6.14,
+          "mape": 47.1,
+          "wape": 45.1,
+          "beats_naive_pct": 3.4
+        },
+        "holt_winters": {
+          "mae": 6.36,
+          "mape": 58.5,
+          "wape": 46.8,
+          "beats_naive_pct": -0.1
+        }
+      }
+    },
+    "frost_honey": {
+      "name": "Frost Honey",
+      "eval_days": 28,
+      "best_model": "holt_winters",
+      "metrics": {
+        "naive": {
+          "mae": 2.29,
+          "mape": 119.7,
+          "wape": 97.0,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 1.6,
+          "mape": 90.9,
+          "wape": 68.0,
+          "beats_naive_pct": 29.9
+        },
+        "same_weekday_4w": {
+          "mae": 1.58,
+          "mape": 83.2,
+          "wape": 67.0,
+          "beats_naive_pct": 30.9
+        },
+        "holt_winters": {
+          "mae": 1.48,
+          "mape": 81.9,
+          "wape": 62.9,
+          "beats_naive_pct": 35.2
+        }
+      }
+    },
+    "ghost_pepper": {
+      "name": "Ghost Pepper",
+      "eval_days": 28,
+      "best_model": "moving_average_7d",
+      "metrics": {
+        "naive": {
+          "mae": 5.68,
+          "mape": 54.5,
+          "wape": 43.0,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 5.91,
+          "mape": 53.6,
+          "wape": 44.7,
+          "beats_naive_pct": -4.0
+        },
+        "same_weekday_4w": {
+          "mae": 6.14,
+          "mape": 55.8,
+          "wape": 46.5,
+          "beats_naive_pct": -8.2
+        },
+        "holt_winters": {
+          "mae": 6.36,
+          "mape": 59.5,
+          "wape": 48.2,
+          "beats_naive_pct": -12.1
+        }
+      }
+    },
+    "mandrake_root": {
+      "name": "Mandrake Root",
+      "eval_days": 28,
+      "best_model": "same_weekday_4w",
+      "metrics": {
+        "naive": {
+          "mae": 3.25,
+          "mape": 81.3,
+          "wape": 63.6,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 2.21,
+          "mape": 58.6,
+          "wape": 43.4,
+          "beats_naive_pct": 31.9
+        },
+        "same_weekday_4w": {
+          "mae": 2.13,
+          "mape": 53.5,
+          "wape": 41.8,
+          "beats_naive_pct": 34.3
+        },
+        "holt_winters": {
+          "mae": 2.21,
+          "mape": 53.9,
+          "wape": 43.3,
+          "beats_naive_pct": 32.0
+        }
+      }
+    },
+    "moonpetal_dust": {
+      "name": "Moonpetal Dust",
+      "eval_days": 28,
+      "best_model": "holt_winters",
+      "metrics": {
+        "naive": {
+          "mae": 2.39,
+          "mape": 75.8,
+          "wape": 60.4,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 2.16,
+          "mape": 80.9,
+          "wape": 54.4,
+          "beats_naive_pct": 9.8
+        },
+        "same_weekday_4w": {
+          "mae": 2.19,
+          "mape": 87.3,
+          "wape": 55.2,
+          "beats_naive_pct": 8.6
+        },
+        "holt_winters": {
+          "mae": 2.01,
+          "mape": 79.6,
+          "wape": 50.7,
+          "beats_naive_pct": 16.0
+        }
+      }
+    },
+    "newt_eyes": {
+      "name": "Newt Eyes",
+      "eval_days": 28,
+      "best_model": "same_weekday_4w",
+      "metrics": {
+        "naive": {
+          "mae": 3.29,
+          "mape": 69.9,
+          "wape": 52.0,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 3.59,
+          "mape": 71.3,
+          "wape": 56.8,
+          "beats_naive_pct": -9.3
+        },
+        "same_weekday_4w": {
+          "mae": 3.36,
+          "mape": 61.8,
+          "wape": 53.1,
+          "beats_naive_pct": -2.2
+        },
+        "holt_winters": {
+          "mae": 3.58,
+          "mape": 72.5,
+          "wape": 56.7,
+          "beats_naive_pct": -9.0
+        }
+      }
+    },
+    "rose_root": {
+      "name": "Rose Root",
+      "eval_days": 28,
+      "best_model": "holt_winters",
+      "metrics": {
+        "naive": {
+          "mae": 3.0,
+          "mape": 73.1,
+          "wape": 54.2,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 2.16,
+          "mape": 70.4,
+          "wape": 39.0,
+          "beats_naive_pct": 28.1
+        },
+        "same_weekday_4w": {
+          "mae": 2.06,
+          "mape": 63.6,
+          "wape": 37.3,
+          "beats_naive_pct": 31.2
+        },
+        "holt_winters": {
+          "mae": 1.99,
+          "mape": 62.9,
+          "wape": 35.9,
+          "beats_naive_pct": 33.7
+        }
+      }
+    }
+  },
+  "holdout_evaluation": {
+    "total_points": 98,
+    "winning_model": "holt_winters",
+    "overall": {
+      "naive": {
+        "mae": 3.56,
+        "mape": 66.8,
+        "wape": 54.8,
+        "beats_naive_pct": 0.0
+      },
+      "moving_average_7d": {
+        "mae": 2.05,
+        "mape": 38.3,
+        "wape": 31.5,
+        "beats_naive_pct": 42.5
+      },
+      "same_weekday_4w": {
+        "mae": 2.36,
+        "mape": 43.7,
+        "wape": 36.3,
+        "beats_naive_pct": 33.8
+      },
+      "holt_winters": {
+        "mae": 1.94,
+        "mape": 38.2,
+        "wape": 29.8,
+        "beats_naive_pct": 45.6
+      }
+    },
+    "per_ingredient": {
+      "bat_wings": {
+        "naive": {
+          "mae": 6.07,
+          "mape": 78.4,
+          "wape": 61.2,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 2.42,
+          "mape": 30.8,
+          "wape": 24.4,
+          "beats_naive_pct": 60.2
+        },
+        "same_weekday_4w": {
+          "mae": 4.61,
+          "mape": 54.9,
+          "wape": 46.4,
+          "beats_naive_pct": 24.1
+        },
+        "holt_winters": {
+          "mae": 2.25,
+          "mape": 27.8,
+          "wape": 22.6,
+          "beats_naive_pct": 63.0
+        }
+      },
+      "frost_honey": {
+        "naive": {
+          "mae": 1.21,
+          "mape": 66.1,
+          "wape": 43.6,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 1.38,
+          "mape": 45.9,
+          "wape": 49.5,
+          "beats_naive_pct": -13.6
+        },
+        "same_weekday_4w": {
+          "mae": 1.25,
+          "mape": 58.2,
+          "wape": 44.9,
+          "beats_naive_pct": -2.9
+        },
+        "holt_winters": {
+          "mae": 1.22,
+          "mape": 56.0,
+          "wape": 43.9,
+          "beats_naive_pct": -0.8
+        }
+      },
+      "ghost_pepper": {
+        "naive": {
+          "mae": 6.36,
+          "mape": 78.1,
+          "wape": 54.6,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 3.91,
+          "mape": 35.0,
+          "wape": 33.6,
+          "beats_naive_pct": 38.5
+        },
+        "same_weekday_4w": {
+          "mae": 4.68,
+          "mape": 57.0,
+          "wape": 40.2,
+          "beats_naive_pct": 26.4
+        },
+        "holt_winters": {
+          "mae": 3.94,
+          "mape": 42.0,
+          "wape": 33.9,
+          "beats_naive_pct": 38.0
+        }
+      },
+      "mandrake_root": {
+        "naive": {
+          "mae": 4.93,
+          "mape": 128.6,
+          "wape": 97.2,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 1.48,
+          "mape": 41.5,
+          "wape": 29.2,
+          "beats_naive_pct": 70.0
+        },
+        "same_weekday_4w": {
+          "mae": 1.5,
+          "mape": 34.3,
+          "wape": 29.6,
+          "beats_naive_pct": 69.6
+        },
+        "holt_winters": {
+          "mae": 1.52,
+          "mape": 35.4,
+          "wape": 30.1,
+          "beats_naive_pct": 69.1
+        }
+      },
+      "moonpetal_dust": {
+        "naive": {
+          "mae": 1.93,
+          "mape": 40.6,
+          "wape": 49.1,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 1.38,
+          "mape": 47.8,
+          "wape": 35.1,
+          "beats_naive_pct": 28.6
+        },
+        "same_weekday_4w": {
+          "mae": 1.29,
+          "mape": 39.9,
+          "wape": 32.7,
+          "beats_naive_pct": 33.3
+        },
+        "holt_winters": {
+          "mae": 1.39,
+          "mape": 45.3,
+          "wape": 35.3,
+          "beats_naive_pct": 28.2
+        }
+      },
+      "newt_eyes": {
+        "naive": {
+          "mae": 2.71,
+          "mape": 41.0,
+          "wape": 43.2,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 2.08,
+          "mape": 42.3,
+          "wape": 33.1,
+          "beats_naive_pct": 23.3
+        },
+        "same_weekday_4w": {
+          "mae": 2.21,
+          "mape": 45.5,
+          "wape": 35.2,
+          "beats_naive_pct": 18.4
+        },
+        "holt_winters": {
+          "mae": 2.07,
+          "mape": 41.9,
+          "wape": 32.9,
+          "beats_naive_pct": 23.7
+        }
+      },
+      "rose_root": {
+        "naive": {
+          "mae": 1.71,
+          "mape": 34.9,
+          "wape": 29.3,
+          "beats_naive_pct": 0.0
+        },
+        "moving_average_7d": {
+          "mae": 1.69,
+          "mape": 24.6,
+          "wape": 28.9,
+          "beats_naive_pct": 1.3
+        },
+        "same_weekday_4w": {
+          "mae": 0.96,
+          "mape": 15.8,
+          "wape": 16.5,
+          "beats_naive_pct": 43.7
+        },
+        "holt_winters": {
+          "mae": 1.16,
+          "mape": 18.8,
+          "wape": 19.7,
+          "beats_naive_pct": 32.5
+        }
+      }
+    }
+  },
+  "anomaly_detection": {
+    "status": "success",
+    "blind_detection": {
+      "total_injected_anomalies": 12,
+      "true_positives": 11,
+      "false_positives": 28,
+      "false_negatives": 1,
+      "recall_pct": 91.7,
+      "precision_pct": 28.2
+    },
+    "event_aware_detection": {
+      "festival_registered": true,
+      "festival_dates_falsely_flagged": 0,
+      "festival_suppression_verified": true,
+      "unlabelled_spikes_detected": 3,
+      "total_unlabelled_spikes": 3,
+      "unlabelled_spike_recall_pct": 100.0,
+      "precision_pct": 9.7
+    }
+  },
+  "leakage_warnings": [],
+  "last_evaluated_at": "2026-11-01T05:32:09.243368"
 }
