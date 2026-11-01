@@ -2,21 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Witch's Potion Pantry — Android Mobile Preview</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#110c18">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Hexley's Potion Pantry — Mobile Vault Ledger</title>
+  <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
   <style>
+    :root {
+      --bg-primary: #110c18;
+      --bg-surface: #171120;
+      --bg-card: #1c1527;
+      --bg-elevated: #231b31;
+      --border-subtle: #362945;
+      --border-card: #453657;
+      --border-copper: #c86d3b;
+      --border-copper-dim: #6d3a1d;
+      --text-main: #f5eedf;
+      --text-cream: #faf2e3;
+      --text-muted: #ab9eb8;
+      --text-dim: #7a6e88;
+      --text-copper: #dc7a42;
+      --accent-copper: #c86d3b;
+      --accent-copper-hover: #dc7a42;
+      --accent-amber: #d97706;
+      --accent-urgent-rose: #be123c;
+      --accent-urgent-bg: #2b0b14;
+      --accent-sage: #2d6a4f;
+      --accent-sage-bg: #0f281d;
+      --font-serif: "Plus Jakarta Sans", system-ui, sans-serif;
+      --font-editorial: "Playfair Display", Georgia, serif;
+      --font-heading: "Cinzel", Georgia, serif;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
     }
+
     body {
       background: #09040c;
-      color: #f5eedf;
-      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+      font-family: var(--font-serif);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -26,43 +60,50 @@
       overflow-x: hidden;
     }
 
-    /* Top helper bar */
+    /* Desktop Preview Wrapper */
+    .preview-layout {
+      display: flex;
+      gap: 36px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
     .preview-header {
       text-align: center;
       margin-bottom: 20px;
       max-width: 600px;
     }
     .preview-header h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 1.4rem;
-      color: #c86d3b;
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      color: var(--accent-copper);
       margin-bottom: 6px;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
     }
     .preview-header p {
       font-size: 0.85rem;
-      color: #a89aa0;
+      color: var(--text-muted);
     }
     .preview-header a {
-      color: #c86d3b;
+      color: var(--accent-copper);
       text-decoration: underline;
     }
 
-    /* Phone Device Frame (Pixel 8 Mockup) */
+    /* Desktop Phone Mockup Frame */
     .phone-bezel {
-      width: 390px;
-      height: 800px;
-      background: #1e132b;
+      width: 400px;
+      height: 840px;
+      background: var(--bg-primary);
       border: 12px solid #281a3d;
       border-radius: 46px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 2px #442a66;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 0 2px #442a66;
       position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
     }
 
-    /* Punch-hole Camera */
     .camera-notch {
       position: absolute;
       top: 10px;
@@ -76,287 +117,584 @@
       box-shadow: inset 0 0 2px #222;
     }
 
-    /* Android Status Bar */
+    /* Mobile Responsive Mode: 100% full screen on real phones */
+    @media (max-width: 650px) {
+      body {
+        padding: 0 !important;
+        margin: 0 !important;
+        height: 100vh !important;
+        width: 100vw !important;
+        background: var(--bg-primary) !important;
+        justify-content: flex-start !important;
+      }
+      .preview-header, .qr-card {
+        display: none !important;
+      }
+      .phone-bezel {
+        width: 100vw !important;
+        height: 100vh !important;
+        border: none !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+      }
+      .camera-notch {
+        display: none !important;
+      }
+      .android-status-bar {
+        display: none !important;
+      }
+      .android-nav-bar {
+        display: none !important;
+      }
+    }
+
+    /* QR Code Card on Desktop */
+    .qr-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-card);
+      border-radius: 20px;
+      padding: 26px 22px;
+      width: 320px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .qr-title {
+      font-family: var(--font-heading);
+      font-size: 1.15rem;
+      color: var(--accent-copper);
+      margin-bottom: 8px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .qr-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+    .qr-img-box {
+      background: #fff;
+      padding: 10px;
+      border-radius: 14px;
+      display: inline-block;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+    .qr-img {
+      width: 160px;
+      height: 160px;
+      display: block;
+    }
+    .lan-url-pill {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-copper-dim);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      color: #6ee7b7;
+      word-break: break-all;
+      margin-bottom: 14px;
+    }
+    .qr-tip {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    /* Mockup Status Bar */
     .android-status-bar {
-      height: 32px;
-      background: #180e28;
+      height: 30px;
+      background: var(--bg-surface);
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 0 20px;
       font-size: 0.72rem;
-      color: #d1c4e9;
+      color: var(--text-muted);
       font-weight: 600;
       user-select: none;
       z-index: 10;
     }
-    .status-icons {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-    }
 
-    /* Android App Header (Theme Data dark) */
-    .app-header {
-      background: #180e28;
-      height: 56px;
+    /* Victorian Apothecary Mobile Header */
+    .apothecary-app-header {
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-card);
+      padding: 12px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 16px;
-      border-bottom: 1px solid #2e1a4d;
-      user-select: none;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
-    .app-title {
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .flask-svg {
+      width: 32px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-family: var(--font-heading);
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: var(--text-cream);
+      letter-spacing: 0.5px;
+      line-height: 1.15;
+    }
+    .brand-sub {
+      display: block;
+      font-family: var(--font-serif);
+      font-size: 0.62rem;
+      font-weight: 600;
+      color: var(--accent-copper);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .header-actions {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: #fff;
     }
-    .app-actions {
-      display: flex;
-      gap: 12px;
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      color: #d1c4e9;
-      cursor: pointer;
+    .btn-icon-action {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-parchment);
+      border-radius: 6px;
+      padding: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 6px;
-      border-radius: 50%;
-      transition: background 0.2s;
+      cursor: pointer;
+      transition: all 0.15s;
     }
-    .icon-btn:hover {
-      background: rgba(255,255,255,0.08);
+    .btn-icon-action:hover {
+      background: rgba(200, 109, 59, 0.15);
+      border-color: var(--border-copper);
     }
 
-    /* Connection Strip */
-    .conn-strip {
-      background: #064e3b;
-      border-bottom: 1px solid #10b981;
-      padding: 7px 14px;
+    /* Telemetry Seal Strip */
+    .telemetry-strip {
+      background: #140d1c;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 6px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       font-size: 0.72rem;
-      color: #a7f3d0;
-      font-weight: 500;
+      min-height: 34px;
     }
-    .conn-strip.error {
-      background: #7f1d1d;
-      border-bottom: 1px solid #ef4444;
-      color: #fca5a5;
-    }
-    .conn-info {
+    .telemetry-seal {
       display: flex;
       align-items: center;
       gap: 6px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+      color: var(--text-muted);
+      font-weight: 500;
     }
-    .switch-btn {
-      background: rgba(0,0,0,0.35);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fff;
+    .seal-dot {
+      color: #34d399;
+      font-size: 0.8rem;
+    }
+    .telemetry-host-pill {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border-subtle);
+      color: #6ee7b7;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+    .btn-switch-ip {
+      background: transparent;
+      border: 1px solid var(--border-copper-dim);
+      color: var(--accent-copper);
       font-size: 0.65rem;
       font-weight: 700;
-      padding: 2px 7px;
+      padding: 3px 8px;
       border-radius: 4px;
       cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
-    /* Scrollable Body */
+    /* Main Scrollable Body */
     .app-body {
       flex: 1;
-      background: #0f0817;
+      background: var(--bg-primary);
       overflow-y: auto;
-      padding: 10px;
+      padding: 14px 14px 100px 14px;
       position: relative;
     }
     .app-body::-webkit-scrollbar {
       width: 4px;
     }
     .app-body::-webkit-scrollbar-thumb {
-      background: #3b2064;
+      background: var(--border-card);
       border-radius: 4px;
     }
 
-    /* Ingredient Card */
-    .pantry-card {
-      background: #1b112c;
-      border: 1px solid #2e1a4d;
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      position: relative;
-    }
-    .pantry-card.cursed {
-      border: 1.5px solid #f59e0b;
-    }
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .card-name {
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: #fff;
-    }
-    .curse-badge {
-      background: rgba(245, 158, 11, 0.18);
-      border: 1px solid #f59e0b;
-      color: #fbbf24;
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 10px;
-      letter-spacing: 0.5px;
-    }
-
-    .card-stock-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-    }
-    .stock-val {
-      font-weight: 700;
-      font-size: 0.85rem;
-    }
-    .stock-ok { color: #34d399; }
-    .stock-low { color: #f87171; }
-    .expected-val { color: #8a789c; font-size: 0.75rem; margin-left: 4px; }
-    .burn-rate { color: #c084fc; font-weight: 600; }
-
-    .card-meta-row {
-      font-size: 0.72rem;
-      color: #cbd5e1;
-      margin-bottom: 8px;
-    }
-
-    /* Anomaly Banner */
-    .anomaly-banner {
-      background: #7f1d1d;
-      border: 1px solid rgba(220, 38, 38, 0.4);
-      border-radius: 6px;
-      padding: 6px 8px;
-      margin-top: 6px;
-      display: flex;
+    /* Summary Metric Tiles (Matching Desktop Dashboard) */
+    .mobile-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       gap: 6px;
-      align-items: flex-start;
-      font-size: 0.72rem;
-      color: #fef2f2;
+      margin-bottom: 14px;
     }
-    .anomaly-date-tag {
-      background: rgba(0,0,0,0.45);
-      color: #fca5a5;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 3px;
-      margin-bottom: 2px;
-      display: inline-block;
-    }
-
-    /* Audit Button */
-    .btn-audit {
-      width: 100%;
-      background: #991b1b;
-      border: none;
-      color: #fff;
-      font-size: 0.74rem;
-      font-weight: 600;
-      padding: 8px 10px;
+    .mobile-stat-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
       border-radius: 8px;
-      cursor: pointer;
+      padding: 8px 4px;
+      text-align: center;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      margin-top: 8px;
-      transition: background 0.2s;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
-    .btn-audit:hover {
-      background: #b91c1c;
+    .mobile-stat-card.stat-deficit {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(43, 11, 20, 0.6);
+    }
+    .mobile-stat-card.stat-depleting {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(38, 25, 13, 0.6);
+    }
+    .mobile-stat-card.stat-prophecy {
+      border-color: rgba(168, 85, 247, 0.4);
+      background: rgba(30, 18, 41, 0.6);
+    }
+    .mobile-stat-card.stat-vault {
+      border-color: var(--border-copper-dim);
+      background: rgba(27, 20, 37, 0.6);
+    }
+    .mobile-stat-num {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--text-cream);
+      line-height: 1.1;
+      font-family: var(--font-heading);
+    }
+    .mobile-stat-label {
+      font-size: 0.52rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-top: 3px;
+      white-space: nowrap;
+    }
+    .mobile-stat-sub {
+      font-size: 0.46rem;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-top: 1px;
     }
 
-    /* Floating Action Button */
-    .fab-add {
-      position: absolute;
-      bottom: 20px;
-      right: 18px;
-      background: #10b981;
-      color: #fff;
-      border: none;
-      border-radius: 28px;
-      padding: 12px 18px;
-      font-size: 0.85rem;
+    /* Hero Section Banner (Matching Desktop) */
+    .mobile-hero-plate {
+      background: linear-gradient(135deg, rgba(36, 17, 24, 0.75) 0%, rgba(20, 10, 20, 0.95) 100%);
+      border: 1px solid var(--border-copper-dim);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-meta-label {
+      font-size: 0.62rem;
       font-weight: 700;
+      color: var(--accent-copper);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--text-cream);
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      line-height: 1.25;
+    }
+    .hero-desc {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+    .curse-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .curse-pill {
+      background: rgba(200, 109, 59, 0.15);
+      border: 1px solid var(--border-copper);
+      color: #ffcd75;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Apothecary Item Cards (Exact Web Match) */
+    .apothecary-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 10px;
+      padding: 14px 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 12px rgba(6, 4, 9, 0.6);
+      transition: border-color 0.15s;
+    }
+    .apothecary-card.cursed-card {
+      border: 1px solid var(--accent-copper);
+      box-shadow: 0 0 14px rgba(200, 109, 59, 0.15);
+    }
+    .card-header-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .item-title {
+      font-family: var(--font-editorial);
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--text-cream);
+      line-height: 1.2;
+    }
+    .item-cat-badge {
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--accent-copper);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      background: rgba(200, 109, 59, 0.1);
+      border: 1px solid var(--border-copper-dim);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    .card-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 10px 0;
+    }
+    .metric-col {
+      display: flex;
+      flex-direction: column;
+    }
+    .metric-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+    .metric-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-cream);
+    }
+    .metric-val.stock-ok { color: #34d399; }
+    .metric-val.stock-low { color: #f87171; }
+    .metric-val.copper-text { color: var(--accent-copper); }
+
+    .card-reorder-row {
+      font-size: 0.73rem;
+      color: var(--text-muted);
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       gap: 8px;
-      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.4);
-      cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-      z-index: 30;
     }
-    .fab-add:hover {
-      background: #059669;
-      transform: scale(1.03);
+    .reorder-pill {
+      background: rgba(200, 109, 59, 0.15);
+      color: var(--text-cream);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-weight: 600;
     }
 
-    /* Android Bottom Navigation Bar (Gesture pill) */
-    .android-nav-bar {
-      height: 24px;
-      background: #0f0817;
+    /* Refined Victorian Anomaly Boxes */
+    .vault-missing-box {
+      background: var(--accent-urgent-bg);
+      border: 1px solid var(--accent-urgent-rose);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.74rem;
+      color: #fecaca;
+    }
+    .vault-spike-box {
+      background: rgba(200, 109, 59, 0.1);
+      border: 1px solid var(--border-copper-dim);
+      border-radius: 6px;
+      padding: 8px 10px;
+      margin: 8px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 0.73rem;
+      color: var(--text-parchment);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .vault-spike-box:hover {
+      background: rgba(200, 109, 59, 0.2);
+      border-color: var(--border-copper);
+    }
+    .spike-toggle-pill {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid var(--border-copper);
+      color: var(--text-copper);
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .spike-drawer {
+      background: #130c1c;
+      border: 1px solid var(--border-subtle);
+      border-radius: 6px;
+      padding: 8px;
+      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+    .spike-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.03);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+    }
+    .spike-date {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-parchment);
+      font-weight: 600;
+    }
+    .spike-z {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--text-copper);
+      font-weight: 700;
+    }
+
+    /* Victorian Ledger Audit Button */
+    .btn-audit-ledger {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--border-card);
+      color: var(--text-parchment);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      user-select: none;
+      gap: 6px;
+      transition: all 0.15s;
     }
-    .gesture-pill {
-      width: 120px;
-      height: 4px;
-      background: #6b5585;
-      border-radius: 2px;
+    .btn-audit-ledger:hover {
+      background: rgba(190, 18, 60, 0.15);
+      border-color: var(--accent-urgent-rose);
+      color: #fca5a5;
     }
 
-    /* Modal / Dialog */
+    /* Burnished Copper Floating Action Button */
+    .fab-copper-add {
+      position: absolute;
+      bottom: 22px;
+      right: 18px;
+      background: linear-gradient(135deg, var(--accent-copper) 0%, #a85425 100%);
+      color: var(--text-cream);
+      border: 1px solid #e08b58;
+      border-radius: 30px;
+      padding: 12px 20px;
+      font-family: var(--font-heading);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 6px 20px rgba(200, 109, 59, 0.45), 0 0 0 1px rgba(0,0,0,0.5);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      z-index: 30;
+    }
+    .fab-copper-add:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 25px rgba(200, 109, 59, 0.6);
+    }
+
+    /* Apothecary Dialog */
     .dialog-backdrop {
       display: none;
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(3px);
+      background: rgba(10, 5, 14, 0.85);
+      backdrop-filter: blur(4px);
       z-index: 100;
       align-items: center;
       justify-content: center;
       padding: 16px;
     }
     .dialog-box {
-      background: #1b112c;
-      border: 1px solid #3b2064;
-      border-radius: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-copper);
+      border-radius: 12px;
       width: 100%;
       max-width: 330px;
-      padding: 18px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      padding: 20px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.85);
     }
     .dialog-title {
+      font-family: var(--font-heading);
       font-size: 1rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-cream);
+      letter-spacing: 0.5px;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -367,23 +705,25 @@
     }
     .input-label {
       display: block;
-      font-size: 0.7rem;
-      color: #a89aa0;
-      margin-bottom: 4px;
+      font-size: 0.68rem;
       font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
     }
     .dialog-input {
       width: 100%;
-      background: #0f0817;
-      border: 1px solid #3b2064;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-card);
       border-radius: 6px;
       padding: 8px 10px;
-      color: #fff;
+      color: var(--text-cream);
       font-size: 0.82rem;
       outline: none;
     }
     .dialog-input:focus {
-      border-color: #9333ea;
+      border-color: var(--border-copper);
     }
     .dialog-actions {
       display: flex;
@@ -393,42 +733,44 @@
     }
     .btn-cancel {
       background: transparent;
-      border: none;
-      color: #a89aa0;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
       padding: 8px 14px;
       border-radius: 6px;
       font-weight: 600;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       cursor: pointer;
     }
-    .btn-submit {
-      background: #10b981;
-      border: none;
-      color: #fff;
+    .btn-copper-submit {
+      background: linear-gradient(135deg, var(--accent-copper) 0%, #a85425 100%);
+      border: 1px solid #e08b58;
+      color: var(--text-cream);
       padding: 8px 16px;
       border-radius: 6px;
+      font-family: var(--font-heading);
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       cursor: pointer;
     }
 
     /* Toast */
     .mobile-toast {
       position: absolute;
-      bottom: 80px;
+      bottom: 85px;
       left: 50%;
       transform: translateX(-50%);
-      background: #2e1065;
-      border: 1px solid #a855f7;
-      color: #fff;
-      padding: 8px 14px;
+      background: #2b1122;
+      border: 1px solid var(--border-copper);
+      color: var(--text-cream);
+      padding: 8px 16px;
       border-radius: 20px;
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       font-weight: 600;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.6);
       z-index: 120;
       display: none;
       animation: fadeIn 0.2s ease-out;
+      white-space: nowrap;
     }
     @keyframes fadeIn {
       from { opacity: 0; transform: translate(-50%, 10px); }
@@ -439,156 +781,231 @@
 <body>
 
   <div class="preview-header">
-    <h1>📱 Android Flutter App Live Simulator</h1>
-    <p>Running the exact codebase from <a href="file:///Users/nityamdeorah/Desktop/Nityam/MiraiClassCodes/Hackolantern/Hackolantern/android-app/lib/main.dart"><code>android-app/lib/main.dart</code></a> against the live FastAPI backend on <code>localhost:8000</code>.</p>
+    <h1>HEXLEY'S POTION PANTRY</h1>
+    <p>Victorian Apothecary Mobile Vault Ledger &bull; Live sync with FastAPI on <code>localhost:8000</code>.</p>
   </div>
 
-  <!-- Physical Phone Frame Mockup -->
-  <div class="phone-bezel">
-    <!-- Camera Notch -->
-    <div class="camera-notch"></div>
+  <div class="preview-layout">
+    <!-- Physical Phone Bezel -->
+    <div class="phone-bezel">
+      <div class="camera-notch"></div>
 
-    <!-- Android Status Bar -->
-    <div class="android-status-bar">
-      <span id="status-clock">03:45</span>
-      <div class="status-icons">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z"/></svg>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
-      </div>
-    </div>
-
-    <!-- App Header -->
-    <div class="app-header">
-      <div class="app-title">
-        <span>🧪</span>
-        <span>Witch Pantry Scanner</span>
-      </div>
-      <div class="app-actions">
-        <button class="icon-btn" title="Settings" onclick="openSettingsModal()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
-        <button class="icon-btn" title="Refresh" onclick="fetchPantry()">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
-        </button>
-      </div>
-    </div>
-
-    <!-- Connection Status Strip -->
-    <div id="conn-strip" class="conn-strip">
-      <div class="conn-info">
-        <span id="conn-dot">●</span>
-        <span id="conn-text">http://localhost:8000 • Connected (HTTP 200)</span>
-      </div>
-      <button class="switch-btn" onclick="openSettingsModal()">Switch IP</button>
-    </div>
-
-    <!-- Main Scrollable App Body -->
-    <div class="app-body" id="app-body">
-      <div style="text-align:center; padding:30px 0; color:#8a789c; font-size:0.85rem;">
-        Fetching pantry telemetry...
-      </div>
-    </div>
-
-    <!-- Floating Action Button (+ Add Ingredient) -->
-    <button class="fab-add" onclick="openAddModal()">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      <span>Add Ingredient</span>
-    </button>
-
-    <!-- Toast Notification -->
-    <div id="mobile-toast" class="mobile-toast">Alert message</div>
-
-    <!-- Dialog: Add Ingredient -->
-    <div id="dialog-add" class="dialog-backdrop">
-      <div class="dialog-box">
-        <div class="dialog-title">
-          <span style="color:#10b981;">➕</span> Add New Ingredient
+      <!-- Mockup Status Bar -->
+      <div class="android-status-bar">
+        <span id="status-clock">12:00</span>
+        <div style="display:flex; gap:6px; align-items:center;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L12 22l7.03-4.39C20.26 16.07 21 14.12 21 12c0-4.97-4.03-9-9-9z"/></svg>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4C7.31 4 3.07 5.9 0 8.98L12 21 24 8.98C20.93 5.9 16.69 4 12 4z"/></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17 4h-3V2h-4v2H7v18h10V4z"/></svg>
         </div>
-        <form id="form-add-item" onsubmit="handleAddSubmit(event)">
-          <div class="input-group">
-            <label class="input-label">Ingredient Name</label>
-            <input type="text" id="add-name" class="dialog-input" placeholder="e.g. Phoenix Feather" required>
+      </div>
+
+      <!-- Apothecary Header (Exact Match to Web Branding) -->
+      <header class="apothecary-app-header">
+        <div class="brand-group">
+          <!-- Flask Logo SVG from Web Dashboard -->
+          <svg class="flask-svg" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="22" cy="22" r="21" fill="#181122" stroke="#c86d3b" stroke-width="1.2"/>
+            <path d="M18 7H26V11L33 24C34.5 26.5 34 30.5 31 32.5C29.5 33.5 27.5 34 25.5 34H18.5C16.5 34 14.5 33.5 13 32.5C10 30.5 9.5 26.5 11 24L18 11V7Z" fill="#181122" stroke="#c86d3b" stroke-width="1.6" stroke-linejoin="round"/>
+            <path d="M16 7H28" stroke="#f5eedf" stroke-width="2" stroke-linecap="round"/>
+            <path d="M19 4H25V7H19V4Z" fill="#c86d3b" stroke="#7e4c27" stroke-width="1"/>
+            <path d="M12.5 25C16 27 28 27 31.5 25" stroke="#d97736" stroke-width="1.5" stroke-dasharray="3 1.5"/>
+            <circle cx="27" cy="23" r="1.2" fill="#ffcd75"/>
+            <circle cx="17" cy="24" r="1" fill="#ffcd75"/>
+          </svg>
+          <div>
+            <div class="brand-name">Hexley's Pantry</div>
+            <span class="brand-sub">EST. 1888 &bull; VAULT OPS</span>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button class="btn-icon-action" title="Server IP Settings" onclick="openSettingsModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+          <button class="btn-icon-action" title="Refresh Telemetry" onclick="fetchPantry()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Telemetry Strip -->
+      <div id="conn-strip" class="telemetry-strip">
+        <div class="telemetry-seal">
+          <span id="conn-dot" class="seal-dot">&bull;</span>
+          <span id="conn-text">Vault Ledger Synchronized</span>
+          <span class="telemetry-host-pill" id="conn-host">:8000</span>
+        </div>
+        <button class="btn-switch-ip" onclick="openSettingsModal()">Host</button>
+      </div>
+
+      <!-- App Body -->
+      <main class="app-body" id="app-body">
+        
+        <!-- Hero Plate (Matching Web Full Moon Lunar Banner) -->
+        <div class="mobile-hero-plate">
+          <div class="hero-meta-label">
+            <span>☾ Mandate Active (3x Demand Surge)</span>
+          </div>
+          <h2 class="hero-title">Full Moon Festival Approaching</h2>
+          <p class="hero-desc">Celestial lunar tides surge consumption across three critical vault ingredients.</p>
+          <div class="curse-pills-row">
+            <span class="curse-pill">☾ Bat Wings</span>
+            <span class="curse-pill">☾ Mandrake Root</span>
+            <span class="curse-pill">☾ Newt Eyes</span>
+          </div>
+        </div>
+
+        <!-- Summary Stat Cards (Exact Desktop Match) -->
+        <div class="mobile-summary-grid">
+          <div class="mobile-stat-card stat-deficit">
+            <span class="mobile-stat-num" id="stat-out-stock" style="color:#f87171;">0</span>
+            <span class="mobile-stat-label">Out of Stock</span>
+            <span class="mobile-stat-sub" style="color:#ef4444;">Deficit</span>
+          </div>
+          <div class="mobile-stat-card stat-depleting">
+            <span class="mobile-stat-num" id="stat-low-stock" style="color:#fbbf24;">0</span>
+            <span class="mobile-stat-label">Low Stock</span>
+            <span class="mobile-stat-sub" style="color:#f59e0b;">Depleting</span>
+          </div>
+          <div class="mobile-stat-card stat-prophecy">
+            <span class="mobile-stat-num" id="stat-runout-7d" style="color:#c084fc;">0</span>
+            <span class="mobile-stat-label">Runout &lt;7d</span>
+            <span class="mobile-stat-sub" style="color:#a855f7;">Prophecy</span>
+          </div>
+          <div class="mobile-stat-card stat-vault">
+            <span class="mobile-stat-num" id="stat-vault-total" style="color:#ffcd75;">0</span>
+            <span class="mobile-stat-label">Catalogued</span>
+            <span class="mobile-stat-sub" style="color:var(--accent-copper);">Vault</span>
+          </div>
+        </div>
+
+        <!-- Inventory List Container -->
+        <div id="cards-container">
+          <div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.85rem;">
+            Consulting apothecary ledger...
+          </div>
+        </div>
+      </main>
+
+      <!-- Burnished Copper Floating Action Button -->
+      <button class="fab-copper-add" onclick="openAddModal()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Add Ingredient</span>
+      </button>
+
+      <!-- Mobile Toast -->
+      <div id="mobile-toast" class="mobile-toast">Ledger updated</div>
+
+      <!-- Modal: Add New Ingredient -->
+      <div id="dialog-add" class="dialog-backdrop">
+        <div class="dialog-box">
+          <div class="dialog-title">
+            <span style="color:var(--accent-copper);">✦</span> Add New Ingredient
+          </div>
+          <form id="form-add-item" onsubmit="handleAddSubmit(event)">
+            <div class="input-group">
+              <label class="input-label">Ingredient Name</label>
+              <input type="text" id="add-name" class="dialog-input" placeholder="e.g. Phoenix Feather" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Current Stock</label>
+              <input type="number" id="add-stock" class="dialog-input" value="50" min="0" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Safety Threshold</label>
+              <input type="number" id="add-safety" class="dialog-input" value="15" min="0" required>
+            </div>
+            <div class="input-group">
+              <label class="input-label">Supplier</label>
+              <input type="text" id="add-supplier" class="dialog-input" value="Diagon Alley Apothecary">
+            </div>
+            <div class="input-group">
+              <label class="input-label">Lead Time (Days)</label>
+              <input type="number" id="add-lead" class="dialog-input" value="3" min="1" max="60">
+            </div>
+            <div class="dialog-actions">
+              <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
+              <button type="submit" class="btn-copper-submit">Save To Vault</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Modal: Server Host Settings -->
+      <div id="dialog-settings" class="dialog-backdrop">
+        <div class="dialog-box">
+          <div class="dialog-title">
+            <span style="color:var(--accent-copper);">⚙</span> Vault Host Settings
           </div>
           <div class="input-group">
-            <label class="input-label">Current Stock</label>
-            <input type="number" id="add-stock" class="dialog-input" value="50" min="0" required>
+            <label class="input-label">FastAPI Host Address:</label>
+            <input type="text" id="settings-url" class="dialog-input" value="http://localhost:8000">
           </div>
-          <div class="input-group">
-            <label class="input-label">Safety Stock Threshold</label>
-            <input type="number" id="add-safety" class="dialog-input" value="15" min="0" required>
-          </div>
-          <div class="input-group">
-            <label class="input-label">Supplier</label>
-            <input type="text" id="add-supplier" class="dialog-input" value="Diagon Alley Apothecary">
-          </div>
-          <div class="input-group">
-            <label class="input-label">Lead Time (Days)</label>
-            <input type="number" id="add-lead" class="dialog-input" value="3" min="1" max="60">
+          <div style="margin:12px 0 6px; font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; font-weight:700;">Host Presets:</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;">
+            <button type="button" class="btn-switch-ip" onclick="setPreset('http://localhost:8000')">Localhost (:8000)</button>
+            <button type="button" class="btn-switch-ip" onclick="setPreset('http://192.168.88.35:8000')">Wi-Fi LAN</button>
           </div>
           <div class="dialog-actions">
-            <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-            <button type="submit" class="btn-submit">Add to Pantry</button>
+            <button type="button" class="btn-cancel" onclick="closeSettingsModal()">Cancel</button>
+            <button type="button" class="btn-copper-submit" onclick="saveSettings()">Connect</button>
           </div>
-        </form>
-      </div>
-    </div>
-
-    <!-- Dialog: Server Settings -->
-    <div id="dialog-settings" class="dialog-backdrop">
-      <div class="dialog-box">
-        <div class="dialog-title">
-          <span style="color:#9333ea;">⚙️</span> Server URL Settings
-        </div>
-        <div class="input-group">
-          <label class="input-label">FastAPI Host Address:</label>
-          <input type="text" id="settings-url" class="dialog-input" value="http://localhost:8000">
-        </div>
-        <div style="margin: 12px 0 6px; font-size:0.7rem; color:#8a789c; font-weight:700;">Quick Presets:</div>
-        <div style="display:flex; flex-wrap:wrap; gap:6px;">
-          <button type="button" class="switch-btn" onclick="setPreset('http://localhost:8000')">Localhost (8000)</button>
-          <button type="button" class="switch-btn" onclick="setPreset('http://192.168.88.35:8000')">Wi-Fi LAN</button>
-          <button type="button" class="switch-btn" onclick="setPreset('http://10.0.2.2:8000')">Android Emulator</button>
-        </div>
-        <div class="dialog-actions">
-          <button type="button" class="btn-cancel" onclick="closeSettingsModal()">Cancel</button>
-          <button type="button" class="btn-submit" style="background:#9333ea;" onclick="saveSettings()">Apply & Connect</button>
         </div>
       </div>
     </div>
 
-    <!-- Android Bottom Gesture Bar -->
-    <div class="android-nav-bar">
-      <div class="gesture-pill"></div>
+    <!-- QR Code Card -->
+    <div class="qr-card">
+      <div class="qr-title">Open On Your Phone</div>
+      <p class="qr-desc">Scan with your phone's camera (iPhone or Android) on the same Wi-Fi:</p>
+      
+      <div class="qr-img-box">
+        <img src="mobile_qr.png" alt="QR Code" class="qr-img" />
+      </div>
+
+      <div class="lan-url-pill" id="lan-url-text">http://192.168.88.35:8080/mobile-preview.html</div>
+
+      <div class="qr-tip">
+        <strong>💡 Install as Native App:</strong><br>
+        &bull; <strong>Android:</strong> Chrome &rarr; ⋮ &rarr; <em>"Add to Home screen"</em>.<br>
+        &bull; <strong>iPhone:</strong> Safari &rarr; Share ⎋ &rarr; <em>"Add to Home Screen"</em>.
+      </div>
     </div>
   </div>
 
   <script>
-    let serverBase = localStorage.getItem("hexley_mobile_server") || "http://localhost:8000";
+    const currentHost = window.location.hostname || "localhost";
+    let serverBase = localStorage.getItem("hexley_mobile_server");
+
+    // Auto-detect & auto-correct host for mobile phone clients
+    if (!serverBase || (currentHost !== "localhost" && currentHost !== "127.0.0.1" && (serverBase.includes("localhost") || serverBase.includes("127.0.0.1")))) {
+      serverBase = `http://${currentHost}:8000`;
+      localStorage.setItem("hexley_mobile_server", serverBase);
+    }
 
     function updateClock() {
       const now = new Date();
       const h = String(now.getHours()).padStart(2, '0');
       const m = String(now.getMinutes()).padStart(2, '0');
-      document.getElementById("status-clock").textContent = `${h}:${m}`;
+      const el = document.getElementById("status-clock");
+      if (el) el.textContent = `${h}:${m}`;
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    function showToast(msg, isError = false) {
+    function showToast(msg) {
       const toast = document.getElementById("mobile-toast");
+      if (!toast) return;
       toast.textContent = msg;
-      toast.style.background = isError ? "#7f1d1d" : "#2e1065";
-      toast.style.borderColor = isError ? "#ef4444" : "#a855f7";
       toast.style.display = "block";
       setTimeout(() => { toast.style.display = "none"; }, 3500);
     }
 
     async function fetchPantry() {
-      const body = document.getElementById("app-body");
-      const strip = document.getElementById("conn-strip");
-      const connText = document.getElementById("conn-text");
+      const container = document.getElementById("cards-container");
       const connDot = document.getElementById("conn-dot");
+      const connText = document.getElementById("conn-text");
+      const connHost = document.getElementById("conn-host");
 
       try {
         const sanitized = serverBase.replace(/\/+$/, '');
@@ -597,20 +1014,41 @@
         const data = await res.json();
         const items = data.pantry || [];
 
-        strip.className = "conn-strip";
-        connDot.textContent = "●";
-        connText.textContent = `${sanitized} • Connected (HTTP 200)`;
+        if (connDot) connDot.style.color = "#34d399";
+        if (connText) connText.textContent = "Vault Ledger Synchronized";
+        if (connHost) connHost.textContent = ":" + (sanitized.split(":").pop() || "8000");
+
+        // Calculate and update summary metric counts
+        let outOfStock = 0;
+        let lowStock = 0;
+        let runout7d = 0;
+        items.forEach(item => {
+          const cur = Number(item.current_stock) || 0;
+          const safe = Number(item.safety_stock) || 0;
+          const days = item.prophecy && item.prophecy.days_until_run_out != null ? Number(item.prophecy.days_until_run_out) : 999;
+          if (cur === 0) outOfStock++;
+          else if (cur < safe) lowStock++;
+          if (days < 7) runout7d++;
+        });
+        const elOut = document.getElementById("stat-out-stock");
+        const elLow = document.getElementById("stat-low-stock");
+        const elRun = document.getElementById("stat-runout-7d");
+        const elTot = document.getElementById("stat-vault-total");
+        if (elOut) elOut.textContent = outOfStock;
+        if (elLow) elLow.textContent = lowStock;
+        if (elRun) elRun.textContent = runout7d;
+        if (elTot) elTot.textContent = items.length;
 
         if (items.length === 0) {
-          body.innerHTML = `
-            <div style="text-align:center; padding:50px 20px; color:#8a789c;">
+          container.innerHTML = `
+            <div style="text-align:center; padding:50px 20px; color:var(--text-muted);">
               <div style="font-size:2rem; margin-bottom:8px;">📦</div>
-              <div>No ingredients found in pantry.</div>
+              <div>No ingredients registered in vault.</div>
             </div>`;
           return;
         }
 
-        body.innerHTML = items.map(item => {
+        container.innerHTML = items.map(item => {
           const isCursed = Boolean(item.is_cursed);
           const currentStock = item.current_stock || 0;
           const expectedStock = item.expected_stock != null ? item.expected_stock : currentStock;
@@ -620,60 +1058,126 @@
           const burn = prophecy.daily_burn_rate != null ? prophecy.daily_burn_rate : 0;
           const runOut = prophecy.days_until_run_out != null ? prophecy.days_until_run_out : "N/A";
           const reorder = prophecy.recommended_reorder != null ? prophecy.recommended_reorder : 0;
+          const category = item.category || "Apothecary Reagent";
           const anomalies = item.anomalies || [];
 
-          const anomaliesHtml = anomalies.map(a => {
-            const dateBadge = (a && a.date) ? `<div class="anomaly-date-tag">${a.date} • Z-Score: ${a.z_score || 'N/A'}σ</div>` : "";
-            const msg = (a && a.message) ? a.message : (typeof a === 'string' ? a : 'Unusual consumption anomaly');
-            return `
-              <div class="anomaly-banner">
-                <span style="font-size:0.8rem;">⚠️</span>
+          // Anomaly checks
+          const missingAlerts = anomalies.filter(a => a && a.type === 'MISSING_STOCK');
+          const spikeAlerts = anomalies.filter(a => a && (a.type === 'CONSUMPTION_SPIKE' || a.type === 'WEEKDAY_SPIKE'));
+
+          let missingHtml = "";
+          if (missingAlerts.length > 0) {
+            const m = missingAlerts[0];
+            const units = m.missing_units || Math.max(1, expectedStock - currentStock);
+            missingHtml = `
+              <div class="vault-missing-box">
+                <span style="font-size:1rem; flex-shrink:0;">🚨</span>
                 <div>
-                  ${dateBadge}
-                  <div>${msg}</div>
+                  <div style="font-weight:700; color:#fca5a5; font-size:0.75rem;">VAULT SHRINKAGE DETECTED</div>
+                  <div>${units} units missing from shelf without sales record!</div>
                 </div>
-              </div>`;
-          }).join("");
+              </div>
+            `;
+          }
+
+          let spikesHtml = "";
+          if (spikeAlerts.length === 1) {
+            const s = spikeAlerts[0];
+            spikesHtml = `
+              <div class="vault-spike-box">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="color:var(--accent-copper); font-size:0.85rem;">⚡</span>
+                  <div>
+                    <span style="font-weight:700; color:var(--text-cream);">Demand Surge on ${s.date}</span>
+                    <span style="font-size:0.68rem; color:var(--accent-copper);">&bull; ${s.qty} units (+${s.z_score || 'N/A'}σ)</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else if (spikeAlerts.length > 1) {
+            let peak = spikeAlerts[0];
+            for (const sp of spikeAlerts) {
+              if ((Number(sp.z_score) || 0) > (Number(peak.z_score) || 0)) peak = sp;
+            }
+
+            spikesHtml = `
+              <div class="vault-spike-box" onclick="toggleSpikes('${item.id}')">
+                <div style="display:flex; align-items:center; gap:8px;">
+                  <span style="color:var(--accent-copper); font-size:0.85rem;">⚡</span>
+                  <div>
+                    <div style="font-weight:700; color:var(--text-cream);">${spikeAlerts.length} Historical Surges Detected</div>
+                    <div style="font-size:0.68rem; color:var(--accent-copper);">Peak: ${peak.qty} units (+${peak.z_score}σ on ${peak.date})</div>
+                  </div>
+                </div>
+                <span class="spike-toggle-pill" id="expand-pill-${item.id}">View All (${spikeAlerts.length}) ▾</span>
+              </div>
+              <div class="spike-drawer" id="spike-drawer-${item.id}" style="display:none;">
+                ${spikeAlerts.map(s => `
+                  <div class="spike-row">
+                    <span class="spike-date">${s.date}</span>
+                    <div>
+                      <span style="color:#ffcd75; font-weight:700;">${s.qty} units</span>
+                      <span class="spike-z">(+${s.z_score}σ)</span>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            `;
+          }
 
           return `
-            <div class="pantry-card ${isCursed ? 'cursed' : ''}">
-              <div class="card-top">
-                <div class="card-name">${item.name}</div>
-                ${isCursed ? '<div class="curse-badge">🌕 3x CURSED</div>' : ''}
-              </div>
-
-              <div class="card-stock-row">
+            <div class="apothecary-card ${isCursed ? 'cursed-card' : ''}">
+              <div class="card-header-row">
                 <div>
-                  <span class="stock-val ${isLow ? 'stock-low' : 'stock-ok'}">Stock: ${currentStock}</span>
-                  <span class="expected-val">/ Expected: ${expectedStock}</span>
+                  <div class="item-title">${item.name}</div>
+                  <div class="item-cat-badge">${category}</div>
                 </div>
-                <div class="burn-rate">Burn: ${burn}/day</div>
+                ${isCursed ? '<div class="curse-pill">☾ 3x CURSED</div>' : ''}
               </div>
 
-              <div class="card-meta-row">
-                Run out: ${runOut}d • Reorder: ${reorder} units
+              <div class="card-metrics-grid">
+                <div class="metric-col">
+                  <span class="metric-label">Current Stock</span>
+                  <span class="metric-val ${isLow ? 'stock-low' : 'stock-ok'}">${currentStock}</span>
+                </div>
+                <div class="metric-col">
+                  <span class="metric-label">Expected</span>
+                  <span class="metric-val">${expectedStock}</span>
+                </div>
+                <div class="metric-col">
+                  <span class="metric-label">Burn Rate</span>
+                  <span class="metric-val copper-text">${burn}/day</span>
+                </div>
               </div>
 
-              ${anomaliesHtml}
+              <div class="card-reorder-row">
+                <span>Run out: <strong>${runOut}d</strong></span>
+                <span>&bull;</span>
+                <span>Reorder prescription: <span class="reorder-pill">${reorder} units</span></span>
+              </div>
 
-              <button class="btn-audit" onclick="reportMissing(${item.id})">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                Audit Shelf (Report Missing Stock)
+              ${missingHtml}
+              ${spikesHtml}
+
+              <button class="btn-audit-ledger" onclick="reportMissing(${item.id})">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                Audit Shelf (Report Shrinkage)
               </button>
             </div>
           `;
         }).join("");
 
       } catch (err) {
-        strip.className = "conn-strip error";
-        connDot.textContent = "✕";
-        connText.textContent = `${serverBase} • Unreachable (${err.message})`;
-        body.innerHTML = `
+        if (connDot) connDot.style.color = "#ef4444";
+        if (connText) connText.textContent = "Vault Disconnected";
+        if (connHost) connHost.textContent = "Offline";
+
+        container.innerHTML = `
           <div style="text-align:center; padding:50px 20px; color:#fca5a5;">
             <div style="font-size:2rem; margin-bottom:8px;">⚠️</div>
-            <div style="font-weight:700;">Cannot connect to backend</div>
-            <div style="font-size:0.75rem; color:#8a789c; margin-top:4px;">Make sure FastAPI is running on port 8000</div>
-            <button class="switch-btn" style="margin-top:14px; padding:6px 12px;" onclick="openSettingsModal()">Change Host IP</button>
+            <div style="font-weight:700; font-family:var(--font-heading);">Cannot Reach Vault Server</div>
+            <div style="font-size:0.75rem; color:var(--text-muted); margin-top:4px;">Ensure FastAPI is running on port 8000</div>
+            <button class="btn-switch-ip" style="margin-top:14px; padding:6px 14px;" onclick="openSettingsModal()">Change Host IP</button>
           </div>`;
       }
     }
@@ -687,10 +1191,10 @@
           body: JSON.stringify({ missing_amount: 5 })
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showToast("⚠️ Shelf audit reported: 5 units missing", true);
+        showToast("⚠️ Shelf audit: 5 units missing recorded");
         await fetchPantry();
       } catch (err) {
-        showToast(`Failed: ${err.message}`, true);
+        showToast(`Audit failed: ${err.message}`);
       }
     }
 
@@ -720,10 +1224,10 @@
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         closeAddModal();
-        showToast(`✨ Added ${payload.name} to pantry!`);
+        showToast(`✦ Added ${payload.name} to vault!`);
         await fetchPantry();
       } catch (err) {
-        showToast(`Error adding: ${err.message}`, true);
+        showToast(`Error: ${err.message}`);
       }
     }
 
@@ -743,6 +1247,30 @@
       closeSettingsModal();
       fetchPantry();
     }
+
+    window.toggleSpikes = function(id) {
+      const drawer = document.getElementById(`spike-drawer-${id}`);
+      const pill = document.getElementById(`expand-pill-${id}`);
+      if (!drawer) return;
+      if (drawer.style.display === "none" || !drawer.style.display) {
+        drawer.style.display = "flex";
+        if (pill) pill.textContent = "Collapse ▴";
+      } else {
+        drawer.style.display = "none";
+        if (pill) pill.textContent = `View All ▾`;
+      }
+    };
+
+    window.fetchPantry = fetchPantry;
+    window.reportMissing = reportMissing;
+    window.openAddModal = openAddModal;
+    window.closeAddModal = closeAddModal;
+    window.handleAddSubmit = handleAddSubmit;
+    window.openSettingsModal = openSettingsModal;
+    window.closeSettingsModal = closeSettingsModal;
+    window.setPreset = setPreset;
+    window.saveSettings = saveSettings;
+    window.showToast = showToast;
 
     // Initial load
     fetchPantry();
