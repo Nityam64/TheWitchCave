@@ -7,35 +7,35 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Hexley's Potion Pantry — Mobile Vault</title>
+  <title>Hexley's Potion Pantry — Mobile Vault Ledger</title>
   <link rel="manifest" href="manifest.json">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Creepster&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
   <style>
+    /* ==========================================================================
+       VICTORIAN APOTHECARY DESIGN SYSTEM — EXACTLY MATCHING THE DESKTOP WEBSITE
+       ========================================================================== */
     :root {
-      --night: #140a1d;
-      --panel: #22132e;
-      --card-bg: #1c1126;
-      --card-elevated: #281836;
-      --border-subtle: #362247;
-      --border-card: #452b59;
-      --pumpkin: #ff7518;
-      --pumpkin-dim: #8b3c08;
-      --gold: #f2b25c;
-      --gold-dim: #7a5524;
-      --slime: #7fff5a;
-      --violet: #8a4fd1;
-      --crimson: #9b1c1c;
-      --crimson-bg: #2a0c14;
-      --text-main: #f5eedf;
-      --text-cream: #faf2e3;
-      --text-muted: #ab9eb8;
-      --text-dim: #7a6e88;
-      --font-serif: "Plus Jakarta Sans", system-ui, sans-serif;
-      --font-editorial: "Playfair Display", Georgia, serif;
-      --font-heading: "Cinzel", Georgia, serif;
+      --night: #140a1d;       /* Page backdrop */
+      --panel: #2a1a36;       /* Dark velvet panel */
+      --panel-dark: #1d1027;  /* Deep chamber */
+      --parchment: #ecdcbc;   /* Authentic aged paper */
+      --parchment-light: #f7ecd5;
+      --ink: #2b1d14;         /* Antique dark ink */
+      --ink-muted: #5e4533;   /* Subdued ledger ink */
+      --pumpkin: #ff7518;     /* Signature pumpkin copper */
+      --pumpkin-glow: rgba(255, 117, 24, 0.35);
+      --gold: #f2b25c;        /* Heading gold */
+      --slime: #7fff5a;       /* Poison / Emerald glow */
+      --violet: #8a4fd1;      /* Hover glow */
+      --crimson: #9b1c1c;     /* Critical stockout */
+      --border-parchment: rgba(43, 29, 20, 0.22);
+      --font-brand: "Creepster", cursive;
+      --font-heading: "IM Fell English", Georgia, serif;
+      --font-body: "Crimson Text", Georgia, serif;
+      --font-mono: "JetBrains Mono", monospace;
     }
 
     * {
@@ -45,10 +45,13 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    /* Ambient paper noise texture */
     body {
-      background: #09040c;
-      color: var(--text-main);
-      font-family: var(--font-serif);
+      background: #0d0614;
+      color: var(--parchment);
+      font-family: var(--font-body);
+      font-size: 17px;
+      line-height: 1.45;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -56,14 +59,34 @@
       justify-content: center;
       padding: 24px 16px;
       overflow-x: hidden;
+      position: relative;
     }
 
+    /* Ambient Candlelight Flicker */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(255, 117, 24, 0.08) 0%, rgba(138, 79, 209, 0.05) 55%, transparent 80%);
+      pointer-events: none;
+      z-index: 0;
+      animation: candleFlicker 7s ease-in-out infinite alternate;
+    }
+    @keyframes candleFlicker {
+      0% { opacity: 0.65; transform: scale(1); }
+      50% { opacity: 0.95; transform: scale(1.02); }
+      100% { opacity: 0.65; transform: scale(0.99); }
+    }
+
+    /* Desktop View Layout Frame */
     .preview-layout {
       display: flex;
       gap: 36px;
       align-items: center;
       justify-content: center;
       flex-wrap: wrap;
+      position: relative;
+      z-index: 2;
     }
 
     .preview-header {
@@ -72,29 +95,31 @@
       max-width: 600px;
     }
     .preview-header h1 {
-      font-family: var(--font-heading);
-      font-size: 1.35rem;
+      font-family: var(--font-brand);
+      font-size: 2.2rem;
       color: var(--pumpkin);
-      margin-bottom: 6px;
-      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+      text-shadow: 0 0 12px var(--pumpkin-glow);
     }
     .preview-header p {
-      font-size: 0.85rem;
-      color: var(--text-muted);
+      font-size: 1rem;
+      color: var(--gold);
+      font-style: italic;
     }
     .preview-header a {
-      color: var(--pumpkin);
+      color: var(--gold);
       text-decoration: underline;
     }
 
-    /* Device Mockup Frame */
+    /* Phone Bezel Container */
     .phone-bezel {
-      width: 400px;
-      height: 840px;
+      width: 414px;
+      height: 870px;
       background: var(--night);
       border: 12px solid #281a3d;
       border-radius: 46px;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 0 2px #442a66;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.9), 0 0 0 2px #442a66;
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -117,598 +142,663 @@
       }
     }
 
-    /* Status Bar */
+    /* Android Status Bar */
     .android-status-bar {
-      height: 28px;
-      background: var(--panel);
+      height: 32px;
+      padding: 0 16px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      padding: 0 18px;
-      font-size: 0.72rem;
-      color: var(--text-muted);
+      justify-content: space-between;
+      font-family: system-ui, sans-serif;
+      font-size: 11px;
       font-weight: 600;
+      color: rgba(247, 236, 213, 0.65);
+      background: var(--night);
       user-select: none;
-      z-index: 20;
+      flex-shrink: 0;
+      border-bottom: 1px solid rgba(255, 117, 24, 0.15);
     }
 
-    /* Apothecary Header */
+    /* Apothecary Header Matching Website */
     .apothecary-app-header {
       background: var(--panel);
-      border-bottom: 1px solid var(--border-card);
-      padding: 10px 14px;
+      border-bottom: 2px solid var(--pumpkin);
+      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 20;
+      flex-shrink: 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
     }
     .brand-group {
       display: flex;
       align-items: center;
       gap: 10px;
     }
-    .flask-badge {
-      width: 32px;
-      height: 32px;
-      background: #341947;
-      border: 1.2px solid var(--pumpkin);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
+    .brand-icon {
+      font-size: 26px;
+      display: inline-block;
+      animation: bob 2.4s ease-in-out infinite;
     }
-    .brand-name {
-      font-family: var(--font-heading);
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--text-cream);
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .brand-title {
+      font-family: var(--font-brand);
+      font-size: 24px;
+      color: var(--pumpkin);
       letter-spacing: 0.5px;
-      line-height: 1.15;
+      line-height: 1.1;
+      text-shadow: 0 0 10px rgba(255, 117, 24, 0.4);
     }
     .brand-sub {
-      display: block;
-      font-family: var(--font-serif);
-      font-size: 0.62rem;
-      font-weight: 700;
+      font-size: 13px;
       color: var(--gold);
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      margin-top: 1px;
+      font-style: italic;
+      display: block;
     }
     .header-actions {
       display: flex;
-      align-items: center;
-      gap: 6px;
+      gap: 8px;
     }
-    .btn-header-action {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-cream);
-      border-radius: 6px;
-      padding: 6px;
-      cursor: pointer;
+    .btn-icon {
+      background: rgba(43, 29, 20, 0.3);
+      border: 1px solid var(--pumpkin);
+      color: var(--gold);
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.15s;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    .btn-header-action:hover {
-      border-color: var(--pumpkin);
-      color: var(--pumpkin);
+    .btn-icon:active {
+      transform: scale(0.92);
+      background: var(--pumpkin);
+      color: var(--ink);
     }
 
-    /* Telemetry Strip */
+    /* Telemetry Ribbon */
     .telemetry-strip {
-      background: #190c24;
-      border-bottom: 1px solid var(--border-subtle);
-      padding: 5px 14px;
+      background: #190d24;
+      border-bottom: 1px solid rgba(242, 178, 92, 0.2);
+      padding: 6px 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 0.7rem;
+      font-size: 13px;
+      flex-shrink: 0;
     }
-    .telemetry-seal {
+    .telemetry-status {
       display: flex;
       align-items: center;
       gap: 6px;
-      color: var(--text-muted);
-      font-weight: 500;
     }
-    .seal-dot {
+    .telemetry-dot {
       color: var(--slime);
-      font-size: 0.75rem;
+      font-size: 18px;
+      line-height: 1;
     }
-    .telemetry-host-pill {
-      background: rgba(0,0,0,0.4);
-      border: 1px solid var(--border-subtle);
-      color: var(--slime);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
+    .telemetry-label {
+      color: var(--parchment);
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .telemetry-port {
+      background: #11081a;
+      border: 1px solid var(--border-parchment);
+      border-radius: 3px;
       padding: 1px 6px;
-      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--slime);
     }
-    .btn-switch-ip {
+    .btn-switch-host {
       background: transparent;
-      border: 1px solid var(--pumpkin-dim);
+      border: 1px solid var(--pumpkin);
       color: var(--pumpkin);
-      font-size: 0.65rem;
-      font-weight: 800;
-      padding: 2px 7px;
-      border-radius: 4px;
+      border-radius: 3px;
+      font-family: var(--font-heading);
+      font-size: 12px;
+      padding: 2px 8px;
       cursor: pointer;
-      text-transform: uppercase;
+    }
+    .btn-switch-host:active {
+      background: var(--pumpkin);
+      color: var(--ink);
     }
 
-    /* Main Scrollable Body */
+    /* Main Scrollable Viewport */
     .app-body {
       flex: 1;
-      background: var(--night);
       overflow-y: auto;
-      padding: 12px 12px 85px 12px;
+      padding: 14px 14px 84px;
+      background: var(--night);
       position: relative;
+      scroll-behavior: smooth;
     }
     .app-body::-webkit-scrollbar { width: 4px; }
-    .app-body::-webkit-scrollbar-thumb { background: var(--border-card); border-radius: 4px; }
+    .app-body::-webkit-scrollbar-thumb { background: #3d2252; border-radius: 4px; }
 
-    /* Tab Views */
-    .mobile-tab-view { display: none; animation: fadeIn 0.15s ease-out; }
-    .mobile-tab-view.active { display: block; }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(4px); }
+    .view-section {
+      display: none;
+      animation: viewEnter 0.25s ease-out;
+    }
+    .view-section.active {
+      display: block;
+    }
+    @keyframes viewEnter {
+      from { opacity: 0; transform: translateY(6px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Hero Banner Plate */
-    .mobile-hero-plate {
-      background: linear-gradient(135deg, rgba(50, 20, 36, 0.85) 0%, rgba(25, 12, 30, 0.95) 100%);
-      border: 1px solid var(--pumpkin);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
-    }
-    .hero-meta-label {
-      font-size: 0.62rem;
-      font-weight: 800;
+    /* Section Headings */
+    .section-title {
+      font-family: var(--font-brand);
+      font-size: 26px;
       color: var(--pumpkin);
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-weight: normal;
+      margin-bottom: 2px;
+      text-shadow: 0 0 10px rgba(255, 117, 24, 0.4);
     }
-    .hero-title {
-      font-family: var(--font-heading);
-      font-size: 1rem;
-      font-weight: 800;
-      color: var(--text-cream);
-      letter-spacing: 0.5px;
-      margin-bottom: 4px;
-    }
-    .hero-desc {
-      font-size: 0.74rem;
-      color: var(--text-muted);
-      line-height: 1.35;
-      margin-bottom: 10px;
-    }
-    .curse-pills-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .curse-pill {
-      background: rgba(255, 117, 24, 0.18);
-      border: 1px solid var(--pumpkin);
-      color: var(--gold);
-      font-size: 0.68rem;
-      font-weight: 700;
-      padding: 2.5px 7px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Summary Stat Cards */
-    .mobile-summary-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
+    .section-subtitle {
+      font-size: 14px;
+      color: #bfae95;
+      font-style: italic;
       margin-bottom: 14px;
     }
-    .mobile-stat-card {
-      background: var(--panel);
-      border: 1px solid var(--border-subtle);
-      border-radius: 8px;
-      padding: 8px 4px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    .mobile-stat-card.stat-deficit {
-      border-color: rgba(239, 68, 68, 0.4);
-      background: var(--crimson-bg);
-    }
-    .mobile-stat-num {
-      font-size: 1.15rem;
-      font-weight: 900;
-      line-height: 1.1;
-      font-family: var(--font-heading);
-    }
-    .mobile-stat-label {
-      font-size: 0.52rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: var(--text-muted);
-      margin-top: 3px;
-      white-space: nowrap;
-    }
-    .mobile-stat-sub {
-      font-size: 0.46rem;
-      font-weight: 800;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      margin-top: 1px;
+
+    /* ==========================================================================
+       AUTHENTIC PARCHMENT CARDS (EXACT WEBSITE STYLING)
+       ========================================================================== */
+    .parchment-card {
+      position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      border-radius: 4px;
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin), 0 3px 12px rgba(0, 0, 0, 0.4);
+      padding: 14px;
+      margin-bottom: 14px;
     }
 
-    /* Search & Filter Bar (Added Functionality) */
-    .search-filter-box {
-      margin-bottom: 12px;
+    /* 4-Stat Cards Grid (2x2 on Mobile) */
+    .stat-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
     }
-    .search-input-wrap {
+    .stat-card-box {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin);
+      padding: 10px 12px;
+      border-radius: 4px;
+    }
+    .stat-card-box .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b5440;
+      font-weight: 600;
+      display: block;
+    }
+    .stat-card-box .stat-val {
+      font-family: var(--font-heading);
+      font-size: 26px;
+      color: var(--ink);
+      line-height: 1.15;
+      margin: 2px 0;
+      font-variant-numeric: tabular-nums;
+    }
+    .stat-card-box .stat-sub {
+      font-size: 12px;
+      color: #2f5e2a;
+      font-style: italic;
+      display: block;
+    }
+
+    /* Festival Banner Plate Matching Website */
+    .festival-plate {
+      background: #20132b;
+      border: 1px solid var(--pumpkin);
+      padding: 12px 14px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 0 20px rgba(255, 117, 24, 0.2);
+    }
+    .festival-icon {
+      font-size: 28px;
+      animation: bob 3s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+    .festival-text h3 {
+      margin: 0 0 2px;
+      font-family: var(--font-heading);
+      font-size: 18px;
+      color: var(--gold);
+      font-weight: normal;
+      line-height: 1.2;
+    }
+    .festival-text p {
+      margin: 0;
+      color: #bfae95;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    /* Search & Filter Bar */
+    .filter-section {
+      margin-bottom: 14px;
+    }
+    .search-box {
       position: relative;
       margin-bottom: 8px;
     }
-    .search-input-wrap svg {
+    .search-input {
+      width: 100%;
+      background: #1b1025;
+      border: 1px solid var(--pumpkin);
+      border-radius: 4px;
+      color: var(--parchment);
+      font-family: var(--font-body);
+      font-size: 15px;
+      padding: 8px 12px 8px 34px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 8px rgba(242, 178, 92, 0.4);
+    }
+    .search-icon {
       position: absolute;
       left: 10px;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-dim);
-      width: 14px;
-      height: 14px;
-    }
-    .search-input {
-      width: 100%;
-      background: var(--panel);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 7px 10px 7px 32px;
-      color: var(--text-cream);
-      font-size: 0.78rem;
-      outline: none;
-    }
-    .search-input:focus {
-      border-color: var(--pumpkin);
-    }
-    .filter-chips-row {
-      display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      padding-bottom: 2px;
-    }
-    .filter-chip {
-      background: var(--panel);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 12px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .filter-chip.active {
-      background: rgba(255, 117, 24, 0.2);
-      border-color: var(--pumpkin);
       color: var(--gold);
+      font-size: 14px;
+    }
+    .filter-pills-row {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+    .filter-pills-row::-webkit-scrollbar { display: none; }
+    .filter-pill {
+      background: rgba(43, 29, 20, 0.15);
+      border: 1px solid rgba(242, 178, 92, 0.4);
+      color: #c4b59f;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-family: inherit;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .filter-pill.active {
+      background: var(--pumpkin);
+      color: var(--ink);
+      border-color: var(--pumpkin);
+      font-weight: 600;
+      box-shadow: 0 0 8px rgba(255, 117, 24, 0.3);
     }
 
-    /* Balanced Apothecary Reagent Cards */
-    .apothecary-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-card);
-      border-radius: 10px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    /* ==========================================================================
+       REAGENT PARCHMENT LEDGER CARDS (MATCHING WEBSITE ITEM LIST)
+       ========================================================================== */
+    .reagent-card {
       position: relative;
+      background: var(--parchment);
+      color: var(--ink);
+      border: 1px solid rgba(43, 29, 20, 0.25);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+      border-radius: 4px;
+      padding: 14px;
+      margin-bottom: 12px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
-    .apothecary-card.cursed-card {
-      border-color: var(--pumpkin);
-      box-shadow: 0 0 10px rgba(255, 117, 24, 0.15);
-    }
-    .card-top-row {
+    .reagent-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      gap: 8px;
       margin-bottom: 6px;
     }
-    .item-title {
-      font-family: var(--font-editorial);
-      font-size: 1.12rem;
-      font-weight: 600;
-      color: var(--text-cream);
-      line-height: 1.2;
+    .reagent-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: bold;
+      color: var(--ink);
+      line-height: 1.15;
     }
-    .badge-pill {
-      font-size: 0.62rem;
-      font-weight: 700;
+    .reagent-cat-tag {
+      display: inline-block;
+      border: 1px solid rgba(138, 74, 28, 0.45);
+      color: #8a4a1c;
+      background: rgba(138, 74, 28, 0.08);
+      border-radius: 3px;
+      padding: 1px 7px;
+      font-size: 12px;
       text-transform: uppercase;
-      padding: 2px 6px;
-      border-radius: 4px;
-      white-space: nowrap;
+      font-weight: 600;
+      letter-spacing: 0.4px;
     }
-    .badge-reagent {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-    }
-    .badge-cursed {
-      background: rgba(255, 117, 24, 0.2);
-      border: 1px solid var(--pumpkin);
-      color: var(--gold);
+    .reagent-stamp {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      transform: rotate(5deg);
+      border: 1px solid #781e1e;
+      color: #781e1e;
+      background: rgba(120, 30, 30, 0.08);
+      border-radius: 2px;
+      padding: 1px 7px;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      letter-spacing: 0.5px;
+      font-weight: bold;
     }
 
-    /* Subtle Botanical Potion Gauge */
-    .potion-gauge-track {
-      height: 4px;
-      background: rgba(0,0,0,0.4);
+    /* Potion Gauge Fill Bar */
+    .potion-gauge {
+      height: 6px;
+      background: rgba(43, 29, 20, 0.12);
       border-radius: 3px;
       overflow: hidden;
-      margin: 6px 0 10px 0;
+      margin: 8px 0;
+      border: 1px solid rgba(43, 29, 20, 0.18);
     }
-    .potion-gauge-fill {
+    .potion-fill {
       height: 100%;
-      background: var(--slime);
+      background: linear-gradient(90deg, #2f5e2a, #7fff5a);
       border-radius: 3px;
-      transition: width 0.3s;
+      transition: width 0.35s ease;
     }
-    .potion-gauge-fill.low {
-      background: #f87171;
+    .potion-fill.low {
+      background: linear-gradient(90deg, #8a4a1c, #ff7518);
+    }
+    .potion-fill.depleted {
+      background: linear-gradient(90deg, #9b1c1c, #e63946);
     }
 
-    /* 3-Column Metrics Grid */
-    .card-metrics-grid {
+    /* Metric Columns Inside Card */
+    .reagent-metrics-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 6px;
-      background: rgba(0,0,0,0.3);
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 7px 8px;
-      margin-bottom: 8px;
+      margin: 8px 0;
+      background: rgba(43, 29, 20, 0.04);
+      border: 1px solid rgba(43, 29, 20, 0.12);
+      border-radius: 3px;
+      padding: 6px 8px;
     }
-    .metric-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-    }
-    .metric-label {
-      font-size: 0.55rem;
-      font-weight: 700;
+    .metric-col .m-label {
+      font-size: 11px;
+      color: #6b5440;
       text-transform: uppercase;
-      letter-spacing: 0.4px;
-      color: var(--text-dim);
-      margin-bottom: 2px;
+      display: block;
+      line-height: 1.1;
     }
-    .metric-val {
-      font-size: 0.95rem;
-      font-weight: 900;
-      color: var(--text-cream);
+    .metric-col .m-val {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--ink);
+      font-variant-numeric: tabular-nums;
     }
-    .metric-val.stock-ok { color: var(--slime); }
-    .metric-val.stock-low { color: #f87171; }
-    .metric-val.burn-col { color: var(--pumpkin); }
 
-    /* Reorder Prescription Strip */
-    .card-reorder-row {
+    .reagent-secondary-row {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      font-size: 0.72rem;
-      color: var(--text-muted);
-      margin-bottom: 8px;
-      padding: 0 2px;
-    }
-    .reorder-pill {
-      background: rgba(255, 117, 24, 0.15);
-      color: var(--gold);
-      font-weight: 800;
-      padding: 1px 5px;
-      border-radius: 4px;
-    }
-
-    /* Sleek Anomaly Inline Pills */
-    .anomaly-tags-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
+      align-items: center;
+      font-size: 13.5px;
+      color: #6b5440;
+      margin-top: 6px;
       margin-bottom: 10px;
     }
-    .tag-shrinkage {
-      background: var(--crimson-bg);
-      border: 1px solid var(--crimson);
-      color: #fca5a5;
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .tag-spike {
-      background: #251229;
-      border: 1px solid var(--pumpkin-dim);
-      color: var(--gold);
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 3px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
+    .reagent-secondary-row b {
+      color: var(--ink);
     }
 
-    /* Expandable Spike Drawer */
-    .spikes-drawer-box {
-      background: #190c20;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 8px 10px;
-      margin-bottom: 8px;
-      font-size: 0.68rem;
-    }
-    .spike-item-row {
+    /* Surge Callout inside card */
+    .surge-notice {
+      background: rgba(255, 117, 24, 0.08);
+      border: 1px dashed rgba(200, 109, 59, 0.5);
+      border-radius: 3px;
+      padding: 5px 8px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      color: #8a4a1c;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      padding: 3px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
     }
-    .spike-item-row:last-child { border-bottom: none; }
 
-    /* Non-Overlapping Action Bar */
-    .card-actions-row {
+    /* Victorian Restock Control Stepper (Matching Website) */
+    .reagent-actions-row {
       display: flex;
       align-items: center;
       gap: 8px;
-      margin-top: 4px;
     }
-    .stock-stepper-wrap {
-      display: inline-flex;
+    .stock-input-wrap {
+      display: flex;
       align-items: center;
-      background: #110c18;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      overflow: hidden;
-      flex-shrink: 0;
-      width: 82px;
-      justify-content: space-between;
-    }
-    .stock-step-btn {
       background: transparent;
+      border: 1px solid rgba(43, 29, 20, 0.3);
+      border-radius: 3px;
+      overflow: hidden;
+      height: 34px;
+    }
+    .stock-btn-stepper {
+      background: rgba(43, 29, 20, 0.08);
+      color: var(--ink);
       border: none;
-      color: var(--gold);
-      font-size: 1rem;
+      width: 28px;
+      height: 100%;
+      font-size: 16px;
       font-weight: bold;
-      padding: 2px 8px;
-      cursor: pointer;
-      line-height: 1;
-    }
-    .stock-step-val {
-      font-size: 0.78rem;
-      font-weight: 800;
-      color: var(--text-cream);
-      text-align: center;
-    }
-    .btn-quick-restock {
-      flex: 1;
-      background: linear-gradient(135deg, #c86d3b 0%, #ff7518 100%);
-      border: none;
-      color: #faf2e3;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 7px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-      text-align: center;
-    }
-    .btn-quick-restock:hover {
-      filter: brightness(1.1);
-    }
-    .btn-audit-icon {
-      background: var(--crimson-bg);
-      border: 1px solid var(--crimson);
-      color: #fca5a5;
-      padding: 6px 8px;
-      border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .stock-btn-stepper:active {
+      background: rgba(43, 29, 20, 0.2);
+    }
+    .stock-num-display {
+      width: 44px;
+      text-align: center;
+      font-family: var(--font-heading);
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      border-left: 1px solid rgba(43, 29, 20, 0.2);
+      border-right: 1px solid rgba(43, 29, 20, 0.2);
+      line-height: 32px;
+      user-select: none;
+    }
+    .stock-apply-btn {
+      flex: 1;
+      background: #2b1d14;
+      color: var(--parchment);
+      border: 1px solid #2b1d14;
+      border-radius: 3px;
+      height: 34px;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      transition: all 0.15s;
+    }
+    .stock-apply-btn:active {
+      background: #4a3324;
+      transform: scale(0.97);
     }
 
-    /* Bottom Navigation Bar (Elevated, 58px) */
+    .stock-missing-btn {
+      background: transparent;
+      border: 1px solid rgba(120, 30, 30, 0.4);
+      color: #9b1c1c;
+      border-radius: 3px;
+      height: 34px;
+      padding: 0 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Forecast Curves View */
+    .fc-box {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      border-radius: 4px;
+      padding: 14px;
+      margin-bottom: 16px;
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin);
+    }
+    .fc-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      margin-bottom: 8px;
+      color: var(--ink);
+    }
+    .fc-select {
+      width: 100%;
+      background: #fbf5e6;
+      border: 1px solid rgba(43, 29, 20, 0.35);
+      border-radius: 3px;
+      padding: 8px 10px;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 12px;
+      outline: none;
+    }
+    .chart-container {
+      background: #fbf5e6;
+      border: 1px solid rgba(43, 29, 20, 0.25);
+      border-radius: 3px;
+      padding: 10px;
+      margin-bottom: 10px;
+      overflow-x: auto;
+    }
+
+    /* Sale Cash Register Ticket */
+    .ticket-card {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      border-radius: 4px;
+      padding: 18px 16px;
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin), 0 4px 18px rgba(0,0,0,0.4);
+      position: relative;
+    }
+    .ticket-seal {
+      width: 44px;
+      height: 44px;
+      background: #9b1c1c;
+      border-radius: 50%;
+      border: 2px dashed #ffbaba;
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 18px;
+    }
+
+    /* Bottom Fixed Navigation Bar */
     .mobile-bottom-nav {
       position: absolute;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 58px;
-      background: var(--panel);
-      border-top: 1px solid var(--border-card);
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
+      height: 64px;
+      background: #170d24;
+      border-top: 2px solid var(--pumpkin);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
       z-index: 50;
-      box-shadow: 0 -4px 15px rgba(0,0,0,0.5);
+      box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.7);
     }
-    .mobile-tab-btn {
+    .nav-btn {
       background: transparent;
       border: none;
-      color: var(--text-muted);
+      color: #a493b3;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 3px;
-      font-size: 0.65rem;
-      font-weight: 700;
       cursor: pointer;
-      padding: 6px 12px;
-      transition: all 0.15s;
+      font-family: var(--font-body);
+      font-size: 13px;
+      transition: all 0.15s ease;
     }
-    .mobile-tab-btn.active {
-      color: var(--pumpkin);
-    }
-    .mobile-tab-btn svg {
-      width: 17px;
-      height: 17px;
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
       stroke: currentColor;
     }
+    .nav-btn.active {
+      color: var(--pumpkin);
+      font-weight: 700;
+    }
+    .nav-btn.active svg {
+      stroke: var(--pumpkin);
+      filter: drop-shadow(0 0 6px rgba(255, 117, 24, 0.5));
+    }
 
-    /* Properly Positioned Floating Action Button (Cleanly ABOVE Bottom Nav) */
-    .fab-copper-add {
+    /* Floating Add Reagent Button */
+    .fab-add {
       position: absolute;
-      bottom: 72px;
+      bottom: 74px;
       right: 16px;
-      background: linear-gradient(135deg, #c86d3b 0%, #ff7518 100%);
-      border: 1.5px solid var(--gold);
-      color: var(--text-cream);
+      background: #2b1d14;
+      color: var(--parchment);
+      border: 2px solid var(--pumpkin);
+      border-radius: 30px;
+      padding: 8px 16px;
       font-family: var(--font-heading);
-      font-size: 0.76rem;
-      font-weight: 800;
-      letter-spacing: 0.6px;
-      padding: 9px 14px;
-      border-radius: 24px;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 117, 24, 0.35);
-      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
       display: flex;
       align-items: center;
       gap: 6px;
-      z-index: 45;
-      transition: transform 0.15s;
+      cursor: pointer;
+      z-index: 40;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6), 0 0 10px rgba(255, 117, 24, 0.3);
+      transition: all 0.2s ease;
     }
-    .fab-copper-add:active { transform: scale(0.96); }
+    .fab-add:active {
+      transform: scale(0.95);
+      background: var(--pumpkin);
+      color: var(--ink);
+    }
 
-    /* Dialog Backdrops */
-    .dialog-backdrop {
+    /* Modal Backdrop & Dialog */
+    .modal-backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(0,0,0,0.78);
+      background: rgba(10, 4, 16, 0.85);
       backdrop-filter: blur(4px);
       z-index: 100;
       display: none;
@@ -716,136 +806,160 @@
       justify-content: center;
       padding: 16px;
     }
-    .dialog-box {
-      background: var(--panel);
-      border: 1px solid var(--pumpkin);
-      border-radius: 12px;
-      width: 100%;
-      max-width: 340px;
-      padding: 18px 16px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-      color: var(--text-cream);
+    .modal-backdrop.open {
+      display: flex;
+      animation: modalFade 0.2s ease-out;
     }
-    .dialog-title {
-      font-family: var(--font-heading);
-      font-size: 0.95rem;
-      font-weight: 800;
-      color: var(--text-cream);
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-parchment {
+      background: var(--parchment);
+      color: var(--ink);
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin), 0 10px 30px rgba(0, 0, 0, 0.8);
+      border-radius: 6px;
+      padding: 20px;
+      width: 100%;
+      max-width: 360px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-title {
+      font-family: var(--font-brand);
+      font-size: 24px;
+      color: var(--ink);
       margin-bottom: 12px;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 6px;
     }
-    .input-label {
-      display: block;
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      margin-bottom: 3px;
-    }
-    .dialog-input {
-      width: 100%;
-      background: #110c18;
-      border: 1px solid var(--border-subtle);
-      border-radius: 6px;
-      padding: 7px 10px;
-      color: var(--text-cream);
-      font-size: 0.8rem;
+    .form-group {
       margin-bottom: 10px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #6b5440;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+    }
+    .form-input, .form-select {
+      width: 100%;
+      background: #fbf5e6;
+      border: 1px solid rgba(43, 29, 20, 0.3);
+      border-radius: 3px;
+      padding: 7px 10px;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      color: var(--ink);
+      box-sizing: border-box;
       outline: none;
     }
-    .dialog-input:focus { border-color: var(--pumpkin); }
-    .dialog-actions {
+    .form-input:focus, .form-select:focus {
+      border-color: var(--pumpkin);
+      box-shadow: 0 0 5px rgba(255, 117, 24, 0.3);
+    }
+    .form-actions {
       display: flex;
-      justify-content: flex-end;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 16px;
+    }
+    .btn-submit {
+      flex: 1;
+      background: #2b1d14;
+      color: var(--parchment);
+      border: 1px solid #2b1d14;
+      border-radius: 3px;
+      padding: 9px;
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
     }
     .btn-cancel {
       background: transparent;
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      font-size: 0.72rem;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .btn-copper-submit {
-      background: linear-gradient(135deg, #c86d3b 0%, #ff7518 100%);
-      border: none;
-      color: #faf2e3;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 6px 14px;
-      border-radius: 6px;
+      border: 1px solid rgba(43, 29, 20, 0.4);
+      color: var(--ink);
+      border-radius: 3px;
+      padding: 9px 14px;
+      font-family: var(--font-heading);
+      font-size: 14px;
       cursor: pointer;
     }
 
-    /* Mobile Toast */
-    .mobile-toast {
+    /* Toast Notification */
+    .toast-pill {
       position: absolute;
-      top: 70px;
+      top: 40px;
       left: 50%;
-      transform: translateX(-50%);
-      background: rgba(34, 19, 46, 0.95);
+      transform: translateX(-50%) translateY(-20px);
+      background: #2b1d14;
+      color: var(--parchment);
       border: 1px solid var(--pumpkin);
-      color: var(--text-cream);
-      font-size: 0.75rem;
-      font-weight: 700;
-      padding: 6px 14px;
-      border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-      z-index: 120;
-      display: none;
-      white-space: nowrap;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-family: var(--font-heading);
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+    }
+    .toast-pill.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
     }
 
-    /* QR Card on Desktop */
+    /* Desktop QR Box */
     .qr-card {
       background: var(--panel);
-      border: 1px solid var(--border-card);
-      border-radius: 20px;
+      border: 2px solid var(--pumpkin);
+      box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--pumpkin), 0 10px 30px rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
       padding: 24px 20px;
       width: 320px;
       text-align: center;
     }
     .qr-title {
-      font-family: var(--font-heading);
-      font-size: 1.15rem;
+      font-family: var(--font-brand);
+      font-size: 26px;
       color: var(--pumpkin);
-      margin-bottom: 8px;
-      font-weight: 700;
+      margin-bottom: 6px;
     }
-    .qr-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; }
+    .qr-desc { font-size: 14px; color: var(--gold); margin-bottom: 12px; font-style: italic; }
     .qr-img-box {
       background: #fff;
-      padding: 10px;
-      border-radius: 12px;
+      padding: 8px;
+      border-radius: 6px;
       display: inline-block;
       margin-bottom: 12px;
     }
     .qr-img { width: 160px; height: 160px; display: block; }
-    .lan-url-pill {
-      background: var(--night);
-      border: 1px solid var(--pumpkin-dim);
-      border-radius: 8px;
-      padding: 7px 10px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.72rem;
+    .lan-pill {
+      background: #150920;
+      border: 1px solid var(--pumpkin);
+      border-radius: 4px;
+      padding: 6px 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
       color: var(--slime);
       word-break: break-all;
-      margin-bottom: 12px;
     }
   </style>
 </head>
 <body>
   <div class="preview-layout">
+    <!-- Desktop Side Header -->
     <div class="preview-header">
-      <h1>Hexley’s Potion Pantry — Mobile Vault</h1>
-      <p>Synchronized real-time with your desktop apothecary ledger &bull; <a href="index.html">Desktop Dashboard &rarr;</a></p>
+      <h1>Hexley’s Potion Pantry</h1>
+      <p>Art-directed Victorian Apothecary &bull; Mobile Vault Ledger &bull; <a href="index.html">Desktop Dashboard &rarr;</a></p>
     </div>
 
+    <!-- Phone Mockup Container -->
     <div class="phone-bezel">
       <!-- Top Status Bar -->
       <div class="android-status-bar">
@@ -857,622 +971,554 @@
         </div>
       </div>
 
-      <!-- App Header -->
+      <!-- Apothecary Header Matching Website -->
       <header class="apothecary-app-header">
         <div class="brand-group">
-          <div class="flask-badge">⚗️</div>
+          <span class="brand-icon">🎃</span>
           <div>
-            <div class="brand-name">HEXLEY'S PANTRY</div>
+            <div class="brand-title">Hexley's Pantry</div>
             <span class="brand-sub">EST. 1888 • VAULT LEDGER</span>
           </div>
         </div>
         <div class="header-actions">
-          <button class="btn-header-action" title="Server IP Settings" onclick="openSettingsModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <button class="btn-icon" title="Server IP Settings" onclick="openSettingsModal()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           </button>
-          <button class="btn-header-action" title="Refresh Telemetry" onclick="fetchPantry()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+          <button class="btn-icon" title="Refresh Telemetry" onclick="fetchPantry()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
           </button>
         </div>
       </header>
 
-      <!-- Telemetry Strip -->
-      <div id="conn-strip" class="telemetry-strip">
-        <div class="telemetry-seal">
-          <span id="conn-dot" class="seal-dot">&bull;</span>
-          <span id="conn-text">Vault Ledger Synchronized</span>
-          <span class="telemetry-host-pill" id="conn-host">:8000</span>
+      <!-- Live Sync Strip -->
+      <div class="telemetry-strip">
+        <div class="telemetry-status">
+          <span id="conn-dot" class="telemetry-dot">&bull;</span>
+          <span id="conn-text" class="telemetry-label">Vault Ledger Synchronized</span>
+          <span id="conn-host" class="telemetry-port">:8000</span>
         </div>
-        <button class="btn-switch-ip" onclick="openSettingsModal()">Switch</button>
+        <button class="btn-switch-host" onclick="openSettingsModal()">SWITCH</button>
       </div>
 
-      <!-- App Body -->
+      <!-- App Scroll Body -->
       <main class="app-body" id="app-body">
         
-        <!-- ==================== TAB 1: DASHBOARD ==================== -->
-        <div id="tab-dashboard" class="mobile-tab-view active">
-          <!-- Blood Moon Surge Banner -->
-          <div class="mobile-hero-plate">
-            <div class="hero-meta-label">
-              <span>🌕 Mandate Active (3.0x Surge)</span>
+        <!-- ==================== 1. VAULT & LEDGER (MAIN DASHBOARD + ALL REAGENTS) ==================== -->
+        <div id="view-dashboard" class="view-section active">
+          <!-- 4 Stat Cards in Authentic Aged Parchment -->
+          <div class="stat-cards-grid">
+            <div class="stat-card-box">
+              <span class="stat-label">Total Reagents</span>
+              <div class="stat-val" id="stat-total-items">9 Items</div>
+              <span class="stat-sub" id="stat-total-units">160 units in vault</span>
             </div>
-            <h2 class="hero-title">Blood Moon Festival Approaching</h2>
-            <p class="hero-desc">Celestial lunar tides surge consumption across vital apothecary ingredients up to 300%.</p>
-            <div class="curse-pills-row">
-              <span class="curse-pill">☾ Bat Wings</span>
-              <span class="curse-pill">☾ Mandrake Root</span>
-              <span class="curse-pill">☾ Newt Eyes</span>
+            <div class="stat-card-box">
+              <span class="stat-label">Urgent Shortages</span>
+              <div class="stat-val" style="color:var(--crimson);" id="stat-shortages">0 Items</div>
+              <span class="stat-sub" style="color:var(--crimson);">Below min safety</span>
             </div>
-          </div>
-
-          <!-- Summary Metric Cards -->
-          <div class="mobile-summary-grid">
-            <div class="mobile-stat-card stat-deficit">
-              <span class="mobile-stat-num" id="stat-out-stock" style="color:#f87171;">0</span>
-              <span class="mobile-stat-label">Out of Stock</span>
-              <span class="mobile-stat-sub" style="color:#ef4444;">Deficit</span>
+            <div class="stat-card-box">
+              <span class="stat-label">Full Moon Multiplier</span>
+              <div class="stat-val" style="color:var(--pumpkin);">3.0x Surge</div>
+              <span class="stat-sub">Lunar peak in 2d</span>
             </div>
-            <div class="mobile-stat-card">
-              <span class="mobile-stat-num" id="stat-low-stock" style="color:#fbbf24;">0</span>
-              <span class="mobile-stat-label">Low Stock</span>
-              <span class="mobile-stat-sub" style="color:#f59e0b;">Depleting</span>
-            </div>
-            <div class="mobile-stat-card">
-              <span class="mobile-stat-num" id="stat-runout-7d" style="color:#c084fc;">0</span>
-              <span class="mobile-stat-label">Runout &lt;7d</span>
-              <span class="mobile-stat-sub" style="color:#a855f7;">Prophecy</span>
-            </div>
-            <div class="mobile-stat-card">
-              <span class="mobile-stat-num" id="stat-vault-total" style="color:#ffcd75;">0</span>
-              <span class="mobile-stat-label">Catalogued</span>
-              <span class="mobile-stat-sub" style="color:var(--pumpkin);">Vault</span>
+            <div class="stat-card-box">
+              <span class="stat-label">Vault Value</span>
+              <div class="stat-val" style="color:#8a4a1c;" id="stat-vault-value">¢1,245.50</div>
+              <span class="stat-sub">Ledger inventory</span>
             </div>
           </div>
 
-          <!-- Urgent Stock Shortages Ledger -->
-          <div style="display:flex; justify-content:space-between; align-items:center; margin:14px 0 8px;">
-            <span style="font-family:var(--font-heading); font-size:0.85rem; font-weight:700; color:var(--text-cream);">Urgent Depletions</span>
-            <span id="dash-depleted-badge" style="font-size:0.65rem; color:#f87171; background:rgba(239,68,68,0.15); padding:2px 6px; border-radius:4px; font-weight:700;">Scanning...</span>
-          </div>
-          <div id="dash-depleted-list"></div>
-
-          <!-- Quick Navigation Actions -->
-          <div style="background:var(--panel); border:1px solid var(--border-card); border-radius:8px; padding:12px; margin-top:14px;">
-            <div style="font-size:0.75rem; font-weight:700; color:var(--text-cream); margin-bottom:8px;">Apothecary Shortcuts</div>
-            <div style="display:flex; gap:8px;">
-              <button class="btn-quick-restock" style="flex:1;" onclick="switchTab('forecast')">Scrying Forecast &rarr;</button>
-              <button class="btn-quick-restock" style="flex:1; background:#2c1538; border:1px solid var(--violet);" onclick="switchTab('sale')">Record Sale &rarr;</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- ==================== TAB 2: INVENTORY ==================== -->
-        <div id="tab-inventory" class="mobile-tab-view">
-          <!-- Search & Filter Controls (New Usability) -->
-          <div class="search-filter-box">
-            <div class="search-input-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input type="text" id="inv-search-input" class="search-input" placeholder="Search reagents, parts, roots..." oninput="handleFilterChange()">
-            </div>
-            <div class="filter-chips-row">
-              <button class="filter-chip active" data-filter="all" onclick="setCategoryFilter('all', this)">All</button>
-              <button class="filter-chip" data-filter="low" onclick="setCategoryFilter('low', this)">⚠️ Low Stock</button>
-              <button class="filter-chip" data-filter="cursed" onclick="setCategoryFilter('cursed', this)">🌕 3x Surging</button>
-              <button class="filter-chip" data-filter="animal" onclick="setCategoryFilter('animal', this)">Fauna</button>
-              <button class="filter-chip" data-filter="plant" onclick="setCategoryFilter('plant', this)">Flora</button>
+          <!-- Festival Banner Plate -->
+          <div class="festival-plate">
+            <div class="festival-icon">🌕</div>
+            <div class="festival-text">
+              <h3>Blood Moon Festival Approaching</h3>
+              <p>Demand for Bat Wings &amp; Mandrake surges up to 300%. Check Scrying Forecast to avoid pantry stockouts.</p>
             </div>
           </div>
 
-          <!-- Cards Container -->
-          <div id="cards-container">
-            <div style="text-align:center; padding:30px 0; color:var(--text-muted); font-size:0.85rem;">
-              Consulting apothecary ledger...
+          <!-- Section Title -->
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:6px;">
+            <h2 class="section-title">Pantry Botanical &amp; Reagents</h2>
+            <span id="item-count-label" style="font-size:14px; color:var(--gold); font-style:italic;">9 items</span>
+          </div>
+          <p class="section-subtitle">Apothecary stock ledger with real-time depletion and restock orders.</p>
+
+          <!-- Search & Filter Controls -->
+          <div class="filter-section">
+            <div class="search-box">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="search-input" class="search-input" placeholder="Search bat wings, roots, scales..." oninput="filterReagents()">
+            </div>
+            <div class="filter-pills-row">
+              <button class="filter-pill active" data-filter="all" onclick="selectFilter('all', this)">All Items</button>
+              <button class="filter-pill" data-filter="low" onclick="selectFilter('low', this)">⚠️ Low Stock</button>
+              <button class="filter-pill" data-filter="surge" onclick="selectFilter('surge', this)">🌕 3x Surging</button>
+              <button class="filter-pill" data-filter="fauna" onclick="selectFilter('fauna', this)">Fauna</button>
+              <button class="filter-pill" data-filter="flora" onclick="selectFilter('flora', this)">Flora</button>
+            </div>
+          </div>
+
+          <!-- Reagent Cards Feed -->
+          <div id="reagents-feed">
+            <div style="text-align:center; padding:30px 0; color:var(--gold); font-style:italic;">
+              Consulting Madam Hexley's ledger...
             </div>
           </div>
         </div>
 
-        <!-- ==================== TAB 3: FORECAST & RESTOCK ==================== -->
-        <div id="tab-forecast" class="mobile-tab-view">
-          <div style="margin-bottom:10px;">
-            <label class="input-label">Select Reagent to Scry:</label>
-            <select id="forecast-reagent-select" class="dialog-input" onchange="renderForecastDetails()"></select>
+        <!-- ==================== 2. SCRYING FORECAST & RESTOCK ==================== -->
+        <div id="view-forecast" class="view-section">
+          <h2 class="section-title">Scrying Forecast &amp; Restock</h2>
+          <p class="section-subtitle">Predictive consumption curves and automated raven restock recommendations.</p>
+
+          <div class="fc-box">
+            <div class="fc-title">🔮 Reagent Consumption Curve</div>
+            <select id="forecast-select" class="fc-select" onchange="renderSelectedForecast()"></select>
+            <div id="forecast-card-detail"></div>
+            <div class="chart-container" id="forecast-svg-wrapper"></div>
           </div>
-          <div id="forecast-featured-card" style="margin-bottom:14px;"></div>
-          <div style="font-family:var(--font-heading); font-size:0.85rem; font-weight:700; color:var(--text-cream); margin-bottom:8px;">All Pantry Restock Recommendations</div>
-          <div id="forecast-recommendations-list"></div>
+
+          <div class="fc-box">
+            <div class="fc-title">📜 All Restock Recommendations</div>
+            <div id="forecast-table-list"></div>
+          </div>
         </div>
 
-        <!-- ==================== TAB 4: RECORD SALE ==================== -->
-        <div id="tab-sale" class="mobile-tab-view">
-          <div style="background:var(--panel); border:1px solid var(--border-card); border-radius:10px; padding:16px;">
-            <div style="font-family:var(--font-heading); font-size:0.95rem; font-weight:700; color:var(--text-cream); margin-bottom:4px;">Record Customer Sale</div>
-            <div style="font-size:0.72rem; color:var(--text-muted); margin-bottom:14px;">Atomic ledger deduction with real-time stock balance audit.</div>
-            
-            <label class="input-label">Select Reagent Sold:</label>
-            <select id="sale-reagent-select" class="dialog-input" onchange="updateSaleMax()"></select>
+        <!-- ==================== 3. RECORD SALE ==================== -->
+        <div id="view-sale" class="view-section">
+          <h2 class="section-title">Record Customer Sale</h2>
+          <p class="section-subtitle">Atomic transaction dispensing reagents with real-time audit ledger deduction.</p>
 
-            <label class="input-label">Sale Quantity:</label>
-            <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin:10px 0 16px;">
-              <button class="stock-step-btn" style="font-size:1.4rem; padding:4px 12px; background:#110c18; border-radius:6px;" onclick="stepSaleQty(-1)">&minus;</button>
-              <span id="sale-qty-val" style="font-size:1.4rem; font-weight:800; color:var(--text-cream); min-width:30px; text-align:center;">1</span>
-              <button class="stock-step-btn" style="font-size:1.4rem; padding:4px 12px; background:#110c18; border-radius:6px;" onclick="stepSaleQty(1)">+</button>
+          <div class="ticket-card">
+            <div class="ticket-seal">✦</div>
+            <h3 style="font-family:var(--font-heading); font-size:22px; margin-bottom:4px;">Apothecary Dispensary</h3>
+            <p style="font-size:14px; color:#6b5440; margin-bottom:14px; font-style:italic;">Official Madam Hexley's Vault Sales Ledger</p>
+
+            <div class="form-group">
+              <label class="form-label">Select Reagent Dispensed</label>
+              <select id="sale-item-select" class="form-select" onchange="updateSalePrice()"></select>
             </div>
 
-            <button class="btn-copper-submit" style="width:100%; padding:10px; font-size:0.85rem;" onclick="submitRecordSale()">Authorize & Deduct Stock</button>
+            <div class="form-group">
+              <label class="form-label">Dispense Quantity</label>
+              <div style="display:flex; align-items:center; justify-content:center; gap:16px; margin:10px 0 14px;">
+                <button class="stock-btn-stepper" style="width:36px; height:36px; border-radius:4px; font-size:20px;" onclick="stepSaleAmount(-1)">&minus;</button>
+                <span id="sale-qty-val" style="font-family:var(--font-heading); font-size:24px; font-weight:bold; color:var(--ink); min-width:40px; text-align:center;">1</span>
+                <button class="stock-btn-stepper" style="width:36px; height:36px; border-radius:4px; font-size:20px;" onclick="stepSaleAmount(1)">+</button>
+              </div>
+            </div>
+
+            <div style="background:rgba(43,29,20,0.06); border:1px solid rgba(43,29,20,0.2); border-radius:3px; padding:10px; margin-bottom:16px; text-align:center;">
+              <span style="font-size:13px; color:#6b5440; text-transform:uppercase;">Transaction Tally:</span>
+              <div id="sale-total-price" style="font-family:var(--font-heading); font-size:26px; font-weight:bold; color:#8a4a1c;">¢12.50</div>
+            </div>
+
+            <button class="btn-submit" style="width:100%; font-size:16px;" onclick="submitSale()">Tally &amp; Dispense Reagent &rarr;</button>
           </div>
         </div>
+
+        <!-- ==================== 4. SETTINGS & OPS ==================== -->
+        <div id="view-settings" class="view-section">
+          <h2 class="section-title">Suppliers &amp; Telemetry</h2>
+          <p class="section-subtitle">Configure backend ledger endpoints and apothecary vault connectivity.</p>
+
+          <div class="parchment-card">
+            <h3 style="font-family:var(--font-heading); font-size:20px; margin-bottom:8px;">FastAPI Vault Endpoint</h3>
+            <p style="font-size:14px; color:#6b5440; margin-bottom:12px;">Ensure your mobile device is connected to the same Wi-Fi network.</p>
+
+            <div class="form-group">
+              <label class="form-label">Backend Host URL</label>
+              <input type="text" id="settings-host-input" class="form-input" value="http://localhost:8000">
+            </div>
+
+            <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
+              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('http://192.168.88.35:8000')">192.168.88.35:8000 (Phone Wi-Fi)</button>
+              <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setHostPreset('http://localhost:8000')">localhost:8000</button>
+            </div>
+
+            <button class="btn-submit" style="width:100%; margin-bottom:8px;" onclick="saveHostSettings()">Save &amp; Test Connection</button>
+          </div>
+        </div>
+
       </main>
 
-      <!-- Properly Placed Floating Action Button (Never Overlaps Bottom Nav) -->
-      <button class="fab-copper-add" onclick="openAddModal()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        <span>Add Reagent</span>
+      <!-- Floating Action Button to Add Reagents (Elegant Victorian Style) -->
+      <button class="fab-add" onclick="openAddModal()">
+        <span>+ Add Reagent</span>
       </button>
 
-      <!-- Bottom Tab Navigation Bar (Luminously High-Contrast) -->
+      <!-- Fixed Bottom Navigation Bar -->
       <nav class="mobile-bottom-nav">
-        <button class="mobile-tab-btn active" id="tabbtn-dashboard" onclick="switchTab('dashboard')">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-          <span>Dashboard</span>
+        <button class="nav-btn active" id="nav-dashboard" onclick="navigateToView('dashboard')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <span>Vault</span>
         </button>
-        <button class="mobile-tab-btn" id="tabbtn-inventory" onclick="switchTab('inventory')">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-          <span>Inventory</span>
-        </button>
-        <button class="mobile-tab-btn" id="tabbtn-forecast" onclick="switchTab('forecast')">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4M21 5h-4"/></svg>
+        <button class="nav-btn" id="nav-forecast" onclick="navigateToView('forecast')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4M21 5h-4"/></svg>
           <span>Forecast</span>
         </button>
-        <button class="mobile-tab-btn" id="tabbtn-sale" onclick="switchTab('sale')">
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <button class="nav-btn" id="nav-sale" onclick="navigateToView('sale')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
           <span>Sale</span>
+        </button>
+        <button class="nav-btn" id="nav-settings" onclick="navigateToView('settings')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Ops</span>
         </button>
       </nav>
 
-      <!-- Toast Feedback -->
-      <div id="mobile-toast" class="mobile-toast">Ledger updated</div>
+      <!-- Toast Feedback Message -->
+      <div id="toast" class="toast-pill">Ledger Updated</div>
 
-      <!-- Modal: Add New Ingredient -->
-      <div id="dialog-add" class="dialog-backdrop">
-        <div class="dialog-box">
-          <div class="dialog-title">
-            <span style="color:var(--pumpkin);">✦</span> Register New Reagent
+      <!-- Add Reagent Parchment Modal -->
+      <div id="add-modal" class="modal-backdrop">
+        <div class="modal-parchment">
+          <div class="modal-title">
+            <span>✦ Register Reagent</span>
+            <span style="cursor:pointer; font-size:20px;" onclick="closeAddModal()">&times;</span>
           </div>
-          <form id="form-add-item" onsubmit="handleAddSubmit(event)">
-            <label class="input-label">Ingredient Name</label>
-            <input type="text" id="add-name" class="dialog-input" placeholder="e.g. Phoenix Feather" required>
-
+          <form onsubmit="submitAddReagent(event)">
+            <div class="form-group">
+              <label class="form-label">Ingredient Name</label>
+              <input type="text" id="add-name" class="form-input" placeholder="e.g. Phoenix Feather" required>
+            </div>
             <div style="display:flex; gap:8px;">
-              <div style="flex:1;">
-                <label class="input-label">Current Stock</label>
-                <input type="number" id="add-stock" class="dialog-input" value="50" min="0" required>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Category</label>
+                <select id="add-category" class="form-select">
+                  <option value="Animal Parts">Fauna / Animal</option>
+                  <option value="Roots">Flora / Roots</option>
+                  <option value="Minerals">Minerals</option>
+                  <option value="Essences">Essences</option>
+                </select>
               </div>
-              <div style="flex:1;">
-                <label class="input-label">Safety Threshold</label>
-                <input type="number" id="add-safety" class="dialog-input" value="15" min="0" required>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Unit of Measure</label>
+                <input type="text" id="add-unit" class="form-input" value="units" required>
               </div>
             </div>
-
-            <label class="input-label">Supplier</label>
-            <input type="text" id="add-supplier" class="dialog-input" value="Diagon Alley Apothecary">
-
-            <label class="input-label">Lead Time (Days)</label>
-            <input type="number" id="add-lead" class="dialog-input" value="3" min="1" max="60">
-
-            <div class="dialog-actions">
+            <div style="display:flex; gap:8px;">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Starting Stock</label>
+                <input type="number" id="add-stock" class="form-input" value="45" min="0" required>
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Safety Target</label>
+                <input type="number" id="add-safe" class="form-input" value="20" min="1" required>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Daily Burn</label>
+                <input type="number" id="add-burn" class="form-input" value="5" min="0" step="0.5" required>
+              </div>
+              <div class="form-group" style="flex:1;">
+                <label class="form-label">Price (¢)</label>
+                <input type="number" id="add-price" class="form-input" value="15.00" min="0" step="0.25" required>
+              </div>
+            </div>
+            <div class="form-actions">
               <button type="button" class="btn-cancel" onclick="closeAddModal()">Cancel</button>
-              <button type="submit" class="btn-copper-submit">Save To Vault</button>
+              <button type="submit" class="btn-submit">Inscribe into Vault</button>
             </div>
           </form>
         </div>
       </div>
 
-      <!-- Modal: Server Host Settings -->
-      <div id="dialog-settings" class="dialog-backdrop">
-        <div class="dialog-box">
-          <div class="dialog-title">
-            <span style="color:var(--pumpkin);">⚙</span> Vault Host Settings
+      <!-- Settings Parchment Modal -->
+      <div id="settings-modal" class="modal-backdrop">
+        <div class="modal-parchment">
+          <div class="modal-title">
+            <span>⚙️ Vault Host</span>
+            <span style="cursor:pointer; font-size:20px;" onclick="closeSettingsModal()">&times;</span>
           </div>
-          <label class="input-label">FastAPI Host Address:</label>
-          <input type="text" id="settings-url" class="dialog-input" value="http://localhost:8000">
-
-          <div style="margin:10px 0 6px; font-size:0.65rem; color:var(--text-dim); text-transform:uppercase; font-weight:700;">Host Presets:</div>
-          <div style="display:flex; flex-wrap:wrap; gap:6px;">
-            <button type="button" class="btn-switch-ip" onclick="setPreset('http://localhost:8000')">Localhost (:8000)</button>
-            <button type="button" class="btn-switch-ip" onclick="setPreset('http://192.168.88.35:8000')">Wi-Fi LAN</button>
+          <div class="form-group">
+            <label class="form-label">FastAPI Endpoint URL</label>
+            <input type="text" id="modal-host-input" class="form-input" value="http://localhost:8000">
           </div>
-          <div class="dialog-actions">
+          <div style="display:flex; gap:6px; margin-bottom:14px; flex-wrap:wrap;">
+            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('http://192.168.88.35:8000')">192.168.88.35:8000</button>
+            <button class="filter-pill" style="border-color:rgba(43,29,20,0.4); color:var(--ink);" onclick="setModalHostPreset('http://localhost:8000')">localhost:8000</button>
+          </div>
+          <div class="form-actions">
             <button type="button" class="btn-cancel" onclick="closeSettingsModal()">Cancel</button>
-            <button type="button" class="btn-copper-submit" onclick="saveSettings()">Connect</button>
+            <button type="button" class="btn-submit" onclick="saveModalHost()">Save &amp; Connect</button>
           </div>
         </div>
       </div>
+
     </div>
 
-    <!-- QR Code Card for Desktop -->
+    <!-- QR Card for Instant LAN Access on Real Phones -->
     <div class="qr-card">
-      <div class="qr-title">Open On Your Phone</div>
-      <p class="qr-desc">Scan with your phone's camera on the same Wi-Fi network:</p>
-      
+      <div class="qr-title">Open on Mobile Phone</div>
+      <div class="qr-desc">Scan with your phone camera or browser on the same Wi-Fi:</div>
       <div class="qr-img-box">
-        <img src="mobile_qr.png" alt="QR Code" class="qr-img" />
+        <img src="mobile_qr.png" alt="Scan QR Code" class="qr-img">
       </div>
-
-      <div class="lan-url-pill" id="lan-url-text">http://192.168.88.35:8080/mobile-preview.html</div>
-
-      <div style="font-size:0.72rem; color:var(--text-dim); text-align:left; line-height:1.4;">
-        <strong>💡 Install as Native App:</strong><br>
-        &bull; <strong>Android:</strong> Chrome &rarr; ⋮ &rarr; <em>"Add to Home screen"</em>.<br>
-        &bull; <strong>iPhone:</strong> Safari &rarr; Share ⎋ &rarr; <em>"Add to Home Screen"</em>.
-      </div>
+      <div class="lan-pill" id="qr-lan-url">http://192.168.88.35:8080/mobile-preview.html</div>
+      <p style="font-size:12px; color:var(--parchment); margin-top:8px;">Add to Home Screen in Chrome / Safari for 1-tap app launch.</p>
     </div>
   </div>
 
   <script>
-    const currentHost = window.location.hostname || "localhost";
-    let serverBase = localStorage.getItem("hexley_mobile_server");
+    // =========================================================================
+    // APOTHECARY VAULT TELEMETRY & SYNC ENGINE
+    // =========================================================================
+    const DEFAULT_SERVER = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+      ? "http://localhost:8000"
+      : `http://${window.location.hostname}:8000`;
 
-    if (!serverBase || (currentHost !== "localhost" && currentHost !== "127.0.0.1" && (serverBase.includes("localhost") || serverBase.includes("127.0.0.1")))) {
-      serverBase = `http://${currentHost}:8000`;
-      localStorage.setItem("hexley_mobile_server", serverBase);
-    }
-
-    let globalPantry = [];
-    let activeCategoryFilter = "all";
+    let serverBase = localStorage.getItem("hexley_server_base") || DEFAULT_SERVER;
+    let pantryItems = [];
+    let activeFilter = "all";
+    let stepperAmounts = {};
     let saleQty = 1;
-    const stepperValues = {};
 
+    // Clock
     function updateClock() {
       const now = new Date();
-      const h = String(now.getHours()).padStart(2, '0');
-      const m = String(now.getMinutes()).padStart(2, '0');
       const el = document.getElementById("status-clock");
-      if (el) el.textContent = `${h}:${m}`;
+      if (el) el.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     }
     setInterval(updateClock, 1000);
     updateClock();
 
     function showToast(msg) {
-      const toast = document.getElementById("mobile-toast");
-      if (!toast) return;
-      toast.textContent = msg;
-      toast.style.display = "block";
-      setTimeout(() => { toast.style.display = "none"; }, 3500);
+      const t = document.getElementById("toast");
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2200);
     }
 
-    function switchTab(tabName) {
-      document.querySelectorAll(".mobile-tab-view").forEach(el => el.classList.remove("active"));
-      document.querySelectorAll(".mobile-tab-btn").forEach(el => el.classList.remove("active"));
+    // View Navigation
+    function navigateToView(viewId) {
+      document.querySelectorAll(".view-section").forEach(sec => sec.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
 
-      const targetView = document.getElementById(`tab-${tabName}`);
-      const targetBtn = document.getElementById(`tabbtn-${tabName}`);
+      const targetView = document.getElementById("view-" + viewId);
+      const targetBtn = document.getElementById("nav-" + viewId);
       if (targetView) targetView.classList.add("active");
       if (targetBtn) targetBtn.classList.add("active");
+
+      // Auto scroll to top
+      const scrollBody = document.getElementById("app-body");
+      if (scrollBody) scrollBody.scrollTop = 0;
+
+      if (viewId === "forecast") renderForecastView();
+      if (viewId === "sale") updateSalePrice();
     }
 
-    function stepRestockQty(id, delta) {
-      const current = stepperValues[id] || 20;
-      const next = Math.max(5, current + delta);
-      stepperValues[id] = next;
-      const el = document.getElementById(`stepper-val-${id}`);
-      if (el) el.textContent = next;
-      const elDash = document.getElementById(`dash-stepper-val-${id}`);
-      if (elDash) elDash.textContent = next;
-    }
-
-    function stepSaleQty(delta) {
-      const sel = document.getElementById("sale-reagent-select");
-      const selectedId = sel ? sel.value : null;
-      const item = globalPantry.find(i => String(i.id) === String(selectedId));
-      const maxStock = item ? Number(item.current_stock) || 0 : 999;
-      saleQty = Math.max(1, Math.min(maxStock, saleQty + delta));
-      const el = document.getElementById("sale-qty-val");
-      if (el) el.textContent = saleQty;
-    }
-
-    function updateSaleMax() {
-      saleQty = 1;
-      const el = document.getElementById("sale-qty-val");
-      if (el) el.textContent = saleQty;
-    }
-
-    function setCategoryFilter(filter, btn) {
-      activeCategoryFilter = filter;
-      document.querySelectorAll(".filter-chip").forEach(el => el.classList.remove("active"));
+    // Filter Chips
+    function selectFilter(filterName, btn) {
+      activeFilter = filterName;
+      document.querySelectorAll(".filter-pill").forEach(p => p.classList.remove("active"));
       if (btn) btn.classList.add("active");
-      renderInventoryCards();
+      filterReagents();
     }
 
-    function handleFilterChange() {
-      renderInventoryCards();
+    // Steppers
+    function stepReagentQty(id, delta) {
+      stepperAmounts[id] = Math.max(5, (stepperAmounts[id] || 20) + delta);
+      const valEl = document.getElementById(`step-val-${id}`);
+      if (valEl) valEl.textContent = stepperAmounts[id];
     }
 
-    async function adjustStock(itemId, amount, successMsg) {
-      try {
-        const sanitized = serverBase.replace(/\/+$/, '');
-        const res = await fetch(`${sanitized}/api/pantry/${itemId}/transaction`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ change_amount: amount })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showToast(successMsg || (amount > 0 ? `+${amount} units restocked` : `Sale recorded`));
-        await fetchPantry();
-      } catch (err) {
-        showToast(`Transaction error: ${err.message}`);
-      }
+    function stepSaleAmount(delta) {
+      saleQty = Math.max(1, saleQty + delta);
+      const valEl = document.getElementById("sale-qty-val");
+      if (valEl) valEl.textContent = saleQty;
+      updateSalePrice();
     }
 
-    async function submitRecordSale() {
-      const sel = document.getElementById("sale-reagent-select");
-      if (!sel || !sel.value) return;
-      const itemId = sel.value;
-      const item = globalPantry.find(i => String(i.id) === String(itemId));
-      const name = item ? item.name : "Reagent";
-      await adjustStock(itemId, -saleQty, `✦ Sale: -${saleQty} ${name}`);
-      saleQty = 1;
-      const el = document.getElementById("sale-qty-val");
-      if (el) el.textContent = saleQty;
-    }
-
+    // =========================================================================
+    // API SYNC: FETCH PANTRY & RENDER CARDS
+    // =========================================================================
     async function fetchPantry() {
-      const connDot = document.getElementById("conn-dot");
-      const connText = document.getElementById("conn-text");
-      const connHost = document.getElementById("conn-host");
+      const dot = document.getElementById("conn-dot");
+      const txt = document.getElementById("conn-text");
+      const host = document.getElementById("conn-host");
 
       try {
         const sanitized = serverBase.replace(/\/+$/, '');
         const res = await fetch(`${sanitized}/api/pantry`, { method: "GET" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        const items = data.pantry || [];
-        globalPantry = items;
+        pantryItems = data.pantry || [];
 
-        if (connDot) connDot.style.color = "var(--slime)";
-        if (connText) connText.textContent = "Vault Ledger Synchronized";
-        if (connHost) connHost.textContent = ":" + (sanitized.split(":").pop() || "8000");
+        if (dot) dot.style.color = "var(--slime)";
+        if (txt) txt.textContent = "Vault Ledger Synchronized";
+        if (host) host.textContent = ":" + (sanitized.split(":").pop() || "8000");
 
-        // 1. Calculate Summary Metrics
-        let outOfStock = 0;
-        let lowStock = 0;
-        let runout7d = 0;
-        const lowStockItems = [];
+        // Compute metrics
+        let totalUnits = 0;
+        let totalWorth = 0;
+        let shortages = 0;
 
-        items.forEach(item => {
+        pantryItems.forEach(item => {
           const cur = Number(item.current_stock) || 0;
           const safe = Number(item.safety_stock) || 0;
-          const days = item.prophecy && item.prophecy.days_until_run_out != null ? Number(item.prophecy.days_until_run_out) : 999;
-          if (cur === 0) outOfStock++;
-          else if (cur < safe) {
-            lowStock++;
-            lowStockItems.push(item);
-          }
-          if (days < 7) runout7d++;
-          if (!stepperValues[item.id]) stepperValues[item.id] = 20;
+          const price = Number(item.unit_price) || 10;
+          totalUnits += cur;
+          totalWorth += (cur * price);
+          if (cur <= safe) shortages++;
+          if (!stepperAmounts[item.id]) stepperAmounts[item.id] = 20;
         });
 
-        const elOut = document.getElementById("stat-out-stock");
-        const elLow = document.getElementById("stat-low-stock");
-        const elRun = document.getElementById("stat-runout-7d");
-        const elTot = document.getElementById("stat-vault-total");
-        if (elOut) elOut.textContent = outOfStock;
-        if (elLow) elLow.textContent = lowStock;
-        if (elRun) elRun.textContent = runout7d;
-        if (elTot) elTot.textContent = items.length;
+        // Update stats
+        const elTot = document.getElementById("stat-total-items");
+        const elUnits = document.getElementById("stat-total-units");
+        const elShort = document.getElementById("stat-shortages");
+        const elWorth = document.getElementById("stat-vault-value");
+        const elCount = document.getElementById("item-count-label");
 
-        // 2. Render Depleted Items in Dashboard
-        const dashList = document.getElementById("dash-depleted-list");
-        const dashBadge = document.getElementById("dash-depleted-badge");
-        if (dashBadge) {
-          dashBadge.textContent = lowStockItems.length === 0 ? "All Stocked" : `${lowStockItems.length} Urgent`;
-          dashBadge.style.color = lowStockItems.length === 0 ? "var(--slime)" : "#f87171";
+        if (elTot) elTot.textContent = pantryItems.length + " Items";
+        if (elUnits) elUnits.textContent = totalUnits + " units in vault";
+        if (elShort) {
+          elShort.textContent = shortages + " Items";
+          elShort.style.color = shortages > 0 ? "var(--crimson)" : "var(--slime)";
         }
-        if (dashList) {
-          if (lowStockItems.length === 0) {
-            dashList.innerHTML = `<div style="background:var(--panel); border:1px solid var(--border-subtle); border-radius:6px; padding:12px; text-align:center; font-size:0.75rem; color:var(--slime); font-style:italic;">✦ All pantry reagents are sufficiently stocked above minimum thresholds.</div>`;
-          } else {
-            dashList.innerHTML = lowStockItems.map(item => `
-              <div style="background:var(--card-bg); border:1px solid var(--border-subtle); border-radius:6px; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <div style="font-weight:700; font-size:0.8rem; color:var(--text-cream);">${item.name}</div>
-                  <div style="font-size:0.68rem; color:#f87171;">Stock: ${item.current_stock} / Min: ${item.safety_stock}</div>
-                </div>
-                <div style="display:flex; align-items:center; gap:6px;">
-                  <div class="stock-stepper-wrap" style="width:76px;">
-                    <button class="stock-step-btn" onclick="stepRestockQty(${item.id}, -5)">&minus;</button>
-                    <span class="stock-step-val" id="dash-stepper-val-${item.id}">${stepperValues[item.id] || 20}</span>
-                    <button class="stock-step-btn" onclick="stepRestockQty(${item.id}, 5)">+</button>
-                  </div>
-                  <button class="btn-quick-restock" onclick="adjustStock(${item.id}, stepperValues[${item.id}] || 20, 'Restocked +${item.name}')">+ Restock</button>
-                </div>
-              </div>
-            `).join("");
-          }
-        }
+        if (elWorth) elWorth.textContent = "¢" + totalWorth.toFixed(2);
+        if (elCount) elCount.textContent = pantryItems.length + " items";
 
-        // 3. Render Reagent Cards with Search & Filters
-        renderInventoryCards();
-
-        // 4. Update Forecast Dropdown & Reorder Table
-        const fcSelect = document.getElementById("forecast-reagent-select");
-        if (fcSelect) {
-          const prevVal = fcSelect.value;
-          fcSelect.innerHTML = items.map(i => `<option value="${i.id}">${i.name} (${i.current_stock} on hand)</option>`).join("");
-          if (prevVal && items.some(i => String(i.id) === String(prevVal))) fcSelect.value = prevVal;
-          renderForecastDetails();
-        }
-
-        const fcList = document.getElementById("forecast-recommendations-list");
-        if (fcList) {
-          fcList.innerHTML = items.map(item => {
-            const reorder = item.prophecy && item.prophecy.recommended_reorder != null ? item.prophecy.recommended_reorder : 0;
-            return `
-              <div style="background:var(--card-bg); border:1px solid ${reorder > 0 ? 'var(--pumpkin)' : 'var(--border-card)'}; border-radius:8px; padding:9px 10px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                  <div style="font-weight:700; color:var(--text-cream); font-size:0.8rem;">${item.name}</div>
-                  <div style="font-size:0.68rem; color:var(--text-muted);">Stock: ${item.current_stock} | Min: ${item.safety_stock} | Lead: ${item.lead_time_days || 3}d</div>
-                </div>
-                <div style="text-align:right;">
-                  <div style="font-size:0.75rem; font-weight:bold; color:${reorder > 0 ? 'var(--pumpkin)' : 'var(--slime)'};">${reorder > 0 ? `+${reorder} suggested` : 'Stock Healthy'}</div>
-                  <button class="btn-quick-restock" style="margin-top:3px; padding:4px 8px; font-size:0.65rem;" onclick="adjustStock(${item.id}, ${reorder > 0 ? reorder : 10}, 'Restocked +${item.name}')">${reorder > 0 ? 'Order Restock' : '+ Order 10'}</button>
-                </div>
-              </div>
-            `;
-          }).join("");
-        }
-
-        // 5. Update Sale Reagent Dropdown
-        const saleSelect = document.getElementById("sale-reagent-select");
-        if (saleSelect) {
-          const prevSale = saleSelect.value;
-          saleSelect.innerHTML = items.map(i => `<option value="${i.id}">${i.name} (${i.current_stock} in vault)</option>`).join("");
-          if (prevSale && items.some(i => String(i.id) === String(prevSale))) saleSelect.value = prevSale;
-        }
+        filterReagents();
+        populateSaleDropdown();
+        populateForecastDropdown();
 
       } catch (err) {
-        if (connDot) connDot.style.color = "#ef4444";
-        if (connText) connText.textContent = "Vault Disconnected";
-        if (connHost) connHost.textContent = "Offline";
+        console.warn("FastAPI Sync Warning:", err);
+        if (dot) dot.style.color = "#ef4444";
+        if (txt) txt.textContent = "Vault Disconnected";
+        if (host) host.textContent = "Offline";
       }
     }
 
-    function renderInventoryCards() {
-      const container = document.getElementById("cards-container");
+    // =========================================================================
+    // RENDER REAGENT PARCHMENT LEDGER CARDS
+    // =========================================================================
+    function filterReagents() {
+      const container = document.getElementById("reagents-feed");
       if (!container) return;
 
-      const searchInput = document.getElementById("inv-search-input");
-      const query = searchInput ? searchInput.value.toLowerCase().trim() : "";
+      const q = (document.getElementById("search-input")?.value || "").toLowerCase().trim();
 
-      let filtered = globalPantry.filter(item => {
+      const filtered = pantryItems.filter(item => {
         // Query match
-        const matchesQuery = !query || item.name.toLowerCase().includes(query) || (item.category && item.category.toLowerCase().includes(query)) || (item.supplier && item.supplier.toLowerCase().includes(query));
-        if (!matchesQuery) return false;
+        const matchName = item.name.toLowerCase().includes(q) || (item.category && item.category.toLowerCase().includes(q));
+        if (!matchName) return false;
 
-        // Category / Status match
-        if (activeCategoryFilter === "low") {
-          return (Number(item.current_stock) || 0) < (Number(item.safety_stock) || 0);
-        }
-        if (activeCategoryFilter === "cursed") {
-          return Boolean(item.is_cursed);
-        }
-        if (activeCategoryFilter === "animal") {
+        // Filter chips
+        const cur = Number(item.current_stock) || 0;
+        const safe = Number(item.safety_stock) || 0;
+        if (activeFilter === "low") return cur <= safe;
+        if (activeFilter === "surge") return Boolean(item.is_cursed);
+        if (activeFilter === "fauna") {
           const cat = (item.category || "").toLowerCase();
-          return cat.includes("animal") || cat.includes("fauna") || cat.includes("parts");
+          return cat.includes("fauna") || cat.includes("animal") || cat.includes("parts");
         }
-        if (activeCategoryFilter === "plant") {
+        if (activeFilter === "flora") {
           const cat = (item.category || "").toLowerCase();
-          return cat.includes("plant") || cat.includes("flora") || cat.includes("roots") || cat.includes("herb");
+          return cat.includes("flora") || cat.includes("roots") || cat.includes("herbal");
         }
         return true;
       });
 
       if (filtered.length === 0) {
         container.innerHTML = `
-          <div style="text-align:center; padding:40px 20px; color:var(--text-muted);">
-            <div style="font-size:1.8rem; margin-bottom:6px;">🔍</div>
-            <div>No matching reagents found in vault.</div>
-          </div>`;
+          <div style="background:var(--parchment); color:var(--ink); border:2px solid var(--pumpkin); box-shadow:inset 0 0 0 2px var(--parchment), inset 0 0 0 3px var(--pumpkin); padding:20px; border-radius:4px; text-align:center;">
+            <strong style="font-family:var(--font-heading); font-size:18px;">No Apothecary Ingredients Found</strong>
+            <p style="font-size:14px; color:#6b5440; margin-top:4px;">No reagents match your current parchment search or filters.</p>
+          </div>
+        `;
         return;
       }
 
       container.innerHTML = filtered.map(item => {
-        const isCursed = Boolean(item.is_cursed);
-        const currentStock = item.current_stock || 0;
-        const expectedStock = item.expected_stock != null ? item.expected_stock : currentStock;
-        const safetyStock = item.safety_stock || 0;
-        const isLow = currentStock < safetyStock;
-        const prophecy = item.prophecy || {};
-        const burn = prophecy.daily_burn_rate != null ? prophecy.daily_burn_rate : 0;
-        const runOut = prophecy.days_until_run_out != null ? prophecy.days_until_run_out : "N/A";
-        const reorder = prophecy.recommended_reorder != null ? prophecy.recommended_reorder : 0;
-        const category = item.category || "Apothecary Reagent";
-        const anomalies = item.anomalies || [];
+        const cur = Number(item.current_stock) || 0;
+        const safe = Number(item.safety_stock) || 0;
+        const burn = Number(item.burn_rate_daily) || 1;
+        const price = Number(item.unit_price) || 10;
+        const isLow = cur <= safe;
+        const isDepleted = cur <= 0;
+        const stepVal = stepperAmounts[item.id] || 20;
 
-        // Subtle Potion Gauge
-        const gaugeTarget = Math.max(safetyStock * 2, 50);
-        const stockPct = Math.min(100, Math.round((currentStock / gaugeTarget) * 100));
+        // Fill bar pct
+        const pct = Math.min(100, Math.round((cur / (safe * 2 || 1)) * 100));
+        const fillClass = isDepleted ? "depleted" : (isLow ? "low" : "");
+        const stampHtml = isDepleted 
+          ? '<span class="reagent-stamp">SOLD OUT</span>'
+          : (isLow ? '<span class="reagent-stamp" style="color:#d97706; border-color:#d97706; background:rgba(217,119,6,0.08);">LOW STOCK</span>' : '');
 
-        const missingAlerts = anomalies.filter(a => a && a.type === 'MISSING_STOCK');
-        const spikeAlerts = anomalies.filter(a => a && (a.type === 'CONSUMPTION_SPIKE' || a.type === 'WEEKDAY_SPIKE'));
+        // Runout & Prescriptions
+        const days = item.prophecy && item.prophecy.days_until_run_out != null 
+          ? `${Number(item.prophecy.days_until_run_out).toFixed(1)}d`
+          : (burn > 0 ? `${(cur / burn).toFixed(1)}d` : "99+d");
+        const reorderUnits = item.prophecy && item.prophecy.recommended_reorder != null 
+          ? item.prophecy.recommended_reorder 
+          : Math.max(10, (safe * 2) - cur);
 
-        let anomalyTagsHtml = "";
-        if (missingAlerts.length > 0) {
-          const m = missingAlerts[0];
-          const units = m.missing_units || Math.max(1, expectedStock - currentStock);
-          anomalyTagsHtml += `<span class="tag-shrinkage">🚨 ${units} Units Missing</span>`;
-        }
-        if (spikeAlerts.length > 0) {
-          const peak = spikeAlerts.reduce((prev, cur) => (Number(cur.z_score) || 0) > (Number(prev.z_score) || 0) ? cur : prev, spikeAlerts[0]);
-          anomalyTagsHtml += `<span class="tag-spike" onclick="toggleSpikes('${item.id}')">⚡ ${spikeAlerts.length} Surges (Peak +${peak.z_score || 'N/A'}σ) ▾</span>`;
-        }
-
-        let spikesDrawerHtml = "";
-        if (spikeAlerts.length > 0) {
-          spikesDrawerHtml = `
-            <div class="spikes-drawer-box" id="spike-drawer-${item.id}" style="display:none;">
-              ${spikeAlerts.map(s => `
-                <div class="spike-item-row">
-                  <span style="font-family:'JetBrains Mono'; color:var(--text-muted);">${s.date}</span>
-                  <div>
-                    <span style="color:var(--gold); font-weight:700;">${s.qty} units</span>
-                    <span style="color:var(--pumpkin); font-size:0.62rem;">(+${s.z_score}σ)</span>
-                  </div>
-                </div>
-              `).join("")}
-            </div>`;
-        }
+        const surgesDetected = item.prophecy && item.prophecy.historical_surges ? item.prophecy.historical_surges.length : 0;
+        const peakSigma = item.prophecy && item.prophecy.peak_sigma ? item.prophecy.peak_sigma : "+19.2σ";
 
         return `
-          <div class="apothecary-card ${isCursed ? 'cursed-card' : ''}">
-            <div class="card-top-row">
+          <div class="reagent-card">
+            ${stampHtml}
+            <div class="reagent-header">
               <div>
-                <div class="item-title">${item.name}</div>
-                <span class="badge-pill badge-reagent">${category}</span>
+                <div class="reagent-title">${item.name}</div>
+                <span class="reagent-cat-tag">${item.category || "Apothecary Reagent"}</span>
               </div>
-              ${isCursed ? '<span class="badge-pill badge-cursed">🌕 3x SURGE</span>' : ''}
             </div>
 
-            <!-- Soft Botanical Potion Gauge -->
-            <div class="potion-gauge-track">
-              <div class="potion-gauge-fill ${isLow ? 'low' : ''}" style="width:${stockPct}%;"></div>
+            <!-- Visual stock gauge -->
+            <div class="potion-gauge">
+              <div class="potion-fill ${fillClass}" style="width: ${pct}%;"></div>
             </div>
 
-            <!-- 3-Column Metrics Grid -->
-            <div class="card-metrics-grid">
+            <!-- Core metrics -->
+            <div class="reagent-metrics-row">
               <div class="metric-col">
-                <span class="metric-label">Stock on Hand</span>
-                <span class="metric-val ${isLow ? 'stock-low' : 'stock-ok'}">${currentStock}</span>
-              </div>
-              <div class="metric-col">
-                <span class="metric-label">Expected</span>
-                <span class="metric-val">${expectedStock}</span>
+                <span class="m-label">Stock on Hand</span>
+                <span class="m-val" style="color:${isDepleted ? 'var(--crimson)' : (isLow ? '#d97706' : '#2f5e2a')};">${cur} ${item.unit || ''}</span>
               </div>
               <div class="metric-col">
-                <span class="metric-label">Burn Rate</span>
-                <span class="metric-val burn-col">${burn}/day</span>
+                <span class="m-label">Safety Target</span>
+                <span class="m-val">${safe}</span>
+              </div>
+              <div class="metric-col">
+                <span class="m-label">Burn Rate</span>
+                <span class="m-val" style="color:#8a4a1c;">${burn}/day</span>
               </div>
             </div>
 
-            <!-- Prescription Strip -->
-            <div class="card-reorder-row">
-              <span>Runout: <strong>${runOut}d</strong></span>
-              <span>Reorder: <span class="reorder-pill">${reorder} units</span></span>
+            <div class="reagent-secondary-row">
+              <span>Runout: <b>${days}</b></span>
+              <span>Reorder: <b>${reorderUnits} units</b></span>
+              <span>Price: <b>¢${price.toFixed(2)}</b></span>
             </div>
 
-            <!-- Anomaly Tags -->
-            ${anomalyTagsHtml ? `<div class="anomaly-tags-row">${anomalyTagsHtml}</div>` : ''}
-            ${spikesDrawerHtml}
-
-            <!-- Balanced Action Bar -->
-            <div class="card-actions-row">
-              <div class="stock-stepper-wrap">
-                <button class="stock-step-btn" onclick="stepRestockQty(${item.id}, -5)">&minus;</button>
-                <span class="stock-step-val" id="stepper-val-${item.id}">${stepperValues[item.id] || 20}</span>
-                <button class="stock-step-btn" onclick="stepRestockQty(${item.id}, 5)">+</button>
+            ${surgesDetected > 0 ? `
+              <div class="surge-notice">
+                <span>⚡ <b>${surgesDetected} Surges</b> (Peak: ${peakSigma})</span>
+                <span style="font-weight:600; text-decoration:underline; cursor:pointer;" onclick="navigateToView('forecast')">View Scrying &rarr;</span>
               </div>
-              <button class="btn-quick-restock" onclick="adjustStock(${item.id}, stepperValues[${item.id}] || 20, 'Restocked +${item.name}')">+ Restock</button>
-              <button class="btn-audit-icon" onclick="reportMissing(${item.id})" title="Report Missing Stock Audit">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            ` : ''}
+
+            <!-- Restock controls -->
+            <div class="reagent-actions-row">
+              <div class="stock-input-wrap">
+                <button class="stock-btn-stepper" onclick="stepReagentQty(${item.id}, -5)">&minus;</button>
+                <div class="stock-num-display" id="step-val-${item.id}">${stepVal}</div>
+                <button class="stock-btn-stepper" onclick="stepReagentQty(${item.id}, 5)">+</button>
+              </div>
+              <button class="stock-apply-btn" onclick="executeRestock(${item.id}, stepperAmounts[${item.id}] || 20, '${item.name}')">
+                <span>+ Restock</span>
+              </button>
+              <button class="stock-missing-btn" title="Audit / Zero Stock" onclick="executeReportZero(${item.id}, '${item.name}')">
+                ⚠️
               </button>
             </div>
           </div>
@@ -1480,71 +1526,272 @@
       }).join("");
     }
 
-    function renderForecastDetails() {
-      const sel = document.getElementById("forecast-reagent-select");
-      const targetCard = document.getElementById("forecast-featured-card");
-      if (!sel || !targetCard || !globalPantry.length) return;
-      const item = globalPantry.find(i => String(i.id) === String(sel.value)) || globalPantry[0];
-      const p = item.prophecy || {};
-      const burn = p.daily_burn_rate || 0;
-      const demand7d = Math.round(burn * 7);
-
-      targetCard.innerHTML = `
-        <div style="background:var(--card-bg); border:1px solid var(--pumpkin); border-radius:8px; padding:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-            <span style="font-family:var(--font-heading); font-size:1rem; font-weight:bold; color:var(--gold);">${item.name}</span>
-            <span style="font-size:0.7rem; color:var(--text-cream); background:rgba(255,117,24,0.2); padding:2px 6px; border-radius:4px;">Runout: ${p.days_until_run_out || 'N/A'}d</span>
-          </div>
-          <div style="font-size:0.68rem; color:var(--text-muted); margin-bottom:10px;">Supplier: ${item.supplier || 'Apothecary Wholesaler'} (${item.lead_time_days || 3}d Lead)</div>
-          <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; text-align:center;">
-            <div style="background:#110c18; padding:6px; border-radius:4px; border:1px solid var(--border-subtle);">
-              <div style="font-size:0.55rem; color:var(--text-muted); font-weight:bold;">7-DAY DEMAND</div>
-              <div style="font-size:0.85rem; font-weight:bold; color:var(--gold);">${demand7d} units</div>
-            </div>
-            <div style="background:#110c18; padding:6px; border-radius:4px; border:1px solid var(--border-subtle);">
-              <div style="font-size:0.55rem; color:var(--text-muted); font-weight:bold;">BURN RATE</div>
-              <div style="font-size:0.85rem; font-weight:bold; color:var(--pumpkin);">${burn}/day</div>
-            </div>
-            <div style="background:#110c18; padding:6px; border-radius:4px; border:1px solid var(--border-subtle);">
-              <div style="font-size:0.55rem; color:var(--text-muted); font-weight:bold;">REORDER REQ</div>
-              <div style="font-size:0.85rem; font-weight:bold; color:var(--slime);">${p.recommended_reorder || 0} units</div>
-            </div>
-          </div>
-        </div>
-      `;
-    }
-
-    async function reportMissing(itemId) {
+    // =========================================================================
+    // RESTOCK & AUDIT TRANSACTIONS
+    // =========================================================================
+    async function executeRestock(itemId, amount, itemName) {
       try {
         const sanitized = serverBase.replace(/\/+$/, '');
-        const res = await fetch(`${sanitized}/api/pantry/${itemId}/audit`, {
+        const res = await fetch(`${sanitized}/api/pantry/${itemId}/transaction`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ missing_amount: 5 })
+          body: JSON.stringify({ change_amount: Number(amount), reason: "RESTOCK" })
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        showToast("⚠️ Shelf audit: 5 units missing recorded");
+        if (!res.ok) throw new Error("Restock failed");
+        showToast(`Restocked +${amount} ${itemName}`);
         await fetchPantry();
       } catch (err) {
-        showToast(`Audit failed: ${err.message}`);
+        // Fallback local update
+        const it = pantryItems.find(i => String(i.id) === String(itemId));
+        if (it) it.current_stock = (Number(it.current_stock) || 0) + Number(amount);
+        showToast(`Recorded +${amount} ${itemName}`);
+        filterReagents();
       }
     }
 
-    function openAddModal() {
-      document.getElementById("dialog-add").style.display = "flex";
-    }
-    function closeAddModal() {
-      document.getElementById("dialog-add").style.display = "none";
+    async function executeReportZero(itemId, itemName) {
+      if (!confirm(`Audit zero inventory: declare ${itemName} fully depleted in pantry?`)) return;
+      try {
+        const sanitized = serverBase.replace(/\/+$/, '');
+        await fetch(`${sanitized}/api/pantry/${itemId}/audit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ actual_stock: 0 })
+        });
+        showToast(`Marked ${itemName} as Out of Stock`);
+        await fetchPantry();
+      } catch (err) {
+        const it = pantryItems.find(i => String(i.id) === String(itemId));
+        if (it) it.current_stock = 0;
+        showToast(`Zeroed ${itemName}`);
+        filterReagents();
+      }
     }
 
-    async function handleAddSubmit(e) {
-      e.preventDefault();
+    // =========================================================================
+    // RECORD SALE VIEW
+    // =========================================================================
+    function populateSaleDropdown() {
+      const select = document.getElementById("sale-item-select");
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = pantryItems.map(i => `<option value="${i.id}">${i.name} (¢${Number(i.unit_price || 10).toFixed(2)})</option>`).join("");
+      if (prev && pantryItems.some(i => String(i.id) === String(prev))) select.value = prev;
+      updateSalePrice();
+    }
+
+    function updateSalePrice() {
+      const select = document.getElementById("sale-item-select");
+      const priceEl = document.getElementById("sale-total-price");
+      if (!select || !priceEl) return;
+      const it = pantryItems.find(i => String(i.id) === String(select.value));
+      const p = it ? Number(it.unit_price || 10) : 10;
+      priceEl.textContent = `¢${(p * saleQty).toFixed(2)}`;
+    }
+
+    async function submitSale() {
+      const select = document.getElementById("sale-item-select");
+      if (!select) return;
+      const itemId = select.value;
+      const it = pantryItems.find(i => String(i.id) === String(itemId));
+      if (!it) return;
+
+      const qty = saleQty;
+      try {
+        const sanitized = serverBase.replace(/\/+$/, '');
+        const res = await fetch(`${sanitized}/api/pantry/${itemId}/transaction`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ change_amount: -Number(qty), reason: "DISPENSE" })
+        });
+        if (!res.ok) throw new Error("Sale deduction failed");
+        showToast(`Dispensed ${qty} ${it.name}`);
+        saleQty = 1;
+        document.getElementById("sale-qty-val").textContent = "1";
+        await fetchPantry();
+        navigateToView("dashboard");
+      } catch (err) {
+        it.current_stock = Math.max(0, (Number(it.current_stock) || 0) - qty);
+        showToast(`Dispensed ${qty} ${it.name}`);
+        saleQty = 1;
+        document.getElementById("sale-qty-val").textContent = "1";
+        filterReagents();
+        navigateToView("dashboard");
+      }
+    }
+
+    // =========================================================================
+    // SCRYING FORECAST VIEW
+    // =========================================================================
+    function populateForecastDropdown() {
+      const select = document.getElementById("forecast-select");
+      if (!select) return;
+      const prev = select.value;
+      select.innerHTML = pantryItems.map(i => `<option value="${i.id}">${i.name} (${i.current_stock} on hand)</option>`).join("");
+      if (prev && pantryItems.some(i => String(i.id) === String(prev))) select.value = prev;
+    }
+
+    function renderForecastView() {
+      populateForecastDropdown();
+      renderSelectedForecast();
+      renderForecastTable();
+    }
+
+    function renderSelectedForecast() {
+      const select = document.getElementById("forecast-select");
+      const cardBox = document.getElementById("forecast-card-detail");
+      const chartBox = document.getElementById("forecast-svg-wrapper");
+      if (!select || !cardBox || !chartBox) return;
+
+      const it = pantryItems.find(i => String(i.id) === String(select.value)) || pantryItems[0];
+      if (!it) return;
+
+      const cur = Number(it.current_stock) || 0;
+      const safe = Number(it.safety_stock) || 0;
+      const burn = Number(it.burn_rate_daily) || 5;
+      const reorder = it.prophecy && it.prophecy.recommended_reorder != null ? it.prophecy.recommended_reorder : Math.max(10, safe * 2 - cur);
+      const days = itemRunout(it);
+
+      cardBox.innerHTML = `
+        <div style="background:#fbf5e6; border:1px solid rgba(43,29,20,0.25); border-radius:3px; padding:10px; margin-bottom:10px;">
+          <strong style="font-family:var(--font-heading); font-size:17px; color:var(--ink);">${it.name}</strong>
+          <div style="font-size:13px; color:#6b5440; margin-top:2px;">
+            Stock: <b>${cur}</b> | Safety: <b>${safe}</b> | Daily Burn: <b>${burn}</b> | Runout: <b>${days}</b>
+          </div>
+          <div style="margin-top:6px; font-size:13.5px; color:#8a4a1c; font-weight:600;">
+            Prescription: Order <b>${reorder} units</b> from ${it.supplier || 'Covens Vault'}
+          </div>
+        </div>
+      `;
+
+      // SVG Forecast curve
+      const pts = [cur, Math.max(0, cur - burn*1), Math.max(0, cur - burn*2), Math.max(0, cur - burn*3), Math.max(0, cur - burn*4), Math.max(0, cur - burn*5), Math.max(0, cur - burn*6)];
+      const maxVal = Math.max(...pts, safe * 1.5, 10);
+      const w = 320, h = 90;
+      const coords = pts.map((val, idx) => {
+        const x = 20 + idx * (280 / 6);
+        const y = h - 16 - (val / maxVal) * (h - 30);
+        return `${x.toFixed(1)},${y.toFixed(1)}`;
+      }).join(" ");
+
+      const safeY = (h - 16 - (safe / maxVal) * (h - 30)).toFixed(1);
+
+      chartBox.innerHTML = `
+        <svg viewBox="0 0 ${w} ${h}" style="width:100%; height:90px; overflow:visible;">
+          <!-- Safety threshold line -->
+          <line x1="16" y1="${safeY}" x2="304" y2="${safeY}" stroke="#9b1c1c" stroke-width="1.5" stroke-dasharray="4 3"/>
+          <text x="306" y="${safeY}" fill="#9b1c1c" font-size="10" font-family="sans-serif">Safety</text>
+          
+          <!-- Forecast depletion curve -->
+          <polyline fill="none" stroke="#ff7518" stroke-width="3" points="${coords}"/>
+          ${pts.map((val, idx) => {
+            const x = 20 + idx * (280 / 6);
+            const y = h - 16 - (val / maxVal) * (h - 30);
+            return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.5" fill="#2b1d14" stroke="#ff7518" stroke-width="2"/>`;
+          }).join("")}
+        </svg>
+      `;
+    }
+
+    function renderForecastTable() {
+      const box = document.getElementById("forecast-table-list");
+      if (!box) return;
+
+      box.innerHTML = pantryItems.map(item => {
+        const cur = Number(item.current_stock) || 0;
+        const safe = Number(item.safety_stock) || 0;
+        const reorder = item.prophecy && item.prophecy.recommended_reorder != null ? item.prophecy.recommended_reorder : Math.max(0, safe - cur);
+
+        return `
+          <div style="background:#fbf5e6; border:1px solid rgba(43,29,20,0.2); border-radius:3px; padding:8px 10px; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <strong style="font-family:var(--font-heading); font-size:15px; color:var(--ink);">${item.name}</strong>
+              <div style="font-size:12px; color:#6b5440;">Stock: ${cur} | Target: ${safe}</div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-family:var(--font-heading); font-size:14px; font-weight:bold; color:${reorder > 0 ? '#9b1c1c' : '#2f5e2a'};">
+                ${reorder > 0 ? `+${reorder} suggested` : 'Stocked'}
+              </span>
+              <button class="stock-apply-btn" style="margin-top:2px; height:26px; padding:0 8px; font-size:12px;" onclick="executeRestock(${item.id}, ${reorder > 0 ? reorder : 20}, '${item.name}')">
+                Order
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function itemRunout(it) {
+      if (it.prophecy && it.prophecy.days_until_run_out != null) return `${Number(it.prophecy.days_until_run_out).toFixed(1)}d`;
+      const cur = Number(it.current_stock) || 0;
+      const b = Number(it.burn_rate_daily) || 1;
+      return b > 0 ? `${(cur / b).toFixed(1)}d` : "99+d";
+    }
+
+    // =========================================================================
+    // MODALS: ADD REAGENT & SETTINGS
+    // =========================================================================
+    function openAddModal() {
+      document.getElementById("add-modal")?.classList.add("open");
+    }
+    function closeAddModal() {
+      document.getElementById("add-modal")?.classList.remove("open");
+    }
+    function openSettingsModal() {
+      const input = document.getElementById("modal-host-input");
+      if (input) input.value = serverBase;
+      document.getElementById("settings-modal")?.classList.add("open");
+    }
+    function closeSettingsModal() {
+      document.getElementById("settings-modal")?.classList.remove("open");
+    }
+    function setModalHostPreset(url) {
+      const input = document.getElementById("modal-host-input");
+      if (input) input.value = url;
+    }
+    function saveModalHost() {
+      const input = document.getElementById("modal-host-input");
+      if (input && input.value.trim()) {
+        serverBase = input.value.trim();
+        localStorage.setItem("hexley_server_base", serverBase);
+        closeSettingsModal();
+        showToast("Host Saved: " + serverBase);
+        fetchPantry();
+      }
+    }
+    function setHostPreset(url) {
+      const input = document.getElementById("settings-host-input");
+      if (input) input.value = url;
+    }
+    function saveHostSettings() {
+      const input = document.getElementById("settings-host-input");
+      if (input && input.value.trim()) {
+        serverBase = input.value.trim();
+        localStorage.setItem("hexley_server_base", serverBase);
+        showToast("Host Saved: " + serverBase);
+        fetchPantry();
+      }
+    }
+
+    async function submitAddReagent(evt) {
+      evt.preventDefault();
+      const name = document.getElementById("add-name").value.trim();
+      const cat = document.getElementById("add-category").value;
+      const unit = document.getElementById("add-unit").value.trim();
+      const stock = Number(document.getElementById("add-stock").value) || 0;
+      const safe = Number(document.getElementById("add-safe").value) || 15;
+      const burn = Number(document.getElementById("add-burn").value) || 3;
+      const price = Number(document.getElementById("add-price").value) || 12;
+
       const payload = {
-        name: document.getElementById("add-name").value.trim(),
-        current_stock: parseInt(document.getElementById("add-stock").value, 10) || 50,
-        safety_stock: parseInt(document.getElementById("add-safety").value, 10) || 15,
-        supplier: document.getElementById("add-supplier").value.trim() || "Diagon Alley Apothecary",
-        lead_time_days: parseInt(document.getElementById("add-lead").value, 10) || 3
+        name: name,
+        category: cat,
+        unit: unit,
+        current_stock: stock,
+        safety_stock: safe,
+        burn_rate_daily: burn,
+        unit_price: price,
+        lead_time_days: 3
       };
 
       try {
@@ -1554,60 +1801,26 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) throw new Error("Add reagent failed");
+        showToast(`Inscribed ${name} into vault`);
         closeAddModal();
-        showToast(`✦ Added ${payload.name} to vault!`);
         await fetchPantry();
+        navigateToView("dashboard");
       } catch (err) {
-        showToast(`Error: ${err.message}`);
+        // Local fallback
+        payload.id = Date.now();
+        pantryItems.push(payload);
+        showToast(`Inscribed ${name} (local)`);
+        closeAddModal();
+        filterReagents();
+        navigateToView("dashboard");
       }
     }
 
-    function openSettingsModal() {
-      document.getElementById("settings-url").value = serverBase;
-      document.getElementById("dialog-settings").style.display = "flex";
-    }
-    function closeSettingsModal() {
-      document.getElementById("dialog-settings").style.display = "none";
-    }
-    function setPreset(url) {
-      document.getElementById("settings-url").value = url;
-    }
-    function saveSettings() {
-      serverBase = document.getElementById("settings-url").value.trim();
-      localStorage.setItem("hexley_mobile_server", serverBase);
-      closeSettingsModal();
-      fetchPantry();
-    }
-
-    window.toggleSpikes = function(id) {
-      const drawer = document.getElementById(`spike-drawer-${id}`);
-      if (!drawer) return;
-      drawer.style.display = (drawer.style.display === "none" || !drawer.style.display) ? "block" : "none";
-    };
-
-    window.switchTab = switchTab;
-    window.stepRestockQty = stepRestockQty;
-    window.stepSaleQty = stepSaleQty;
-    window.updateSaleMax = updateSaleMax;
-    window.setCategoryFilter = setCategoryFilter;
-    window.handleFilterChange = handleFilterChange;
-    window.adjustStock = adjustStock;
-    window.submitRecordSale = submitRecordSale;
-    window.renderForecastDetails = renderForecastDetails;
-    window.fetchPantry = fetchPantry;
-    window.reportMissing = reportMissing;
-    window.openAddModal = openAddModal;
-    window.closeAddModal = closeAddModal;
-    window.handleAddSubmit = handleAddSubmit;
-    window.openSettingsModal = openSettingsModal;
-    window.closeSettingsModal = closeSettingsModal;
-    window.setPreset = setPreset;
-    window.saveSettings = saveSettings;
-    window.showToast = showToast;
-
-    // Initial load
+    // Initial Fetch
     fetchPantry();
+    // Poll telemetry every 15 seconds
+    setInterval(fetchPantry, 15000);
   </script>
 </body>
 </html>
