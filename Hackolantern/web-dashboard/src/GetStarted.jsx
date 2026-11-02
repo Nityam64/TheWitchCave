@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import MicroSlats from "./MicroSlats";
+import { MagneticAuraHeading } from "./components/ui/MagneticAuraText";
+import { TechText } from "./components/ui/TechText";
 
 export default function GetStarted({ onEnterConsole }) {
   const scrollRef = useRef(null);
@@ -199,6 +201,11 @@ export default function GetStarted({ onEnterConsole }) {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
+        {/* Magnetic Letter Snap & Radial MicroSlat Aura Wave Layer */}
+        <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 1, pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <MagneticAuraHeading text="Mirai" />
+        </div>
+
         {/* MicroSlats Ambient Wave Field */}
         <div style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0 }}>
           <MicroSlats
