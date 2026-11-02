@@ -5,6 +5,9 @@ const SNAP_RADIUS = 110; // Distance in px where cursor snaps to letter
 const MAX_PULL = 28;     // Maximum px the letter can travel toward cursor
 
 export const MagneticLetter = ({ char, index, onSnapChange }) => {
+  if (char === ' ') {
+    return <span key={index} style={{ display: "inline-block", width: "clamp(12px, 2vw, 28px)" }}>&nbsp;</span>;
+  }
   const ref = useRef(null);
   const [isSnapped, setIsSnapped] = useState(false);
 
@@ -99,7 +102,7 @@ export const MagneticLetter = ({ char, index, onSnapChange }) => {
   );
 };
 
-export const MagneticAuraHeading = ({ text = "Mirai", children }) => {
+export const MagneticAuraHeading = ({ text = "Mirai", children, style = {}, headingStyle = {} }) => {
   const containerRef = useRef(null);
   const [waves, setWaves] = useState([]);
   const [activeAura, setActiveAura] = useState({ active: false, x: 0, y: 0 });
@@ -133,14 +136,12 @@ export const MagneticAuraHeading = ({ text = "Mirai", children }) => {
         position: "relative",
         display: "flex",
         width: "100%",
-        height: "100%",
-        minHeight: "480px",
         alignItems: "center",
         justifyContent: "center",
         overflow: "hidden",
-        borderRadius: "24px"
+        ...style
       }}
-      className="relative flex w-full h-[480px] items-center justify-center overflow-hidden rounded-3xl"
+      className="relative flex w-full items-center justify-center overflow-hidden"
     >
       {/* Radial Wave Rings Flowing Through the Stat / MicroSlat Box */}
       <div
@@ -207,14 +208,17 @@ export const MagneticAuraHeading = ({ text = "Mirai", children }) => {
             position: "relative",
             zIndex: 10,
             display: "flex",
+            flexWrap: "wrap",
             alignItems: "center",
             justifyContent: "center",
-            fontSize: "clamp(64px, 12vw, 150px)",
-            fontWeight: 700,
-            letterSpacing: "-0.05em",
-            lineHeight: 1
+            fontSize: "clamp(42px, 7vw, 92px)",
+            fontWeight: 800,
+            letterSpacing: "-0.02em",
+            lineHeight: 1.1,
+            margin: "0",
+            ...headingStyle
           }}
-          className="relative z-10 flex items-center justify-center text-[150px] font-semibold tracking-[-0.05em] leading-none"
+          className="relative z-10 flex flex-wrap items-center justify-center font-bold leading-tight"
         >
           {text.split("").map((char, idx) => (
             <MagneticLetter char={char} index={idx} key={idx} onSnapChange={handleSnapChange} />

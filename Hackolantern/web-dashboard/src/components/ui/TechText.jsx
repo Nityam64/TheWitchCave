@@ -9,3 +9,4 @@ export const TechText = ({ text = "Mirai", className = "", children, ...props })
 };
 
 export default TechText;
+

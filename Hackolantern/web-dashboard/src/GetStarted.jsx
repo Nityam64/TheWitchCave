@@ -271,21 +271,18 @@ export default function GetStarted({ onEnterConsole }) {
             <span>EST. 1888 • APOTHECARY VAULT SUITE</span>
           </div>
 
-          <h1 style={{
-            fontSize: "clamp(38px, 6vw, 68px)",
-            fontFamily: "'IM Fell English', Georgia, serif",
-            fontWeight: 900,
-            letterSpacing: "0.02em",
-            lineHeight: 1.1,
-            margin: "0 auto 16px",
-            maxWidth: "880px",
-            color: "#ff8b3d",
-            textTransform: "uppercase",
-            textShadow: "0 0 35px rgba(255, 117, 24, 0.45), 0 4px 18px rgba(0, 0, 0, 0.8)",
-            pointerEvents: "auto"
-          }}>
-            Hexley's Potion Pantry
-          </h1>
+          <div style={{ pointerEvents: "auto", margin: "0 auto 16px", width: "100%", maxWidth: "940px" }}>
+            <MagneticAuraHeading
+              text="Hexley's Potion Pantry"
+              headingStyle={{
+                fontFamily: "'IM Fell English', Georgia, serif",
+                fontSize: "clamp(36px, 5.5vw, 68px)",
+                color: "#ff8b3d",
+                textTransform: "uppercase",
+                textShadow: "0 0 35px rgba(255, 117, 24, 0.45), 0 4px 18px rgba(0, 0, 0, 0.8)"
+              }}
+            />
+          </div>
 
           <p style={{
             fontSize: "19px",

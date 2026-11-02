@@ -252,6 +252,124 @@
       overflow: hidden;
     }
 
+    /* Magnetic Per-Letter Snap & MicroSlat Aura Wave Styling */
+    .magnetic-heading {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 14px 0 16px;
+      padding: 0;
+      user-select: none;
+      z-index: 10;
+    }
+
+    .magnetic-word {
+      display: inline-flex;
+      align-items: center;
+      white-space: nowrap;
+      margin: 0 10px;
+    }
+
+    .magnetic-char {
+      position: relative;
+      display: inline-block;
+      padding: 0 2px;
+      font-family: 'Creepster', cursive;
+      font-size: clamp(46px, 6.5vw, 84px);
+      letter-spacing: 2px;
+      color: #ff7518;
+      text-shadow: 0 0 20px rgba(255, 117, 24, 0.45);
+      cursor: pointer;
+      will-change: transform, color;
+      transition: color 0.18s ease;
+      touch-action: none;
+    }
+
+    .magnetic-char.snapped {
+      color: #97e8f1 !important;
+      text-shadow: 0 0 18px rgba(151, 232, 241, 0.85), 0 0 35px rgba(151, 232, 241, 0.45) !important;
+    }
+
+    .magnetic-char-aura {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 130px;
+      height: 130px;
+      transform: translate(-50%, -50%) scale(0.4);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(151, 232, 241, 0.45) 0%, rgba(32, 32, 91, 0.55) 55%, transparent 75%);
+      filter: blur(8px);
+      pointer-events: none;
+      opacity: 0;
+      z-index: -1;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.22s ease-out;
+    }
+
+    .magnetic-char.snapped .magnetic-char-aura {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.35);
+    }
+
+    /* Radial Wave Propagation Container & Wave Rings */
+    #radialWaveContainer {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .radial-wave-ring {
+      position: absolute;
+      width: 144px;
+      height: 144px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0.2);
+      border: 1.5px solid rgba(151, 232, 241, 0.55);
+      box-shadow: 0 0 35px 8px rgba(151, 232, 241, 0.25), inset 0 0 25px rgba(32, 32, 91, 0.65);
+      background: radial-gradient(circle, rgba(151, 232, 241, 0.12) 0%, rgba(32, 32, 91, 0.28) 60%, transparent 72%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      opacity: 0.85;
+      animation: expandWaveAnim 1.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes expandWaveAnim {
+      0% {
+        transform: translate(-50%, -50%) scale(0.2);
+        opacity: 0.85;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(5.5);
+        opacity: 0;
+      }
+    }
+
+    /* Continuous Following MicroSlat Highlight Aura */
+    .aura-follower {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 288px;
+      height: 288px;
+      transform: translate(-50%, -50%) scale(0.6);
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(151, 232, 241, 0.28) 0%, rgba(32, 32, 91, 0.45) 45%, transparent 70%);
+      filter: blur(14px);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      opacity: 0;
+      z-index: 2;
+      transition: opacity 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .aura-follower.active {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
     /* Hero Section */
     .hero-section {
       min-height: 100vh;
@@ -1077,18 +1195,54 @@
     <!-- Hero Section -->
     <section class="hero-section" style="padding-top: 110px; min-height: auto;">
       <!-- 600px MicroSlats Hero Head Backdrop -->
-      <div style="width: 100%; height: 600px; min-height: 600px; position: relative; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255, 117, 24, 0.35); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #120f17; display: flex; align-items: center; justify-content: center; margin-bottom: 36px;">
-        <!-- MicroSlats WebGL Shader Canvas -->
-        <div id="microSlatsHeroBg" style="position: absolute; top: 0; left: 0; width: 100%; height: 600px; min-height: 600px; z-index: 1; overflow: hidden;"></div>
+      <div id="heroCanvasContainer" style="width: 100%; height: 600px; min-height: 600px; position: relative; border-radius: 24px; overflow: hidden; border: 1px solid rgba(255, 117, 24, 0.35); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); background: #120f17; display: flex; align-items: center; justify-content: center; margin-bottom: 36px;">
+        <!-- MicroSlats Canvas -->
+        <div id="microSlatsHeroBg" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; overflow: hidden;">
+          <canvas id="microSlatsCanvas" style="position: absolute; inset: 0; width: 100%; height: 100%; display: block;"></canvas>
+        </div>
+
+        <!-- Radial Wave Propagation Rings Layer Flowing Through Container -->
+        <div id="radialWaveContainer"></div>
+
+        <!-- Continuous Following MicroSlat Aura Follower -->
+        <div id="auraFollower" class="aura-follower"></div>
         
         <!-- Hero Head Content Floating Above MicroSlats -->
-        <div style="position: relative; z-index: 2; pointer-events: none; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px;">
+        <div style="position: relative; z-index: 5; pointer-events: none; width: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24px;">
           <div class="pill-badge" style="pointer-events: auto;">
             <span class="dot"></span>
             <span>EST. 1888 &bull; APOTHECARY VAULT SUITE</span>
           </div>
 
-          <h1 class="hero-title" style="pointer-events: auto; margin-top: 10px;">Hexley's Potion Pantry</h1>
+          <!-- Magnetic Per-Letter Snapped Heading -->
+          <h1 class="hero-title magnetic-heading" id="magneticHeroHeading" data-text="Hexley's Potion Pantry" style="pointer-events: auto; margin-top: 10px;">
+            <span class="magnetic-word">
+              <span class="magnetic-char" data-char="H"><span class="magnetic-char-aura"></span><span class="char-glyph">H</span></span>
+              <span class="magnetic-char" data-char="e"><span class="magnetic-char-aura"></span><span class="char-glyph">e</span></span>
+              <span class="magnetic-char" data-char="x"><span class="magnetic-char-aura"></span><span class="char-glyph">x</span></span>
+              <span class="magnetic-char" data-char="l"><span class="magnetic-char-aura"></span><span class="char-glyph">l</span></span>
+              <span class="magnetic-char" data-char="e"><span class="magnetic-char-aura"></span><span class="char-glyph">e</span></span>
+              <span class="magnetic-char" data-char="y"><span class="magnetic-char-aura"></span><span class="char-glyph">y</span></span>
+              <span class="magnetic-char" data-char="'"><span class="magnetic-char-aura"></span><span class="char-glyph">'</span></span>
+              <span class="magnetic-char" data-char="s"><span class="magnetic-char-aura"></span><span class="char-glyph">s</span></span>
+            </span>
+            <span class="magnetic-word">
+              <span class="magnetic-char" data-char="P"><span class="magnetic-char-aura"></span><span class="char-glyph">P</span></span>
+              <span class="magnetic-char" data-char="o"><span class="magnetic-char-aura"></span><span class="char-glyph">o</span></span>
+              <span class="magnetic-char" data-char="t"><span class="magnetic-char-aura"></span><span class="char-glyph">t</span></span>
+              <span class="magnetic-char" data-char="i"><span class="magnetic-char-aura"></span><span class="char-glyph">i</span></span>
+              <span class="magnetic-char" data-char="o"><span class="magnetic-char-aura"></span><span class="char-glyph">o</span></span>
+              <span class="magnetic-char" data-char="n"><span class="magnetic-char-aura"></span><span class="char-glyph">n</span></span>
+            </span>
+            <span class="magnetic-word">
+              <span class="magnetic-char" data-char="P"><span class="magnetic-char-aura"></span><span class="char-glyph">P</span></span>
+              <span class="magnetic-char" data-char="a"><span class="magnetic-char-aura"></span><span class="char-glyph">a</span></span>
+              <span class="magnetic-char" data-char="n"><span class="magnetic-char-aura"></span><span class="char-glyph">n</span></span>
+              <span class="magnetic-char" data-char="t"><span class="magnetic-char-aura"></span><span class="char-glyph">t</span></span>
+              <span class="magnetic-char" data-char="r"><span class="magnetic-char-aura"></span><span class="char-glyph">r</span></span>
+              <span class="magnetic-char" data-char="y"><span class="magnetic-char-aura"></span><span class="char-glyph">y</span></span>
+            </span>
+          </h1>
           <p class="hero-subtitle" style="pointer-events: auto;">
             Atomic stock deduction, real-time lunar scrying algorithms, and automated raven-dispatch restocking for the modern Victorian alchemist.
           </p>
@@ -1732,61 +1886,348 @@
     })();
   </script>
 
-  <!-- MicroSlats WebGL Background Engine -->
-  <script src="microslats.bundle.js?v=3"></script>
+  <!-- MicroSlats WebGL & Magnetic Letter Snap Physics Engine -->
   <script>
-    (function initMicroSlatsHero() {
-      let attempts = 0;
-      function start() {
-        var bg = document.getElementById('microSlatsHeroBg');
-        var launcher = window.renderMicroSlats || window.initMicroSlats;
-        if (!bg || !launcher) {
-          if (++attempts < 50) {
-            setTimeout(start, 60);
-          } else {
-            console.warn('🔮 MicroSlats engine timed out waiting for bundle.');
+    (function initMicroSlatsAndMagneticAura() {
+      // -------------------------------------------------------------
+      // 1. MicroSlats Canvas Simulation Engine
+      // -------------------------------------------------------------
+      const canvas = document.getElementById('microSlatsCanvas');
+      const container = document.getElementById('heroCanvasContainer') || document.getElementById('microSlatsHeroBg');
+      if (!canvas || !container) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // MicroSlats Swell Preset Parameters
+      const SLAT_W = 10;
+      const SLAT_H = 25;
+      const GAP = 3;
+      const CORNER_R = 3;
+      const PITCH_X = SLAT_W + GAP;
+      const PITCH_Y = SLAT_H + GAP;
+      const SCALE = 1.5;
+      const SPEED = 0.6;
+      const DIR_RAD = 250 * Math.PI / 180; // 250 deg swell direction
+      const DIR_X = Math.cos(DIR_RAD);
+      const DIR_Y = Math.sin(DIR_RAD);
+      const CHOP = 0.55;
+      const GLINT = 0.7;
+      const CONTRAST = 1.25;
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+      let animTime = 0;
+      let lastFrameTime = performance.now();
+
+      // Mouse tracking inside container
+      const mouse = { x: -9999, y: -9999, active: false };
+      const slatWaves = []; // Synchronized radial waves from magnetic letters
+
+      function resize() {
+        const rect = container.getBoundingClientRect();
+        width = Math.max(320, Math.floor(rect.width));
+        height = Math.max(300, Math.floor(rect.height));
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = width + 'px';
+        canvas.style.height = height + 'px';
+      }
+
+      window.addEventListener('resize', resize, { passive: true });
+      resize();
+
+      // Track cursor over hero container for MicroSlat fluid ripples
+      container.addEventListener('mousemove', function(e) {
+        const rect = container.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+        mouse.active = true;
+      }, { passive: true });
+
+      container.addEventListener('mouseleave', function() {
+        mouse.active = false;
+        mouse.x = -9999;
+        mouse.y = -9999;
+      });
+
+      // Helper: Draw rounded rectangle
+      function drawRoundRect(c, x, y, w, h, r) {
+        if (c.roundRect) {
+          c.roundRect(x, y, w, h, r);
+        } else {
+          c.beginPath();
+          c.moveTo(x + r, y);
+          c.lineTo(x + w - r, y);
+          c.quadraticCurveTo(x + w, y, x + w, y + r);
+          c.lineTo(x + w, y + h - r);
+          c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          c.lineTo(x + r, y + h);
+          c.quadraticCurveTo(x, y + h, x, y + h - r);
+          c.lineTo(x, y + r);
+          c.quadraticCurveTo(x, y, x + r, y);
+          c.closePath();
+        }
+      }
+
+      // MicroSlats Animation Frame
+      function renderMicroSlats(now) {
+        const dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+        lastFrameTime = now;
+        animTime += dt * SPEED;
+
+        // Clean stale radial wave ripples
+        for (let i = slatWaves.length - 1; i >= 0; i--) {
+          if (now - slatWaves[i].startTime > 1350) {
+            slatWaves.splice(i, 1);
           }
-          return;
         }
-        try {
-          launcher(bg, {
-            preset: 'swell',
-            color: '#f97316',
-            glintColor: '#803edc',
-            backgroundColor: '#120f17',
-            slatWidth: 10,
-            slatHeight: 25,
-            gap: 3,
-            roundness: 0.75,
-            interactive: true,
-            cursorStrength: 1,
-            cursorSize: 40,
-            swirl: 0,
-            trail: 1.4,
-            lean: 0,
-            intro: true,
-            scale: 1.5,
-            speed: 0.6,
-            direction: 250,
-            chop: 0.55,
-            stretch: 0,
-            glint: 0.7,
-            contrast: 1.25,
-            perspective: 0.55,
-            fog: 0.55,
-            introDuration: 1.5,
-            paused: false
-          });
-          console.log('🔮 MicroSlats swell wave background initialized successfully!');
-        } catch (err) {
-          console.error('🔮 MicroSlats initialization error:', err);
+
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        // Background #120f17
+        ctx.fillStyle = '#120f17';
+        ctx.fillRect(0, 0, width, height);
+
+        const cols = Math.ceil(width / PITCH_X) + 1;
+        const rows = Math.ceil(height / PITCH_Y) + 1;
+
+        for (let c = 0; c < cols; c++) {
+          const sx = c * PITCH_X;
+          for (let r = 0; r < rows; r++) {
+            const sy = r * PITCH_Y;
+
+            // Swell wave calculation
+            const proj = (sx * DIR_X + sy * DIR_Y) * (0.0075 / SCALE);
+            const w1 = Math.sin(proj + animTime * 2.2);
+            const w2 = Math.cos(proj * 1.6 - animTime * 1.5 + sy * 0.004);
+            const rawWave = w1 * 0.65 + w2 * 0.35;
+            const waveChop = Math.pow(Math.max(0, rawWave * 0.5 + 0.5), 1.0 + CHOP);
+
+            // Cursor proximity ripple
+            let cursorDisturbance = 0;
+            if (mouse.active) {
+              const dx = sx - mouse.x;
+              const dy = sy - mouse.y;
+              const dist = Math.hypot(dx, dy);
+              if (dist < 180) {
+                cursorDisturbance = Math.exp(-(dist * dist) / (2 * 48 * 48)) * 1.1;
+              }
+            }
+
+            // Radial Aura Wave ripple synchronization
+            let waveBoost = 0;
+            let auraGlint = 0;
+            for (let i = 0; i < slatWaves.length; i++) {
+              const sw = slatWaves[i];
+              const age = (now - sw.startTime) / 1350; // 0 to 1
+              const currentRadius = age * 580;
+              const distW = Math.hypot(sx - sw.x, sy - sw.y);
+              const ringDelta = Math.abs(distW - currentRadius);
+              if (ringDelta < 50) {
+                const ringFactor = (1 - ringDelta / 50) * (1 - age);
+                waveBoost += ringFactor * 0.9;
+                auraGlint += ringFactor * 1.2;
+              }
+            }
+
+            const intensity = Math.min(1, Math.max(0, (waveChop * 0.7 + cursorDisturbance * 0.8 + waveBoost) * CONTRAST));
+            const glintAmount = Math.min(1, Math.max(0, waveChop * GLINT + cursorDisturbance * 0.6 + auraGlint));
+
+            // Color Blending: Base #f97316 (orange) & #803edc (purple glint) & #97e8f1 (aura cyan)
+            let red = Math.round(249 * (1 - glintAmount * 0.5) + 128 * (glintAmount * 0.5));
+            let green = Math.round(115 * (1 - glintAmount * 0.5) + 62 * (glintAmount * 0.5));
+            let blue = Math.round(22 * (1 - glintAmount) + 220 * (glintAmount * 0.8));
+
+            if (auraGlint > 0.05) {
+              const ag = Math.min(1, auraGlint);
+              red = Math.round(red * (1 - ag) + 151 * ag);
+              green = Math.round(green * (1 - ag) + 232 * ag);
+              blue = Math.round(blue * (1 - ag) + 241 * ag);
+            }
+
+            const alpha = 0.2 + intensity * 0.72;
+
+            ctx.fillStyle = `rgba(${red},${green},${blue},${alpha.toFixed(3)})`;
+            ctx.beginPath();
+            drawRoundRect(ctx, sx, sy, SLAT_W, SLAT_H, CORNER_R);
+            ctx.fill();
+          }
         }
+
+        ctx.restore();
+        requestAnimationFrame(renderMicroSlats);
       }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', start);
-      } else {
-        start();
+
+      requestAnimationFrame(renderMicroSlats);
+
+      // -------------------------------------------------------------
+      // 2. Magnetic Letter Snap & Radial Wave Emission Engine
+      // -------------------------------------------------------------
+      const heading = document.getElementById('magneticHeroHeading');
+      const waveContainer = document.getElementById('radialWaveContainer');
+      const auraFollower = document.getElementById('auraFollower');
+
+      if (!heading) return;
+
+      const SNAP_RADIUS = 110; // Activation radius in px
+      const MAX_PULL = 28;     // Maximum pull displacement in px
+      const STIFFNESS = 260;   // Framer motion spring stiffness
+      const DAMPING = 18;      // Framer motion spring damping
+      const MASS = 0.6;        // Spring mass
+
+      const charElements = Array.from(heading.querySelectorAll('.magnetic-char'));
+      const letterNodes = charElements.map((el, index) => {
+        return {
+          el: el,
+          index: index,
+          x: 0,
+          y: 0,
+          vx: 0,
+          vy: 0,
+          targetX: 0,
+          targetY: 0,
+          isSnapped: false,
+          lastWaveTime: 0
+        };
+      });
+
+      const globalMouse = { x: -9999, y: -9999 };
+      let anySnapped = false;
+      let followerX = 0;
+      let followerY = 0;
+      let followerTargetX = 0;
+      let followerTargetY = 0;
+      let followerVx = 0;
+      let followerVy = 0;
+
+      window.addEventListener('mousemove', function(e) {
+        globalMouse.x = e.clientX;
+        globalMouse.y = e.clientY;
+      }, { passive: true });
+
+      function emitRadialWave(viewportX, viewportY) {
+        if (!container || !waveContainer) return;
+        const rect = container.getBoundingClientRect();
+        const localX = viewportX - rect.left;
+        const localY = viewportY - rect.top;
+
+        // Register wave in MicroSlats grid for synchronized slat lighting
+        slatWaves.push({
+          x: localX,
+          y: localY,
+          startTime: performance.now()
+        });
+
+        // Create expanding DOM wave ring with glowing border & cyan/indigo radial gradient
+        const ring = document.createElement('div');
+        ring.className = 'radial-wave-ring';
+        ring.style.left = localX + 'px';
+        ring.style.top = localY + 'px';
+        waveContainer.appendChild(ring);
+
+        setTimeout(() => {
+          if (ring.parentNode) {
+            ring.parentNode.removeChild(ring);
+          }
+        }, 1400);
       }
+
+      let lastPhysTime = performance.now();
+
+      function updateMagneticLetters(now) {
+        const dt = Math.min((now - lastPhysTime) / 1000, 0.032);
+        lastPhysTime = now;
+
+        anySnapped = false;
+        let activeSnappedCenter = null;
+
+        letterNodes.forEach(node => {
+          const rect = node.el.getBoundingClientRect();
+          // Find resting center point without current transform
+          const cx = rect.left + rect.width / 2 - node.x;
+          const cy = rect.top + rect.height / 2 - node.y;
+
+          const dx = globalMouse.x - cx;
+          const dy = globalMouse.y - cy;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < SNAP_RADIUS) {
+            const pullFactor = Math.min(1, (SNAP_RADIUS - dist) / SNAP_RADIUS);
+            const angle = Math.atan2(dy, dx);
+            const pullMag = Math.min(dist * 0.45, MAX_PULL) * (0.4 + pullFactor * 0.6);
+
+            node.targetX = Math.cos(angle) * pullMag;
+            node.targetY = Math.sin(angle) * pullMag;
+
+            if (!node.isSnapped) {
+              node.isSnapped = true;
+              node.el.classList.add('snapped');
+            }
+
+            anySnapped = true;
+            activeSnappedCenter = {
+              x: cx + node.targetX,
+              y: cy + node.targetY
+            };
+
+            // Throttle radial wave emission per letter (> 420ms)
+            if (now - node.lastWaveTime > 420) {
+              node.lastWaveTime = now;
+              emitRadialWave(cx + node.targetX, cy + node.targetY);
+            }
+          } else {
+            node.targetX = 0;
+            node.targetY = 0;
+            if (node.isSnapped) {
+              node.isSnapped = false;
+              node.el.classList.remove('snapped');
+            }
+          }
+
+          // Spring physics integration (F = -k*x - c*v)
+          const forceX = -STIFFNESS * (node.x - node.targetX) - DAMPING * node.vx;
+          const forceY = -STIFFNESS * (node.y - node.targetY) - DAMPING * node.vy;
+
+          node.vx += (forceX / MASS) * dt;
+          node.vy += (forceY / MASS) * dt;
+          node.x += node.vx * dt;
+          node.y += node.vy * dt;
+
+          node.el.style.transform = `translate3d(${node.x.toFixed(2)}px, ${node.y.toFixed(2)}px, 0)`;
+        });
+
+        // Continuous Following MicroSlat Aura Follower
+        if (auraFollower && container) {
+          const containerRect = container.getBoundingClientRect();
+          if (anySnapped && activeSnappedCenter) {
+            followerTargetX = activeSnappedCenter.x - containerRect.left;
+            followerTargetY = activeSnappedCenter.y - containerRect.top;
+            auraFollower.classList.add('active');
+          } else {
+            auraFollower.classList.remove('active');
+          }
+
+          // Spring physics for follower aura
+          const fX = -220 * (followerX - followerTargetX) - 24 * followerVx;
+          const fY = -220 * (followerY - followerTargetY) - 24 * followerVy;
+          followerVx += (fX / 0.8) * dt;
+          followerVy += (fY / 0.8) * dt;
+          followerX += followerVx * dt;
+          followerY += followerVy * dt;
+
+          auraFollower.style.transform = `translate3d(${followerX.toFixed(2)}px, ${followerY.toFixed(2)}px, 0) translate(-50%, -50%) ${anySnapped ? 'scale(1)' : 'scale(0.6)'}`;
+        }
+
+        requestAnimationFrame(updateMagneticLetters);
+      }
+
+      requestAnimationFrame(updateMagneticLetters);
+      console.log('🔮 MicroSlats & Magnetic Aura Letter Snap initialized successfully!');
     })();
   </script>
 </body>
